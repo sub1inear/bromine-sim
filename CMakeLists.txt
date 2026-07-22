@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Cobalt LANGUAGES CXX)
+project(CobaltSim LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,16 +15,16 @@ set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(raylib)
 
-add_executable(Cobalt
+add_executable(CobaltSim
     src/main.cpp
 )
 
-target_include_directories(Cobalt PRIVATE include)
+target_include_directories(CobaltSim PRIVATE include)
 
-target_link_libraries(Cobalt PRIVATE raylib)
+target_link_libraries(CobaltSim PRIVATE raylib)
 
 if(APPLE)
-    target_link_libraries(Cobalt PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+    target_link_libraries(CobaltSim PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
 elseif(UNIX AND NOT APPLE)
-    target_link_libraries(Cobalt PRIVATE m pthread dl X11)
+    target_link_libraries(CobaltSim PRIVATE m pthread dl X11)
 endif()
