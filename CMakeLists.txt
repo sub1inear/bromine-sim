@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(Cobalt LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
@@ -24,7 +24,7 @@ target_include_directories(Cobalt PRIVATE include)
 target_link_libraries(Cobalt PRIVATE raylib)
 
 if(APPLE)
-    target_link_libraries(V5Emulator PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+    target_link_libraries(Cobalt PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
 elseif(UNIX AND NOT APPLE)
-    target_link_libraries(V5Emulator PRIVATE m pthread dl X11)
+    target_link_libraries(Cobalt PRIVATE m pthread dl X11)
 endif()
