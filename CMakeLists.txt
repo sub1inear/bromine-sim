@@ -1,12 +1,30 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 project(Cobalt LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(SDL2 REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+    raylib
+    GIT_REPOSITORY https://github.com/raysan5/raylib.git
+    GIT_TAG 5.5
+)
 
-add_executable(CXX src/main.cpp)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-target_include_directories(MyGame PRIVATE ${SDL2_INCLUDE_DIRS})
-target_link_libraries(MyGame PRIVATE ${SDL2_LIBRARIES})
+FetchContent_MakeAvailable(raylib)
+
+add_executable(Cobalt
+    src/main.cpp
+)
+
+target_include_directories(Cobalt PRIVATE include)
+
+target_link_libraries(Cobalt PRIVATE raylib)
+
+if(APPLE)
+    target_link_libraries(V5Emulator PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+elseif(UNIX AND NOT APPLE)
+    target_link_libraries(V5Emulator PRIVATE m pthread dl X11)
+endif()
