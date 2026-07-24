@@ -8,13 +8,15 @@ class Field
 {
   public:
     using Dist = float;
-    class Vector2
+    class Pose
     {
       public:
         float x;
         float y;
+        float theta;
     };
-    class Rect
+
+    class Rectangle
     {
       public:
         float x;

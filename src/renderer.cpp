@@ -36,28 +36,21 @@ static float fieldDistToDist(Field::Dist dist)
     return remapDist(dist, fieldMin, fieldMax, 0.0f, screenWidth);
 }
 
-static Vector2 fieldVector2ToVector2(Field::Vector2 pos)
+static Vector2 fieldPoseToVector2(Field::Pose pose)
 {
     float screenWidth = static_cast<float>(GetScreenWidth());
     float screenHeight = static_cast<float>(GetScreenHeight());
 
-    return Vector2{remapValue(pos.x, fieldMin, fieldMax, 0.0f, screenWidth),
-                   remapValue(pos.y, fieldMin, fieldMax, 0.0f, screenHeight)};
+    return {remapValue(pose.x, fieldMin, fieldMax, 0.0f, screenWidth),
+            remapValue(pose.y, fieldMin, fieldMax, 0.0f, screenHeight)};
 }
 
-static Rectangle fieldRectToRectangle(Field::Rect rect)
+static Rectangle fieldRectangleToRectangle(Field::Rectangle rect)
 {
-    Vector2 vec = fieldVector2ToVector2(Field::Vector2{rect.x, rect.y});
-
-    Rectangle newRect{vec.x, vec.y, fieldDistToDist(rect.w),
-                      fieldDistToDist(rect.h)};
-
-    newRect.x -= newRect.width / 2.0f;
-    newRect.y -= newRect.height / 2.0f;
-
-    return newRect;
+    Vector2 vector = fieldPoseToVector2({rect.x, rect.y});
+    return {vector.x, vector.y, fieldDistToDist(rect.w),
+            fieldDistToDist(rect.h)};
 }
-
 Renderer::Renderer()
 {
     Image fieldImage = LoadImage("assets/field.png");
@@ -69,7 +62,6 @@ Renderer::~Renderer() { UnloadTexture(fieldTexture); }
 
 void Renderer::draw(const Sim &sim)
 {
-
     BeginDrawing();
     {
         Renderer::drawField(sim.field);
@@ -94,11 +86,10 @@ void Renderer::drawField(const Field &field)
 
 void Renderer::drawRobot(const Robot &robot)
 {
-    Rectangle rect = fieldRectToRectangle(robot.rect);
-    rect.x += rect.width / 2.0f;
-    rect.y += rect.height / 2.0f;
+    Rectangle rect = fieldRectangleToRectangle(robot.rect);
+
     Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
-    std::cout << robot.theta * RAD2DEG << '\n';
+
     DrawRectanglePro(rect, origin, robot.theta * RAD2DEG, WHITE);
 }
 
