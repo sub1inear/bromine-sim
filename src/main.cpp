@@ -1,16 +1,22 @@
-#include "raylib.h"
+#include "renderer.hpp"
+#include "sim.hpp"
+#include "window.hpp"
+#include <raylib.h>
 
-constexpr int screenWidth = 800;
-constexpr int screenHeight = 800;
-
-int main() {
-    InitWindow(screenWidth, screenHeight, "CobaltSim");
+int main()
+{
+    cobalt::Window window;
 
     SetTargetFPS(60);
 
-    while (!WindowShouldClose()) {
+    cobalt::Sim sim;
+    cobalt::Renderer renderer;
+
+    while (!window.shouldClose())
+    {
+        sim.update(GetFrameTime());
+        renderer.draw(sim);
     }
 
-    CloseWindow();
     return 0;
 }
