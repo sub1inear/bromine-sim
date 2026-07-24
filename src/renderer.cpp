@@ -36,7 +36,7 @@ static float fieldDistToDist(Field::Dist dist)
     return remapDist(dist, fieldMin, fieldMax, 0.0f, screenWidth);
 }
 
-static Vector2 fieldPosToVector2(Field::Pos pos)
+static Vector2 fieldVector2ToVector2(Field::Vector2 pos)
 {
     float screenWidth = static_cast<float>(GetScreenWidth());
     float screenHeight = static_cast<float>(GetScreenHeight());
@@ -47,7 +47,7 @@ static Vector2 fieldPosToVector2(Field::Pos pos)
 
 static Rectangle fieldRectToRectangle(Field::Rect rect)
 {
-    Vector2 vec = fieldPosToVector2(Field::Pos{rect.x, rect.y});
+    Vector2 vec = fieldVector2ToVector2(Field::Vector2{rect.x, rect.y});
 
     Rectangle newRect{vec.x, vec.y, fieldDistToDist(rect.w),
                       fieldDistToDist(rect.h)};

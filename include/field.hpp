@@ -8,7 +8,7 @@ class Field
 {
   public:
     using Dist = float;
-    class Pos
+    class Vector2
     {
       public:
         float x;
