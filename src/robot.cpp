@@ -1,22 +1,25 @@
 #include "robot.hpp"
+#include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <numbers>
+#include <print>
 #include <raylib.h>
 
 namespace cobalt
 {
 
-constexpr float gravity = 360.0886f; // in / s^2
+constexpr float gravity = 360.0886f; // In in / s^2.
 
-constexpr Field::Dist linearForce = 500.0f;
-constexpr Field::Dist rotationalForce = 50.0f;
+constexpr float linearForce = 5000.0f;    // In lbs * in / s^2.
+constexpr float rotationalForce = 500.0f; // In lbs * in / s^2.
 
-constexpr float friction = 1.0f;
-constexpr float mass = 16.0f; // lbm
+constexpr float maxLinearVelocity = 50.0f;
+constexpr float maxRotationalVelocity = 10.0f;
 
-constexpr float minVelocity = 0.1f;
-constexpr float minSpeed = 0.1f;
+constexpr float linearFriction = 0.9f;
+constexpr float rotationalFriction = 0.9f;
+
+constexpr float epsilon = 0.1f;
 
 float wrapTheta(float theta)
 {
@@ -57,36 +60,30 @@ void Robot::update(float dt)
 
     if (IsKeyDown(KEY_LEFT))
     {
+        driving = true;
         driveForce.theta -= rotationalForce;
     }
     if (IsKeyDown(KEY_RIGHT))
     {
+        driving = true;
         driveForce.theta += rotationalForce;
     }
     if (IsKeyDown(KEY_UP))
     {
+        driving = true;
         driveForce.x -= std::cos(theta) * linearForce;
         driveForce.y -= std::sin(theta) * linearForce;
     }
     if (IsKeyDown(KEY_DOWN))
     {
+        driving = true;
         driveForce.x += std::cos(theta) * linearForce;
         driveForce.y += std::sin(theta) * linearForce;
     }
 
     Field::Pose force = driveForce;
 
-    Field::Dist speed =
-        std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-
-    // Apply friction if `speed` is greater than an epsilon.
-    if (speed >= minSpeed)
-    {
-        force.x -= gravity * friction * velocity.x / speed;
-        force.y -= gravity * friction * velocity.y / speed;
-    }
-
-    // F = ma, so a = F / m
+    // F = m * a, so a = F / m.
     Field::Pose acceleration{force.x / mass, force.y / mass,
                              force.theta / mass};
 
@@ -94,9 +91,49 @@ void Robot::update(float dt)
     velocity.y += acceleration.y * dt;
     velocity.theta += acceleration.theta * dt;
 
+    // Apply (approximate) friction.
+    velocity.x *= linearFriction;
+    velocity.y *= linearFriction;
+    velocity.theta *= rotationalFriction;
+
+    // Apply maximum velocities.
+    float linearVelocity =
+        std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
+
+    if (linearVelocity > maxLinearVelocity)
+    {
+        velocity.x = velocity.x / linearVelocity * maxLinearVelocity;
+        velocity.y = velocity.y / linearVelocity * maxLinearVelocity;
+    }
+
+    velocity.theta = std::clamp(velocity.theta, -maxRotationalVelocity,
+                                maxRotationalVelocity);
+
+    // Avoid denormalization.
+    if (!driving)
+    {
+        if (std::abs(velocity.x) < epsilon)
+        {
+            velocity.x = 0.0f;
+        }
+        if (std::abs(velocity.y) < epsilon)
+        {
+            velocity.y = 0.0f;
+        }
+        if (std::abs(velocity.theta) < epsilon)
+        {
+            velocity.theta = 0.0f;
+        }
+    }
+
     rect.x += velocity.x * dt;
     rect.y += velocity.y * dt;
+
+    rect.x = std::clamp(rect.x, -72.0f, 72.0f);
+    rect.y = std::clamp(rect.y, -72.0f, 72.0f);
+
     theta += velocity.theta * dt;
+    theta = wrapTheta(theta);
 }
 
 } // namespace cobalt

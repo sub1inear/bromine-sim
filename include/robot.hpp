@@ -10,10 +10,11 @@ class Robot
     Field::Rectangle rect;
     float theta;
     Field::Pose velocity;
+    float mass; // In lbs.
 
     Robot()
         : rect(0.0f, 0.0f, 10.0f, 10.0f), theta(0.0f),
-          velocity(0.0f, 0.0f, 0.0f)
+          velocity(0.0f, 0.0f, 0.0f), mass(16.0f)
     {
     }
     void update(float dt);
