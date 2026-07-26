@@ -18,6 +18,7 @@ FetchContent_MakeAvailable(raylib)
 add_executable(CobaltSim
     src/field.cpp
     src/main.cpp
+    src/pin.cpp
     src/renderer.cpp
     src/robot.cpp
     src/sim.cpp

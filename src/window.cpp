@@ -7,6 +7,7 @@ namespace cobalt
 {
 Window::Window()
 {
+    SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(0, 0, "");
 
     int monitor = GetCurrentMonitor();

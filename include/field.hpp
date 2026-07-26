@@ -1,5 +1,6 @@
 #pragma once
-#include <array>
+#include "pin.hpp"
+#include <vector>
 
 namespace cobalt
 {
@@ -7,24 +8,8 @@ namespace cobalt
 class Field
 {
   public:
-    using Dist = float;
-    class Pose
-    {
-      public:
-        float x;
-        float y;
-        float theta;
-    };
-
-    class Rectangle
-    {
-      public:
-        float x;
-        float y;
-        Dist w;
-        Dist h;
-    };
-
+    std::vector<Pin> pins;
+    Field();
     void update(float dt);
 };
 

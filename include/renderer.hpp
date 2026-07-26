@@ -8,6 +8,7 @@ namespace cobalt
 class Sim;
 class Field;
 class Robot;
+class Pin;
 
 class Renderer
 {
@@ -21,7 +22,9 @@ class Renderer
   private:
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
+    void drawPin(const Pin &pin);
 
     Texture2D fieldTexture;
+    Texture2D pinsTexture;
 };
 } // namespace cobalt

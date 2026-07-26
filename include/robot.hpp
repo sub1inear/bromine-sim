@@ -1,5 +1,5 @@
 #pragma once
-#include "field.hpp"
+#include "types.hpp"
 #include <vector>
 
 namespace cobalt
@@ -7,9 +7,9 @@ namespace cobalt
 class Robot
 {
   public:
-    Field::Rectangle rect;
+    Rect rect;
     float theta;
-    Field::Pose velocity;
+    Pose velocity;
     float mass; // In lbs.
 
     Robot()

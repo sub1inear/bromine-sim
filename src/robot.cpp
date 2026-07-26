@@ -55,7 +55,7 @@ template <typename T> T sign(T v)
 
 void Robot::update(float dt)
 {
-    Field::Pose driveForce{0.0f, 0.0f};
+    Pose driveForce{0.0f, 0.0f};
     bool driving = false;
 
     if (IsKeyDown(KEY_LEFT))
@@ -71,21 +71,20 @@ void Robot::update(float dt)
     if (IsKeyDown(KEY_UP))
     {
         driving = true;
-        driveForce.x -= std::cos(theta) * linearForce;
-        driveForce.y -= std::sin(theta) * linearForce;
+        driveForce.x -= std::sin(theta) * linearForce;
+        driveForce.y -= std::cos(theta) * linearForce;
     }
     if (IsKeyDown(KEY_DOWN))
     {
         driving = true;
-        driveForce.x += std::cos(theta) * linearForce;
-        driveForce.y += std::sin(theta) * linearForce;
+        driveForce.x += std::sin(theta) * linearForce;
+        driveForce.y += std::cos(theta) * linearForce;
     }
 
-    Field::Pose force = driveForce;
+    Pose force = driveForce;
 
     // F = m * a, so a = F / m.
-    Field::Pose acceleration{force.x / mass, force.y / mass,
-                             force.theta / mass};
+    Pose acceleration{force.x / mass, force.y / mass, force.theta / mass};
 
     velocity.x += acceleration.x * dt;
     velocity.y += acceleration.y * dt;
