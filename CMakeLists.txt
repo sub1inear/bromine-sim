@@ -16,6 +16,7 @@ set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(raylib)
 
 add_executable(CobaltSim
+    src/cup.cpp
     src/field.cpp
     src/main.cpp
     src/pin.cpp

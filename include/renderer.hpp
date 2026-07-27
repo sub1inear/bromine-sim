@@ -1,5 +1,7 @@
 #pragma once
+#include "cup.hpp"
 #include "field.hpp"
+#include "pin.hpp"
 #include <algorithm>
 #include <raylib.h>
 
@@ -23,6 +25,7 @@ class Renderer
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
     void drawPin(const Pin &pin);
+    void drawCup(const Cup &cup);
 
     Texture2D fieldTexture;
     Texture2D pinsTexture;

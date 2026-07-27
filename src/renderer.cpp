@@ -1,9 +1,10 @@
 #include "renderer.hpp"
 #include "sim.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 #include <cassert>
 #include <cstdio>
-#include <iostream>
+#include <variant>
 
 namespace cobalt
 {
@@ -86,9 +87,14 @@ void Renderer::drawField(const Field &field)
     Vector2 origin = {0.0f, 0.0f};
     DrawTexturePro(fieldTexture, source, dest, origin, 0.0f, WHITE);
 
-    for (const Pin &pin : field.pins)
+    for (const auto &object : field.objects)
     {
-        drawPin(pin);
+        std::visit(
+            overloaded{
+                [this](const Pin &pin) { drawPin(pin); },
+                [this](const Cup &cup) { drawCup(cup); },
+            },
+            object);
     }
 }
 
@@ -99,8 +105,6 @@ void Renderer::drawRobot(const Robot &robot)
     DrawRectanglePro(rect, origin, robot.theta * RAD2DEG, WHITE);
 }
 
-#include <iostream>
-
 void Renderer::drawPin(const Pin &pin)
 {
     Rectangle dest = cobaltRectToRectangle(pin.rect);
@@ -110,6 +114,13 @@ void Renderer::drawPin(const Pin &pin)
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
     DrawTexturePro(pinsTexture, source, dest, origin, pin.theta * RAD2DEG,
                    WHITE);
+}
+
+void Renderer::drawCup(const Cup &cup)
+{
+    Vector2 vec = cobaltPoseToVector2(cup.pose);
+    Color color = cup.up ? LIGHTGRAY : DARKGRAY;
+    DrawCircle(vec.x, vec.y, cobaltDistToDist(cup.radius), color);
 }
 
 } // namespace cobalt
