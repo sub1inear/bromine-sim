@@ -55,40 +55,34 @@ template <typename T> T sign(T v)
 
 void Robot::update(float dt)
 {
-    Pose driveForce{0.0f, 0.0f};
+    Pose force = {0.0f, 0.0f};
     bool driving = false;
 
     if (IsKeyDown(KEY_LEFT))
     {
         driving = true;
-        driveForce.theta -= rotationalForce;
+        force.theta -= rotationalForce;
     }
     if (IsKeyDown(KEY_RIGHT))
     {
         driving = true;
-        driveForce.theta += rotationalForce;
+        force.theta += rotationalForce;
     }
     if (IsKeyDown(KEY_UP))
     {
         driving = true;
-        driveForce.x -= std::sin(theta) * linearForce;
-        driveForce.y -= std::cos(theta) * linearForce;
+        force.x -= std::sin(theta) * linearForce;
+        force.y -= std::cos(theta) * linearForce;
     }
     if (IsKeyDown(KEY_DOWN))
     {
         driving = true;
-        driveForce.x += std::sin(theta) * linearForce;
-        driveForce.y += std::cos(theta) * linearForce;
+        force.x += std::sin(theta) * linearForce;
+        force.y += std::cos(theta) * linearForce;
     }
-
-    Pose force = driveForce;
-
     // F = m * a, so a = F / m.
-    Pose acceleration{force.x / mass, force.y / mass, force.theta / mass};
-
-    velocity.x += acceleration.x * dt;
-    velocity.y += acceleration.y * dt;
-    velocity.theta += acceleration.theta * dt;
+    Pose acceleration = force / mass;
+    velocity += acceleration * dt;
 
     // Apply (approximate) friction.
     velocity.x *= linearFriction;
