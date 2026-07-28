@@ -108,53 +108,20 @@ void Robot::update(float dt)
     }
 
     rect.x += velocity.x * dt;
-    if (collidesWithWall())
-    {
-        rect.x -= velocity.x * dt;
-    }
-
     rect.y += velocity.y * dt;
-    if (collidesWithWall())
-    {
-        rect.y -= velocity.y * dt;
-    }
-
     theta += velocity.theta * dt;
     theta = wrapTheta(theta);
-    if (collidesWithWall())
-    {
-        theta -= velocity.theta * dt;
-    }
-}
-bool Robot::collidesWithWall()
-{
-    float sinTheta = std::sin(theta);
-    float cosTheta = std::cos(theta);
 
-    float halfW = rect.w / 2.0f;
-    float halfH = rect.h / 2.0f;
+    float halfWidth = rect.w / 2.0f;
+    float halfHeight = rect.h / 2.0f;
 
-    float centerX = rect.x;
-    float centerY = rect.y;
+    float cosTheta = std::abs(std::cos(theta));
+    float sinTheta = std::abs(std::sin(theta));
 
-    Point localCorners[4] = {
-        {-halfW, -halfH},
-        {halfW, -halfH},
-        {halfW, halfH},
-        {-halfW, halfH},
-    };
-    for (const Point &localCorner : localCorners)
-    {
-        Point corner = {
-            rect.x + localCorner.x * sinTheta - localCorner.y * cosTheta,
-            rect.y + localCorner.x * cosTheta + localCorner.y * sinTheta,
-        };
-        if (corner.x < fieldMin || corner.x > fieldMax || corner.y < fieldMin ||
-            corner.y > fieldMax)
-        {
-            return true;
-        }
-    }
-    return false;
+    float eHalfWidth = halfWidth * cosTheta + halfHeight * sinTheta;
+    float eHalfHeight = halfWidth * sinTheta + halfWidth * cosTheta;
+
+    rect.x = std::clamp(rect.x, fieldMin + eHalfWidth, fieldMax - eHalfWidth);
+    rect.y = std::clamp(rect.y, fieldMin + eHalfHeight, fieldMax - eHalfHeight);
 }
 } // namespace cobalt

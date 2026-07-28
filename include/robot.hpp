@@ -18,9 +18,6 @@ class Robot
     {
     }
     void update(float dt);
-
-  private:
-    bool collidesWithWall();
 };
 
 } // namespace cobalt
