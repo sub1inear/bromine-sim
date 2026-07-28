@@ -1,18 +1,15 @@
 #include "renderer.hpp"
+#include "constants.hpp"
 #include "sim.hpp"
 #include "types.hpp"
 #include "utils.hpp"
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <variant>
 
 namespace cobalt
 {
-
-constexpr float fieldSize = 144.0f;
-constexpr float halfFieldSize = fieldSize / 2.0f;
-constexpr float fieldMin = -halfFieldSize;
-constexpr float fieldMax = halfFieldSize;
 
 template <typename T>
 static T remapDist(T dist, T fromMin, T fromMax, T toMin, T toMax)
@@ -35,16 +32,23 @@ static float cobaltDistToDist(Dist dist)
     assert(GetScreenWidth() == GetScreenHeight());
     float screenWidth = static_cast<float>(GetScreenWidth());
 
-    return remapDist(dist, fieldMin, fieldMax, 0.0f, screenWidth);
+    return remapDist(dist, fieldWallMin, fieldWallMax, 0.0f, screenWidth);
 }
 
-static Vector2 cobaltPoseToVector2(Pose pose)
+static Vector2 cobaltPointToVector2(Point point)
 {
     float screenWidth = static_cast<float>(GetScreenWidth());
     float screenHeight = static_cast<float>(GetScreenHeight());
 
-    return {remapValue(pose.x, fieldMin, fieldMax, 0.0f, screenWidth),
-            remapValue(-pose.y, fieldMin, fieldMax, 0.0f, screenHeight)};
+    return {
+        remapValue(point.x, fieldWallMin, fieldWallMax, 0.0f, screenWidth),
+        remapValue(-point.y, fieldWallMin, fieldWallMax, 0.0f, screenHeight),
+    };
+}
+
+static Vector2 cobaltPoseToVector2(Pose pose)
+{
+    return cobaltPointToVector2({pose.x, pose.y});
 }
 
 static Rectangle cobaltRectToRectangle(Rect rect)
@@ -120,7 +124,7 @@ void Renderer::drawCup(const Cup &cup)
 {
     Vector2 vec = cobaltPoseToVector2(cup.pose);
     Color color = cup.up ? LIGHTGRAY : DARKGRAY;
-    DrawCircle(vec.x, vec.y, cobaltDistToDist(cup.radius), color);
+    DrawCircleV(vec, cobaltDistToDist(cup.radius), color);
 }
 
 } // namespace cobalt

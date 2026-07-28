@@ -8,7 +8,7 @@ class Robot
 {
   public:
     Rect rect;
-    float theta;
+    float theta; // In radians.
     Pose velocity;
     float mass; // In lbs.
 
@@ -18,6 +18,9 @@ class Robot
     {
     }
     void update(float dt);
+
+  private:
+    bool collidesWithWall();
 };
 
 } // namespace cobalt

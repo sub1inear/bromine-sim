@@ -1,4 +1,5 @@
 #include "robot.hpp"
+#include "constants.hpp"
 #include <algorithm>
 #include <cmath>
 #include <numbers>
@@ -8,20 +9,7 @@
 namespace cobalt
 {
 
-constexpr float gravity = 360.0886f; // In in / s^2.
-
-constexpr float linearForce = 5000.0f;    // In lbs * in / s^2.
-constexpr float rotationalForce = 500.0f; // In lbs * in / s^2.
-
-constexpr float maxLinearVelocity = 50.0f;
-constexpr float maxRotationalVelocity = 10.0f;
-
-constexpr float linearFriction = 0.9f;
-constexpr float rotationalFriction = 0.9f;
-
-constexpr float epsilon = 0.1f;
-
-float wrapTheta(float theta)
+static float wrapTheta(float theta)
 {
     constexpr float twoPi = 2.0f * std::numbers::pi_v<float>;
 
@@ -37,7 +25,7 @@ float wrapTheta(float theta)
     return theta;
 }
 
-template <typename T> T sign(T v)
+template <typename T> static T sign(T v)
 {
     if (v > 0)
     {
@@ -120,13 +108,53 @@ void Robot::update(float dt)
     }
 
     rect.x += velocity.x * dt;
-    rect.y += velocity.y * dt;
+    if (collidesWithWall())
+    {
+        rect.x -= velocity.x * dt;
+    }
 
-    rect.x = std::clamp(rect.x, -72.0f, 72.0f);
-    rect.y = std::clamp(rect.y, -72.0f, 72.0f);
+    rect.y += velocity.y * dt;
+    if (collidesWithWall())
+    {
+        rect.y -= velocity.y * dt;
+    }
 
     theta += velocity.theta * dt;
     theta = wrapTheta(theta);
+    if (collidesWithWall())
+    {
+        theta -= velocity.theta * dt;
+    }
 }
+bool Robot::collidesWithWall()
+{
+    float sinTheta = std::sin(theta);
+    float cosTheta = std::cos(theta);
 
+    float halfW = rect.w / 2.0f;
+    float halfH = rect.h / 2.0f;
+
+    float centerX = rect.x;
+    float centerY = rect.y;
+
+    Point localCorners[4] = {
+        {-halfW, -halfH},
+        {halfW, -halfH},
+        {halfW, halfH},
+        {-halfW, halfH},
+    };
+    for (const Point &localCorner : localCorners)
+    {
+        Point corner = {
+            rect.x + localCorner.x * sinTheta - localCorner.y * cosTheta,
+            rect.y + localCorner.x * cosTheta + localCorner.y * sinTheta,
+        };
+        if (corner.x < fieldMin || corner.x > fieldMax || corner.y < fieldMin ||
+            corner.y > fieldMax)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace cobalt

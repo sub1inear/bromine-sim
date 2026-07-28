@@ -3,6 +3,14 @@
 namespace cobalt
 {
 using Dist = float;
+
+class Point
+{
+  public:
+    float x;
+    float y;
+};
+
 class Pose
 {
   public:
