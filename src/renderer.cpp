@@ -1,8 +1,9 @@
 #include "renderer.hpp"
 #include "constants.hpp"
+#include "cup.hpp"
+#include "pin.hpp"
 #include "sim.hpp"
 #include "types.hpp"
-#include "utils.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -93,12 +94,7 @@ void Renderer::drawField(const Field &field)
 
     for (const auto &object : field.objects)
     {
-        std::visit(
-            overloaded{
-                [this](const Pin &pin) { drawPin(pin); },
-                [this](const Cup &cup) { drawCup(cup); },
-            },
-            object);
+        drawObject(*object);
     }
 }
 
@@ -108,6 +104,8 @@ void Renderer::drawRobot(const Robot &robot)
     Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
     DrawRectanglePro(rect, origin, robot.theta * RAD2DEG, WHITE);
 }
+
+void Renderer::drawObject(const Object &object) { object.draw(*this); }
 
 void Renderer::drawPin(const Pin &pin)
 {

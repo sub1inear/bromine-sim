@@ -1,9 +1,10 @@
 #pragma once
+#include "object.hpp"
 #include "types.hpp"
 
 namespace cobalt
 {
-class Pin
+class Pin : public Object
 {
   public:
     // Note: Corresponds to spritesheet order for speed.
@@ -21,6 +22,7 @@ class Pin
         : rect(x, y, 3.2f, 6.5f), theta(theta), kind(kind)
     {
     }
-    void update(float dt);
+    void update(float dt) override;
+    void draw(Renderer &renderer) const override;
 };
 } // namespace cobalt

@@ -1,7 +1,6 @@
 #pragma once
-#include "cup.hpp"
-#include "pin.hpp"
-#include <variant>
+#include "object.hpp"
+#include <memory>
 #include <vector>
 
 namespace cobalt
@@ -10,7 +9,7 @@ namespace cobalt
 class Field
 {
   public:
-    std::vector<std::variant<Pin, Cup>> objects;
+    std::vector<std::unique_ptr<Object>> objects;
     Field();
     void update(float dt);
 };
