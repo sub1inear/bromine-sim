@@ -3,6 +3,15 @@
 
 namespace cobalt
 {
-void Pin::update(float dt) {}
-void Pin::draw(Renderer &renderer) const { renderer.drawPin(*this); }
+void HorizontalPin::update(float dt) {}
+void HorizontalPin::draw(Renderer &renderer) const
+{
+    renderer.drawHorizontalPin(*this);
+}
+
+void VerticalPin::update(float dt) {}
+void VerticalPin::draw(Renderer &renderer) const
+{
+    renderer.drawVerticalPin(*this);
+}
 } // namespace cobalt

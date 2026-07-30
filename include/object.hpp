@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include <vector>
 
 namespace cobalt
 {
@@ -7,7 +9,8 @@ class Renderer;
 class Object
 {
   public:
-    Object() = default;
+    std::unique_ptr<Object> next;
+    Object(std::unique_ptr<Object> next = nullptr) : next(std::move(next)) {};
     virtual ~Object() = default;
     virtual void update(float dt) = 0;
     virtual void draw(Renderer &renderer) const = 0; // Double-dispatch.

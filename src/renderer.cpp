@@ -12,6 +12,10 @@
 namespace cobalt
 {
 
+constexpr Color fieldRed = {209, 46, 81, 255};
+constexpr Color fieldBlue = {87, 156, 189, 255};
+constexpr Color fieldYellow = {199, 191, 120, 255};
+
 template <typename T>
 static T remapDist(T dist, T fromMin, T fromMax, T toMin, T toMax)
 {
@@ -105,9 +109,16 @@ void Renderer::drawRobot(const Robot &robot)
     DrawRectanglePro(rect, origin, robot.theta * RAD2DEG, WHITE);
 }
 
-void Renderer::drawObject(const Object &object) { object.draw(*this); }
+void Renderer::drawObject(const Object &object)
+{
+    object.draw(*this);
+    if (object.next)
+    {
+        drawObject(*object.next);
+    }
+}
 
-void Renderer::drawPin(const Pin &pin)
+void Renderer::drawHorizontalPin(const HorizontalPin &pin)
 {
     Rectangle dest = cobaltRectToRectangle(pin.rect);
     Rectangle source = {static_cast<float>(pin.kind) * 467.0f, 0.0f, 467.0f,
@@ -118,9 +129,31 @@ void Renderer::drawPin(const Pin &pin)
                    WHITE);
 }
 
+void Renderer::drawVerticalPin(const VerticalPin &pin)
+{
+    Vector2 vec = cobaltPointToVector2(pin.point);
+    Color color = WHITE;
+    switch (pin.kind)
+    {
+    case Pin::Kind::YellowYellow:
+        color = fieldYellow;
+        break;
+    case Pin::Kind::RedYellow:
+        color = pin.up ? fieldRed : fieldYellow;
+        break;
+    case Pin::Kind::BlueYellow:
+        color = pin.up ? fieldBlue : fieldYellow;
+        break;
+    case Pin::Kind::RedBlue:
+        color = pin.up ? fieldRed : fieldBlue;
+        break;
+    }
+    DrawCircleV(vec, cobaltDistToDist(pin.radius), color);
+}
+
 void Renderer::drawCup(const Cup &cup)
 {
-    Vector2 vec = cobaltPoseToVector2(cup.pose);
+    Vector2 vec = cobaltPointToVector2(cup.point);
     Color color = cup.up ? LIGHTGRAY : DARKGRAY;
     DrawCircleV(vec, cobaltDistToDist(cup.radius), color);
 }

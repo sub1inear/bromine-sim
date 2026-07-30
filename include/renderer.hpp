@@ -8,13 +8,15 @@ class Sim;
 class Field;
 class Robot;
 class Object;
-class Pin;
+class HorizontalPin;
+class VerticalPin;
 class Cup;
 
 class Renderer
 {
   public:
-    friend class Pin;
+    friend class HorizontalPin;
+    friend class VerticalPin;
     friend class Cup;
 
     Renderer();
@@ -24,7 +26,9 @@ class Renderer
     void draw(const Sim &sim);
 
   private:
-    void drawPin(const Pin &pin);
+    void drawHorizontalPin(const HorizontalPin &pin);
+    void drawVerticalPin(const VerticalPin &pin);
+
     void drawCup(const Cup &cup);
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
