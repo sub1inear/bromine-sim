@@ -19,8 +19,8 @@ public:
     };
     Role role;
     Type type;
-    Motor(nlohmann::json &json);
-    void update(float dt);
-    void draw(Renderer &renderer) const;
+    Motor(const nlohmann::json &json);
+    void update(float dt) override;
+    void draw(Renderer &renderer, const DeviceContext &context) const override;
 };
 } // namespace cobalt

@@ -147,5 +147,10 @@ void Robot::update(float dt)
 
     rect.x = std::clamp(rect.x, fieldMin + eHalfWidth, fieldMax - eHalfWidth);
     rect.y = std::clamp(rect.y, fieldMin + eHalfHeight, fieldMax - eHalfHeight);
+
+    for (const auto &device : devices)
+    {
+        device->update(dt);
+    }
 }
 } // namespace cobalt

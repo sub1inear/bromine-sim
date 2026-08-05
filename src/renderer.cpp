@@ -1,12 +1,14 @@
 #include "renderer.hpp"
 #include "constants.hpp"
 #include "cup.hpp"
+#include "motor.hpp"
 #include "pin.hpp"
 #include "sim.hpp"
 #include "types.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <rlgl.h>
 #include <variant>
 
 namespace cobalt
@@ -15,6 +17,13 @@ namespace cobalt
 constexpr Color fieldRed = {209, 46, 81, 255};
 constexpr Color fieldBlue = {87, 156, 189, 255};
 constexpr Color fieldYellow = {199, 191, 120, 255};
+
+class DeviceContext
+{
+public:
+    Rectangle rect;
+    float theta; // Radians.
+};
 
 template <typename T>
 static T remapDist(T dist, T fromMin, T fromMax, T toMin, T toMax)
@@ -63,6 +72,20 @@ static Rectangle cobaltRectToRectangle(Rect rect)
             cobaltDistToDist(rect.h)};
 }
 
+static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin, float theta,
+                                  float thick, Color color)
+{
+    rlPushMatrix();
+    {
+        rlTranslatef(rect.x, rect.y, 0.0f);
+        rlRotatef(theta, 0.0f, 0.0f, 1.0f);
+        rlTranslatef(-origin.x, -origin.y, 0.0f);
+        DrawRectangleLinesEx({0.0f, 0.0f, rect.width, rect.height}, thick,
+                             color);
+    }
+    rlPopMatrix();
+}
+
 Renderer::Renderer()
 {
     fieldTexture = LoadTexture("assets/field.png");
@@ -107,6 +130,12 @@ void Renderer::drawRobot(const Robot &robot)
     Rectangle rect = cobaltRectToRectangle(robot.rect);
     Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
     DrawRectanglePro(rect, origin, robot.theta * RAD2DEG, WHITE);
+
+    for (const auto &device : robot.devices)
+    {
+        DeviceContext deviceContext = {rect, robot.theta};
+        drawDevice(*device, deviceContext);
+    }
 }
 
 void Renderer::drawObject(const Object &object)
@@ -156,6 +185,43 @@ void Renderer::drawCup(const Cup &cup)
     Vector2 vec = cobaltPointToVector2(cup.point);
     Color color = cup.up ? LIGHTGRAY : DARKGRAY;
     DrawCircleV(vec, cobaltDistToDist(cup.radius), color);
+}
+
+void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
+{
+    Rectangle dest = {
+        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.x)),
+        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.y)),
+        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.w)),
+        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.h)),
+    };
+
+    dest.x += context.rect.x;
+    dest.y += context.rect.y;
+    float theta = motor.theta + context.theta;
+
+    Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
+
+    Color color = WHITE;
+    switch (motor.role)
+    {
+    case Motor::Role::Input:
+        color = ORANGE;
+        break;
+    case Motor::Role::Output:
+        color = BLUE;
+        break;
+    case Motor::Role::Drive:
+        color = GREEN;
+        break;
+    }
+
+    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.0f, color);
+}
+
+void Renderer::drawDevice(const Device &device, const DeviceContext &context)
+{
+    device.draw(*this, context);
 }
 
 } // namespace cobalt

@@ -19,18 +19,12 @@ void error(std::format_string<A...> fmt, A &&...args)
 }
 
 template <typename T>
-T expectJsonKey(nlohmann::json &json, std::string_view prefix,
-                std::string_view key)
+T expectJsonKey(const nlohmann::json &json, std::string_view key)
 {
     auto it = json.find(key);
     if (it == json.end() || it->is_null())
     {
-        if (prefix.empty())
-        {
-            error("expected key `{}`", key);
-        }
-
-        error("expected key `{}.{}`", prefix, key);
+        error("expected key `{}`", key);
     }
 
     try
@@ -39,7 +33,7 @@ T expectJsonKey(nlohmann::json &json, std::string_view prefix,
     }
     catch (const nlohmann::json::type_error &e)
     {
-        error("incorrect type for key `{}.{}`", prefix, key);
+        error("incorrect type for key `{}`", key);
     }
 }
 

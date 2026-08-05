@@ -3,9 +3,10 @@
 
 namespace cobalt
 {
-Motor::Motor(nlohmann::json &json) : Device(json)
+Motor::Motor(const nlohmann::json &json) : Device(json)
 {
-    std::string roleStr = expectJsonKey<std::string>(json, "motor", "role");
+
+    std::string roleStr = expectJsonKey<std::string>(json, "role");
     if (roleStr == "input")
     {
         role = Role::Input;
@@ -25,14 +26,18 @@ Motor::Motor(nlohmann::json &json) : Device(json)
               roleStr);
     }
 
-    std::string typeStr = expectJsonKey<std::string>(json, "motor", "type");
+    std::string typeStr = expectJsonKey<std::string>(json, "type");
     if (typeStr == "11w")
     {
         type = Type::FullWatt;
+        rect.w = 2.26f;
+        rect.h = 2.82f;
     }
     else if (typeStr == "5.5w")
     {
         type = Type::HalfWatt;
+        rect.w = 2.25f;
+        rect.h = 2.5f;
     }
     else
     {
@@ -42,6 +47,9 @@ Motor::Motor(nlohmann::json &json) : Device(json)
 }
 
 void Motor::update(float dt) {}
-void Motor::draw(cobalt::Renderer &) const {}
+void Motor::draw(Renderer &renderer, const DeviceContext &context) const
+{
+    renderer.drawMotor(*this, context);
+}
 
 } // namespace cobalt
