@@ -8,7 +8,7 @@ class Renderer;
 
 class Object
 {
-  public:
+public:
     std::unique_ptr<Object> next;
     Object(std::unique_ptr<Object> next = nullptr) : next(std::move(next)) {};
     virtual ~Object() = default;

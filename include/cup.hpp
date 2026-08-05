@@ -7,7 +7,7 @@ namespace cobalt
 {
 class Cup : public Object
 {
-  public:
+public:
     Point point;
     Dist radius;
     bool up;

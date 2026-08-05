@@ -8,7 +8,7 @@ namespace cobalt
 
 class Field
 {
-  public:
+public:
     std::vector<std::unique_ptr<Object>> objects;
     Field();
     void update(float dt);

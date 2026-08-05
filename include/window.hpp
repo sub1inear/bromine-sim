@@ -2,7 +2,7 @@ namespace cobalt
 {
 class Window
 {
-  public:
+public:
     Window();
     ~Window();
     bool shouldClose();

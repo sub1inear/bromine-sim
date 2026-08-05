@@ -6,7 +6,7 @@ namespace cobalt
 {
 class Sim
 {
-  public:
+public:
     Field field;
     Robot robot;
 

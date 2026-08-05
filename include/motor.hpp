@@ -5,7 +5,7 @@ namespace cobalt
 {
 class Motor : public Device
 {
-  public:
+public:
     enum class Role
     {
         Input,

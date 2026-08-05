@@ -14,7 +14,7 @@ class Cup;
 
 class Renderer
 {
-  public:
+public:
     friend class HorizontalPin;
     friend class VerticalPin;
     friend class Cup;
@@ -25,7 +25,7 @@ class Renderer
 
     void draw(const Sim &sim);
 
-  private:
+private:
     void drawHorizontalPin(const HorizontalPin &pin);
     void drawVerticalPin(const VerticalPin &pin);
 

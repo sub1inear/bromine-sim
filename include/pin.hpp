@@ -6,7 +6,7 @@ namespace cobalt
 {
 class Pin : public Object
 {
-  public:
+public:
     // Note: Corresponds to spritesheet order for speed.
     enum class Kind
     {
@@ -23,7 +23,7 @@ class Pin : public Object
 
 class HorizontalPin : public Pin
 {
-  public:
+public:
     Rect rect;
     float theta; // In radians.
     HorizontalPin(float x, float y, float theta, Kind kind)
@@ -36,7 +36,7 @@ class HorizontalPin : public Pin
 
 class VerticalPin : public Pin
 {
-  public:
+public:
     Point point;
     Dist radius;
     bool up;

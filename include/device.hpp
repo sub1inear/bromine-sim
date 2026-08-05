@@ -8,7 +8,7 @@ namespace cobalt
 {
 class Device
 {
-  public:
+public:
     uint8_t port;
     Pose pose;
 

@@ -6,14 +6,14 @@ using Dist = float;
 
 class Point
 {
-  public:
+public:
     float x;
     float y;
 };
 
 class Pose
 {
-  public:
+public:
     float x;
     float y;
     float theta;
@@ -75,7 +75,7 @@ inline Pose &operator/=(Pose &lhs, float rhs)
 
 class Rect
 {
-  public:
+public:
     float x;
     float y;
     Dist w;

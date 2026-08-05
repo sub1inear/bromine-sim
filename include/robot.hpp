@@ -8,7 +8,7 @@ namespace cobalt
 {
 class Robot
 {
-  public:
+public:
     Rect rect;
     float theta; // In radians.
     Pose velocity;
