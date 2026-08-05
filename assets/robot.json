@@ -1,0 +1,3 @@
+{
+    "motor": { "type": "11w", "x": 0, "y": 0, "theta": 0, "role": "input", "port": 3}
+}

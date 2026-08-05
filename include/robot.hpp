@@ -1,5 +1,7 @@
 #pragma once
+#include "device.hpp"
 #include "types.hpp"
+#include <memory>
 #include <vector>
 
 namespace cobalt
@@ -12,11 +14,9 @@ class Robot
     Pose velocity;
     float mass; // In lbs.
 
-    Robot()
-        : rect(0.0f, 0.0f, 10.0f, 10.0f), theta(0.0f),
-          velocity(0.0f, 0.0f, 0.0f), mass(16.0f)
-    {
-    }
+    std::vector<std::unique_ptr<Device>> devices;
+
+    Robot();
     void update(float dt);
 };
 

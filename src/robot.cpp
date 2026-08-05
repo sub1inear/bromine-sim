@@ -1,7 +1,10 @@
 #include "robot.hpp"
 #include "constants.hpp"
+#include "motor.hpp"
+#include "utils.h"
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <numbers>
 #include <print>
 #include <raylib.h>
@@ -38,6 +41,27 @@ template <typename T> static T sign(T v)
     else
     {
         return static_cast<T>(0);
+    }
+}
+
+Robot::Robot()
+    : rect(0.0f, 0.0f, 10.0f, 10.0f), theta(0.0f), velocity(0.0f, 0.0f, 0.0f),
+      mass(16.0f)
+{
+
+    std::ifstream file("assets/robot.json");
+    nlohmann::json json;
+    file >> json;
+    for (auto &[key, value] : json.items())
+    {
+        if (key == "motor")
+        {
+            devices.push_back(std::make_unique<Motor>(value));
+        }
+        else
+        {
+            error("unknown device type `key`");
+        }
     }
 }
 
