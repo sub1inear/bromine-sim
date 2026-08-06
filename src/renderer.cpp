@@ -5,6 +5,7 @@
 #include "pin.hpp"
 #include "sim.hpp"
 #include "types.hpp"
+#include "wheel.hpp"
 #include <cassert>
 #include <cmath>
 #include <cstdio>
@@ -18,13 +19,6 @@ namespace cobalt
 constexpr Color fieldRed = {209, 46, 81, 255};
 constexpr Color fieldBlue = {87, 156, 189, 255};
 constexpr Color fieldYellow = {199, 191, 120, 255};
-
-class DeviceContext
-{
-public:
-    Rectangle rect;
-    float theta; // Radians.
-};
 
 template <typename T>
 static T remapDist(T dist, T fromMin, T fromMax, T toMin, T toMax)
@@ -57,8 +51,7 @@ static Vector2 cobaltPointToVector2(Point point)
 
     return {
         remapValue(point.x, fieldWallMin, fieldWallMax, 0.0f, screenWidth),
-        remapValue(-point.y, fieldWallMin, fieldWallMax, 0.0f, screenHeight),
-    };
+        remapValue(-point.y, fieldWallMin, fieldWallMax, 0.0f, screenHeight)};
 }
 
 static Vector2 cobaltPoseToVector2(Pose pose)
@@ -150,7 +143,7 @@ void Renderer::drawRobot(const Robot &robot)
 
     for (const auto &device : robot.devices)
     {
-        DeviceContext deviceContext = {rect, robot.theta};
+        DeviceContext deviceContext = {robot.rect, robot.theta};
         drawDevice(*device, deviceContext);
     }
 }
@@ -206,24 +199,9 @@ void Renderer::drawCup(const Cup &cup)
 
 void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
 {
+    auto [rect, theta] = motor.getGlobalPosition(context);
 
-    // Transform relative offsets to world space.
-    Vector2 offsets = {cobaltDistToDist(static_cast<Dist>(motor.rect.x)),
-                       cobaltDistToDist(static_cast<Dist>(motor.rect.y))};
-
-    Vector2 rotatedOffsets = {
-        offsets.x * std::cos(context.theta) -
-            offsets.y * std::sin(context.theta),
-        offsets.x * std::sin(context.theta) +
-            offsets.y * std::cos(context.theta),
-    };
-
-    Rectangle dest = {context.rect.x + rotatedOffsets.x,
-                      context.rect.y + rotatedOffsets.y,
-                      cobaltDistToDist(static_cast<Dist>(motor.rect.w)),
-                      cobaltDistToDist(static_cast<Dist>(motor.rect.h))};
-
-    float theta = motor.theta + context.theta;
+    Rectangle dest = cobaltRectToRectangle(rect);
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
 
@@ -243,6 +221,16 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
 
     DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.5f, color);
 } // namespace cobalt
+
+void Renderer::drawWheel(const Wheel &wheel, const DeviceContext &context)
+{
+    auto [rect, theta] = wheel.getGlobalPosition(context);
+    Rectangle dest = cobaltRectToRectangle(rect);
+
+    Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
+
+    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.5f, PURPLE);
+}
 
 void Renderer::drawDevice(const Device &device, const DeviceContext &context)
 {

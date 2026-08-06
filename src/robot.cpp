@@ -2,12 +2,12 @@
 #include "constants.hpp"
 #include "motor.hpp"
 #include "utils.hpp"
+#include "wheel.hpp"
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <numbers>
 #include <print>
-#include <raylib.h>
 
 namespace cobalt
 {
@@ -76,6 +76,10 @@ Robot::Robot() : rect(0.0f, 0.0f), theta(0.0f), velocity(0.0f, 0.0f, 0.0f)
         if (type == "motor")
         {
             devices.push_back(std::make_unique<Motor>(elem));
+        }
+        else if (type == "wheel")
+        {
+            devices.push_back(std::make_unique<Wheel>(elem));
         }
         else
         {

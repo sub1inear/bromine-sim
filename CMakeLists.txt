@@ -34,6 +34,8 @@ add_executable(CobaltSim
     src/sim.cpp
     src/window.cpp
     src/utils.cpp
+    src/wheel.cpp
+    src/device.cpp
 )
 
 target_include_directories(CobaltSim PRIVATE include)

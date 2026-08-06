@@ -5,9 +5,9 @@ namespace cobalt
 {
 Motor::Motor(const json &j)
     : Device(j), port(expectJsonKey<uint8_t>(j, "port")),
-      id(expectJsonKey<uint64_t>(j, "id"))
+      id(expectJsonKey<uint32_t>(j, "id"))
 {
-    std::string roleStr = expectJsonKey<std::string>(j, "role");
+    std::string_view roleStr = expectJsonKey<std::string_view>(j, "role");
     if (roleStr == "input")
     {
         role = Role::Input;
@@ -27,7 +27,7 @@ Motor::Motor(const json &j)
               roleStr);
     }
 
-    std::string powerStr = expectJsonKey<std::string>(j, "power");
+    std::string_view powerStr = expectJsonKey<std::string_view>(j, "power");
     if (powerStr == "full")
     {
         power = Power::Full;

@@ -12,6 +12,7 @@ class HorizontalPin;
 class VerticalPin;
 class Cup;
 class Motor;
+class Wheel;
 class Device;
 class DeviceContext;
 
@@ -22,6 +23,7 @@ public:
     friend class VerticalPin;
     friend class Cup;
     friend class Motor;
+    friend class Wheel;
 
     Renderer();
 
@@ -38,6 +40,7 @@ private:
     void drawRobot(const Robot &robot);
     void drawObject(const Object &object);
     void drawMotor(const Motor &motor, const DeviceContext &context);
+    void drawWheel(const Wheel &wheel, const DeviceContext &context);
     void drawDevice(const Device &device, const DeviceContext &context);
 
     Texture2D fieldTexture;

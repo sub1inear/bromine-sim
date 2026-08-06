@@ -21,7 +21,7 @@ public:
     Role role;
     Power power;
 
-    uint64_t id;
+    uint32_t id;
     uint8_t port;
 
     Motor(const json &j);
