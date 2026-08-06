@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <raymath.h>
 #include <rlgl.h>
-#include <variant>
+#include <utility>
 
 namespace cobalt
 {
@@ -51,19 +51,29 @@ static Vector2 cobaltPointToVector2(Point point)
 
     return {
         remapValue(point.x, fieldWallMin, fieldWallMax, 0.0f, screenWidth),
-        remapValue(-point.y, fieldWallMin, fieldWallMax, 0.0f, screenHeight)};
+        remapValue(-point.y, fieldWallMin, fieldWallMax, 0.0f, screenHeight),
+    };
 }
 
-static Vector2 cobaltPoseToVector2(Pose pose)
+static std::pair<Vector2, float> cobaltPoseToVector2Theta(Pose pose)
 {
-    return cobaltPointToVector2({pose.x, pose.y});
+    return std::make_pair<Vector2, float>(
+        cobaltPointToVector2({pose.x, pose.y}), pose.theta * RAD2DEG);
 }
 
 static Rectangle cobaltRectToRectangle(Rect rect)
 {
-    Vector2 vector = cobaltPoseToVector2({rect.x, rect.y});
-    return {vector.x, vector.y, cobaltDistToDist(rect.w),
-            cobaltDistToDist(rect.h)};
+    Vector2 vec = cobaltPointToVector2({rect.x, rect.y});
+    return {vec.x, vec.y, cobaltDistToDist(rect.w), cobaltDistToDist(rect.h)};
+}
+
+static std::pair<Rectangle, float>
+cobaltRotatedRectToRectangleTheta(RotatedRect rect)
+{
+
+    return std::make_pair<Rectangle, float>(
+        cobaltRectToRectangle({rect.x, rect.y, rect.w, rect.h}),
+        rect.theta * RAD2DEG);
 }
 
 static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
@@ -136,14 +146,13 @@ void Renderer::drawField(const Field &field)
 
 void Renderer::drawRobot(const Robot &robot)
 {
-    Rectangle rect = cobaltRectToRectangle(robot.rect);
-    Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
-    DrawRectangleRoundedPro(rect, origin, robot.theta * RAD2DEG, 0.1f, 10,
-                            WHITE);
+    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(robot.rect);
+    Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
+    DrawRectangleRoundedPro(dest, origin, theta, 0.1f, 10, WHITE);
 
     for (const auto &device : robot.devices)
     {
-        DeviceContext deviceContext = {robot.rect, robot.theta};
+        DeviceContext deviceContext = {robot.rect};
         drawDevice(*device, deviceContext);
     }
 }
@@ -159,31 +168,30 @@ void Renderer::drawObject(const Object &object)
 
 void Renderer::drawHorizontalPin(const HorizontalPin &pin)
 {
-    Rectangle dest = cobaltRectToRectangle(pin.rect);
-    Rectangle source = {static_cast<float>(pin.kind) * 467.0f, 0.0f, 467.0f,
+    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(pin.rect);
+    Rectangle source = {static_cast<float>(pin.type) * 467.0f, 0.0f, 467.0f,
                         static_cast<float>(pinsTexture.height)};
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
-    DrawTexturePro(pinsTexture, source, dest, origin, pin.theta * RAD2DEG,
-                   WHITE);
+    DrawTexturePro(pinsTexture, source, dest, origin, theta, WHITE);
 }
 
 void Renderer::drawVerticalPin(const VerticalPin &pin)
 {
     Vector2 vec = cobaltPointToVector2(pin.point);
     Color color = WHITE;
-    switch (pin.kind)
+    switch (pin.type)
     {
-    case Pin::Kind::YellowYellow:
+    case Pin::Type::YellowYellow:
         color = fieldYellow;
         break;
-    case Pin::Kind::RedYellow:
+    case Pin::Type::RedYellow:
         color = pin.up ? fieldRed : fieldYellow;
         break;
-    case Pin::Kind::BlueYellow:
+    case Pin::Type::BlueYellow:
         color = pin.up ? fieldBlue : fieldYellow;
         break;
-    case Pin::Kind::RedBlue:
+    case Pin::Type::RedBlue:
         color = pin.up ? fieldRed : fieldBlue;
         break;
     }
@@ -199,9 +207,8 @@ void Renderer::drawCup(const Cup &cup)
 
 void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
 {
-    auto [rect, theta] = motor.getGlobalPosition(context);
-
-    Rectangle dest = cobaltRectToRectangle(rect);
+    RotatedRect rect = motor.getGlobalPosition(context);
+    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(rect);
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
 
@@ -219,17 +226,17 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
         break;
     }
 
-    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.5f, color);
+    DrawRectangleLinesPro(dest, origin, theta, 1.5f, color);
 } // namespace cobalt
 
 void Renderer::drawWheel(const Wheel &wheel, const DeviceContext &context)
 {
-    auto [rect, theta] = wheel.getGlobalPosition(context);
-    Rectangle dest = cobaltRectToRectangle(rect);
+    RotatedRect rect = wheel.getGlobalPosition(context);
+    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(rect);
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
 
-    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.5f, PURPLE);
+    DrawRectangleLinesPro(dest, origin, theta, 1.5f, PURPLE);
 }
 
 void Renderer::drawDevice(const Device &device, const DeviceContext &context)

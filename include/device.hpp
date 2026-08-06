@@ -3,30 +3,26 @@
 #include "types.hpp"
 #include "utils.hpp"
 #include <cstdint>
-#include <utility>
 
 namespace cobalt
 {
-class DeviceContext
+
+struct DeviceContext
 {
-public:
-    Rect rect;
-    float theta;
+    RotatedRect rect;
 };
 
 class Device
 {
 public:
-    Rect rect;
-    float theta;
+    RotatedRect rect;
 
     Device(const json &j)
-        : rect(expectJsonKey<float>(j, "x"), expectJsonKey<float>(j, "y")),
-          theta(expectJsonKey<float>(j, "theta"))
+        : rect(expectJsonKey<float>(j, "x"), expectJsonKey<float>(j, "y"), 0.0f,
+               0.0f, expectJsonKey<float>(j, "theta"))
     {
     }
-    std::pair<Rect, float>
-    getGlobalPosition(const DeviceContext &context) const;
+    RotatedRect getGlobalPosition(const DeviceContext &context) const;
     virtual void update(float dt) = 0;
     virtual void
     draw(Renderer &renderer,

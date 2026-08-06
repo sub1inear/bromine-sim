@@ -9,8 +9,7 @@ namespace cobalt
 class Robot
 {
 public:
-    Rect rect;
-    float theta; // In radians.
+    RotatedRect rect;
     Pose velocity;
     float mass; // In lbs.
 

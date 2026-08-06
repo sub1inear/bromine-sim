@@ -2,18 +2,16 @@
 
 namespace cobalt
 {
-std::pair<Rect, float>
-Device::getGlobalPosition(const DeviceContext &context) const
+RotatedRect Device::getGlobalPosition(const DeviceContext &context) const
 {
-    float c = std::cos(context.theta);
-    float s = std::sin(context.theta);
+    float cosTheta = std::cos(context.rect.theta);
+    float sinTheta = std::sin(context.rect.theta);
 
-    Pose offsets = {rect.x * c - rect.y * s, rect.x * s + rect.y * c, theta};
+    Pose offsets = {rect.x * cosTheta - rect.y * sinTheta,
+                    rect.x * sinTheta + rect.y * cosTheta, rect.theta};
 
-    return std::make_pair<Rect, float>({context.rect.x + offsets.x,
-                                        context.rect.y - offsets.y, rect.w,
-                                        rect.h},
-                                       context.theta + offsets.theta);
+    return {context.rect.x + offsets.x, context.rect.y - offsets.y,
+            context.rect.theta + offsets.theta, rect.w, rect.h};
 }
 
 } // namespace cobalt

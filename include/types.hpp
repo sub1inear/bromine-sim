@@ -4,16 +4,14 @@ namespace cobalt
 {
 using Dist = float;
 
-class Point
+struct Point
 {
-public:
     float x;
     float y;
 };
 
-class Pose
+struct Pose
 {
-public:
     float x;
     float y;
     float theta;
@@ -73,12 +71,40 @@ inline Pose &operator/=(Pose &lhs, float rhs)
     return lhs;
 }
 
-class Rect
+struct Rect
 {
-public:
     float x;
     float y;
     Dist w;
     Dist h;
 };
+
+struct RotatedRect
+{
+    float x;
+    float y;
+    float theta;
+    Dist w;
+    Dist h;
+};
+
+inline RotatedRect operator+(const RotatedRect &lhs, const Pose &rhs)
+{
+    return {lhs.x + rhs.x, lhs.y + rhs.y, lhs.theta + rhs.theta, lhs.w, lhs.h};
+}
+inline RotatedRect &operator+=(RotatedRect &lhs, const Pose &rhs)
+{
+    lhs = lhs + rhs;
+    return lhs;
+}
+inline RotatedRect operator-(const RotatedRect &lhs, const Pose &rhs)
+{
+    return {lhs.x - rhs.x, lhs.y - rhs.y, lhs.theta + rhs.theta, lhs.w, lhs.h};
+}
+inline RotatedRect &operator-=(RotatedRect &lhs, const Pose &rhs)
+{
+    lhs = lhs - rhs;
+    return lhs;
+}
+
 } // namespace cobalt

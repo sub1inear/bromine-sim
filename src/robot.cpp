@@ -44,7 +44,7 @@ template <typename T> static T sign(T v)
     }
 }
 
-Robot::Robot() : rect(0.0f, 0.0f), theta(0.0f), velocity(0.0f, 0.0f, 0.0f)
+Robot::Robot() : velocity(0.0f, 0.0f, 0.0f)
 {
     std::ifstream file("assets/robot.json");
     json j;
@@ -64,6 +64,9 @@ Robot::Robot() : rect(0.0f, 0.0f), theta(0.0f), velocity(0.0f, 0.0f, 0.0f)
         error("JSON version mismatch: `{}` vs. `{}`", version, 1);
     }
 
+    rect.x = 0.0f;
+    rect.y = 0.0f;
+    rect.theta = 0.0f;
     rect.w = expectJsonKey<float>(j, "width");
     rect.h = expectJsonKey<float>(j, "height");
     mass = expectJsonKey<float>(j, "mass");
@@ -106,14 +109,14 @@ void Robot::update(float dt)
     if (IsKeyDown(KEY_UP))
     {
         driving = true;
-        force.x -= std::sin(theta) * linearForce;
-        force.y -= std::cos(theta) * linearForce;
+        force.x -= std::sin(rect.theta) * linearForce;
+        force.y -= std::cos(rect.theta) * linearForce;
     }
     if (IsKeyDown(KEY_DOWN))
     {
         driving = true;
-        force.x += std::sin(theta) * linearForce;
-        force.y += std::cos(theta) * linearForce;
+        force.x += std::sin(rect.theta) * linearForce;
+        force.y += std::cos(rect.theta) * linearForce;
     }
     // F = m * a, so a = F / m.
     Pose acceleration = force / mass;
@@ -153,17 +156,14 @@ void Robot::update(float dt)
             velocity.theta = 0.0f;
         }
     }
-
-    rect.x += velocity.x * dt;
-    rect.y += velocity.y * dt;
-    theta += velocity.theta * dt;
-    theta = wrapTheta(theta);
+    rect += velocity * dt;
+    rect.theta = wrapTheta(rect.theta);
 
     float halfWidth = rect.w / 2.0f;
     float halfHeight = rect.h / 2.0f;
 
-    float cosTheta = std::abs(std::cos(theta));
-    float sinTheta = std::abs(std::sin(theta));
+    float cosTheta = std::abs(std::cos(rect.theta));
+    float sinTheta = std::abs(std::sin(rect.theta));
 
     float eHalfWidth = halfWidth * cosTheta + halfHeight * sinTheta;
     float eHalfHeight = halfWidth * sinTheta + halfWidth * cosTheta;

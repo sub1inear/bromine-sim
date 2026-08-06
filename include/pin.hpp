@@ -8,15 +8,15 @@ class Pin : public Object
 {
 public:
     // Note: Corresponds to spritesheet order for speed.
-    enum class Kind
+    enum class Type
     {
         YellowYellow,
         RedYellow,
         BlueYellow,
         RedBlue,
     };
-    Kind kind;
-    Pin(Kind kind) : kind(kind) {};
+    Type type;
+    Pin(Type type) : type(type) {};
     void update(float dt) override = 0;
     void draw(Renderer &renderer) const override = 0;
 };
@@ -24,10 +24,9 @@ public:
 class HorizontalPin : public Pin
 {
 public:
-    Rect rect;
-    float theta; // In radians.
-    HorizontalPin(float x, float y, float theta, Kind kind)
-        : rect(x, y, 3.2f, 6.5f), theta(theta), Pin(kind)
+    RotatedRect rect;
+    HorizontalPin(float x, float y, float theta, Type type)
+        : rect(x, y, theta, 3.2f, 6.5f), Pin(type)
     {
     }
     void update(float dt) override final;
@@ -40,8 +39,8 @@ public:
     Point point;
     Dist radius;
     bool up;
-    VerticalPin(float x, float y, bool up, Kind kind)
-        : point(x, y), radius(1.0f), up(up), Pin(kind)
+    VerticalPin(float x, float y, bool up, Type type)
+        : point(x, y), radius(1.0f), up(up), Pin(type)
     {
     }
     void update(float dt) override final;
