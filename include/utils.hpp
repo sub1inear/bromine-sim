@@ -28,6 +28,11 @@ template <typename T> T expectJsonKey(const json &j, std::string_view key)
         error("expected key `{}`", key);
     }
 
+    if (it->is_null())
+    {
+        error("please fill out key `{}`", key);
+    }
+
     try
     {
         return it->get<T>();
