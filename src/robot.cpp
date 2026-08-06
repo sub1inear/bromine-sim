@@ -109,14 +109,14 @@ void Robot::update(float dt)
     if (IsKeyDown(KEY_UP))
     {
         driving = true;
-        force.x -= std::sin(rect.theta) * linearForce;
-        force.y -= std::cos(rect.theta) * linearForce;
+        force.x += std::sin(rect.theta) * linearForce;
+        force.y += std::cos(rect.theta) * linearForce;
     }
     if (IsKeyDown(KEY_DOWN))
     {
         driving = true;
-        force.x += std::sin(rect.theta) * linearForce;
-        force.y += std::cos(rect.theta) * linearForce;
+        force.x -= std::sin(rect.theta) * linearForce;
+        force.y -= std::cos(rect.theta) * linearForce;
     }
     // F = m * a, so a = F / m.
     Pose acceleration = force / mass;
