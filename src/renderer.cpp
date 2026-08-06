@@ -241,7 +241,7 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
         break;
     }
 
-    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 2.0f, color);
+    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.5f, color);
 } // namespace cobalt
 
 void Renderer::drawDevice(const Device &device, const DeviceContext &context)
