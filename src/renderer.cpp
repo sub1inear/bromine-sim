@@ -73,15 +73,31 @@ static Rectangle cobaltRectToRectangle(Rect rect)
             cobaltDistToDist(rect.h)};
 }
 
-static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin, float theta,
-                                  float thick, Color color)
+static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
+                                  float rotation, float thick, Color color)
 {
     rlPushMatrix();
     {
         rlTranslatef(rect.x, rect.y, 0.0f);
-        rlRotatef(theta, 0.0f, 0.0f, 1.0f);
-        DrawRectangleLinesEx({-origin.x, -origin.y, rect.width, rect.height},
-                             thick, color);
+        rlRotatef(rotation, 0.0f, 0.0f, 1.0f);
+        rlTranslatef(-origin.x, -origin.y, 0.0f);
+        DrawRectangleLinesEx({0.0f, 0.0f, rect.width, rect.height}, thick,
+                             color);
+    }
+    rlPopMatrix();
+}
+
+static void DrawRectangleRoundedPro(Rectangle rect, Vector2 origin,
+                                    float rotation, float roundness,
+                                    int segments, Color color)
+{
+    rlPushMatrix();
+    {
+        rlTranslatef(rect.x, rect.y, 0.0f);
+        rlRotatef(rotation, 0.0f, 0.0f, 1.0f);
+        rlTranslatef(-origin.x, -origin.y, 0.0f);
+        DrawRectangleRounded({0.0f, 0.0f, rect.width, rect.height}, roundness,
+                             segments, color);
     }
     rlPopMatrix();
 }
@@ -129,7 +145,8 @@ void Renderer::drawRobot(const Robot &robot)
 {
     Rectangle rect = cobaltRectToRectangle(robot.rect);
     Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
-    DrawRectanglePro(rect, origin, robot.theta * RAD2DEG, WHITE);
+    DrawRectangleRoundedPro(rect, origin, robot.theta * RAD2DEG, 0.1f, 10,
+                            WHITE);
 
     for (const auto &device : robot.devices)
     {
@@ -191,10 +208,8 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
 {
 
     // Transform relative offsets to world space.
-    Vector2 offsets = {
-        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.x)),
-        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.y)),
-    };
+    Vector2 offsets = {cobaltDistToDist(static_cast<Dist>(motor.rect.x)),
+                       cobaltDistToDist(static_cast<Dist>(motor.rect.y))};
 
     Vector2 rotatedOffsets = {
         offsets.x * std::cos(context.theta) -
@@ -203,12 +218,10 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
             offsets.y * std::cos(context.theta),
     };
 
-    Rectangle dest = {
-        context.rect.x + rotatedOffsets.x,
-        context.rect.y + rotatedOffsets.y,
-        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.w)),
-        cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.h)),
-    };
+    Rectangle dest = {context.rect.x + rotatedOffsets.x,
+                      context.rect.y + rotatedOffsets.y,
+                      cobaltDistToDist(static_cast<Dist>(motor.rect.w)),
+                      cobaltDistToDist(static_cast<Dist>(motor.rect.h))};
 
     float theta = motor.theta + context.theta;
 
@@ -228,7 +241,7 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
         break;
     }
 
-    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.0f, color);
+    DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 2.0f, color);
 } // namespace cobalt
 
 void Renderer::drawDevice(const Device &device, const DeviceContext &context)
