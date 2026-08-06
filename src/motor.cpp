@@ -3,10 +3,11 @@
 
 namespace cobalt
 {
-Motor::Motor(const nlohmann::json &json) : Device(json)
+Motor::Motor(const json &j)
+    : Device(j), port(expectJsonKey<uint8_t>(j, "port")),
+      id(expectJsonKey<uint64_t>(j, "id"))
 {
-
-    std::string roleStr = expectJsonKey<std::string>(json, "role");
+    std::string roleStr = expectJsonKey<std::string>(j, "role");
     if (roleStr == "input")
     {
         role = Role::Input;
@@ -26,23 +27,23 @@ Motor::Motor(const nlohmann::json &json) : Device(json)
               roleStr);
     }
 
-    std::string typeStr = expectJsonKey<std::string>(json, "type");
-    if (typeStr == "11w")
+    std::string powerStr = expectJsonKey<std::string>(j, "power");
+    if (powerStr == "full")
     {
-        type = Type::FullWatt;
+        power = Power::Full;
         rect.w = 2.26f;
         rect.h = 2.82f;
     }
-    else if (typeStr == "5.5w")
+    else if (powerStr == "half")
     {
-        type = Type::HalfWatt;
+        power = Power::Half;
         rect.w = 2.25f;
         rect.h = 2.5f;
     }
     else
     {
-        error("unknown motor type `{}`, expected one of: `11w`, `5.5w`",
-              typeStr);
+        error("unknown motor power `{}`, expected one of: `full`, `half`",
+              powerStr);
     }
 }
 

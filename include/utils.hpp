@@ -7,6 +7,8 @@
 namespace cobalt
 {
 
+using json = nlohmann::json;
+
 // Implementation, not meant to be called directly.
 [[noreturn]]
 void errorCore(std::string_view fmt, std::format_args args);
@@ -18,11 +20,10 @@ void error(std::format_string<A...> fmt, A &&...args)
     errorCore(fmt.get(), std::make_format_args(args...));
 }
 
-template <typename T>
-T expectJsonKey(const nlohmann::json &json, std::string_view key)
+template <typename T> T expectJsonKey(const json &j, std::string_view key)
 {
-    auto it = json.find(key);
-    if (it == json.end() || it->is_null())
+    auto it = j.find(key);
+    if (it == j.end() || it->is_null())
     {
         error("expected key `{}`", key);
     }
@@ -31,7 +32,7 @@ T expectJsonKey(const nlohmann::json &json, std::string_view key)
     {
         return it->get<T>();
     }
-    catch (const nlohmann::json::type_error &e)
+    catch (const json::type_error &e)
     {
         error("incorrect type for key `{}`", key);
     }

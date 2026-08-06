@@ -1,7 +1,7 @@
 #include "robot.hpp"
 #include "constants.hpp"
 #include "motor.hpp"
-#include "utils.h"
+#include "utils.hpp"
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -20,7 +20,7 @@ static float wrapTheta(float theta)
     {
         theta -= twoPi;
     }
-    while (theta < twoPi)
+    while (theta < 0.0f)
     {
         theta += twoPi;
     }
@@ -44,23 +44,42 @@ template <typename T> static T sign(T v)
     }
 }
 
-Robot::Robot()
-    : rect(0.0f, 0.0f, 10.0f, 10.0f), theta(0.0f), velocity(0.0f, 0.0f, 0.0f),
-      mass(16.0f)
+Robot::Robot() : rect(0.0f, 0.0f), theta(0.0f), velocity(0.0f, 0.0f, 0.0f)
 {
-
     std::ifstream file("assets/robot.json");
-    nlohmann::json json;
-    file >> json;
-    for (auto &[key, value] : json.items())
+    json j;
+    try
     {
-        if (key == "motor")
+        j = json::parse(file, nullptr, true, true);
+    }
+    catch (const json::parse_error &e)
+    {
+        error("{}", e.what());
+    }
+
+    uint64_t version = expectJsonKey<uint64_t>(j, "version");
+
+    if (version != 1)
+    {
+        error("JSON version mismatch: `{}` vs. `{}`", version, 1);
+    }
+
+    rect.w = expectJsonKey<float>(j, "width");
+    rect.h = expectJsonKey<float>(j, "height");
+    mass = expectJsonKey<float>(j, "mass");
+
+    std::vector<json> vec = expectJsonKey<std::vector<json>>(j, "devices");
+
+    for (const auto &elem : vec)
+    {
+        std::string_view type = expectJsonKey<std::string_view>(elem, "type");
+        if (type == "motor")
         {
-            devices.push_back(std::make_unique<Motor>(value));
+            devices.push_back(std::make_unique<Motor>(elem));
         }
         else
         {
-            error("unknown device type `key`");
+            error("unknown device type `{}`", type);
         }
     }
 }

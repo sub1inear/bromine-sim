@@ -8,6 +8,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <raymath.h>
 #include <rlgl.h>
 #include <variant>
 
@@ -79,9 +80,8 @@ static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin, float theta,
     {
         rlTranslatef(rect.x, rect.y, 0.0f);
         rlRotatef(theta, 0.0f, 0.0f, 1.0f);
-        rlTranslatef(-origin.x, -origin.y, 0.0f);
-        DrawRectangleLinesEx({0.0f, 0.0f, rect.width, rect.height}, thick,
-                             color);
+        DrawRectangleLinesEx({-origin.x, -origin.y, rect.width, rect.height},
+                             thick, color);
     }
     rlPopMatrix();
 }
@@ -189,15 +189,27 @@ void Renderer::drawCup(const Cup &cup)
 
 void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
 {
-    Rectangle dest = {
+
+    // Transform relative offsets to world space.
+    Vector2 offsets = {
         cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.x)),
         cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.y)),
+    };
+
+    Vector2 rotatedOffsets = {
+        offsets.x * std::cos(context.theta) -
+            offsets.y * std::sin(context.theta),
+        offsets.x * std::sin(context.theta) +
+            offsets.y * std::cos(context.theta),
+    };
+
+    Rectangle dest = {
+        context.rect.x + rotatedOffsets.x,
+        context.rect.y + rotatedOffsets.y,
         cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.w)),
         cobaltDistToDist(static_cast<cobalt::Dist>(motor.rect.h)),
     };
 
-    dest.x += context.rect.x;
-    dest.y += context.rect.y;
     float theta = motor.theta + context.theta;
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
@@ -217,7 +229,7 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
     }
 
     DrawRectangleLinesPro(dest, origin, theta * RAD2DEG, 1.0f, color);
-}
+} // namespace cobalt
 
 void Renderer::drawDevice(const Device &device, const DeviceContext &context)
 {

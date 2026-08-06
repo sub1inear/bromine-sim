@@ -9,15 +9,12 @@ namespace cobalt
 class Device
 {
 public:
-    uint8_t port;
     Rect rect;
     float theta;
 
-    Device(const nlohmann::json &json)
-        : port(expectJsonKey<uint8_t>(json, "port")),
-          rect(expectJsonKey<float>(json, "x"),
-               expectJsonKey<float>(json, "y")),
-          theta(expectJsonKey<float>(json, "theta"))
+    Device(const json &j)
+        : rect(expectJsonKey<float>(j, "x"), expectJsonKey<float>(j, "y")),
+          theta(expectJsonKey<float>(j, "theta"))
     {
     }
     virtual void update(float dt) = 0;

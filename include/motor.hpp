@@ -1,5 +1,6 @@
 #pragma once
 #include "device.hpp"
+#include <cstdint>
 
 namespace cobalt
 {
@@ -12,14 +13,18 @@ public:
         Output,
         Drive,
     };
-    enum class Type
+    enum class Power
     {
-        FullWatt,
-        HalfWatt,
+        Full,
+        Half,
     };
     Role role;
-    Type type;
-    Motor(const nlohmann::json &json);
+    Power power;
+
+    uint64_t id;
+    uint8_t port;
+
+    Motor(const json &j);
     void update(float dt) override;
     void draw(Renderer &renderer, const DeviceContext &context) const override;
 };
