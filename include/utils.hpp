@@ -23,7 +23,7 @@ void error(std::format_string<A...> fmt, A &&...args)
 template <typename T> T expectJsonKey(const json &j, std::string_view key)
 {
     auto it = j.find(key);
-    if (it == j.end() || it->is_null())
+    if (it == j.end())
     {
         error("expected key `{}`", key);
     }
