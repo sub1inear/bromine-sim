@@ -1,23 +1,74 @@
 {
-	"version" : 1,
-	"width": 18.0,
-	"height": 18.0,
-	"mass": 16.0,
-	"devices": [
-		{ "type": "motor", "power": "full", "gear": "blue", "x": 4.0, "y":  4.0, "theta": 0.0, "role": "drive", "id": 0, "port": 3},
-		{ "type": "motor", "power": "full", "gear": "blue", "x": 4.0, "y":  0.0, "theta": 0.0, "role": "drive", "id": 0, "port": 3},
-		{ "type": "motor", "power": "full", "gear": "blue", "x": 4.0, "y": -4.0, "theta": 0.0, "role": "drive", "id": 0, "port": 3},
-
-		{ "type": "motor", "power": "full", "gear": "blue", "x": -4.0, "y":  4.0, "theta": 0.0, "role": "drive", "id": 1, "port": 3},
-		{ "type": "motor", "power": "full", "gear": "blue", "x": -4.0, "y":  0.0, "theta": 0.0, "role": "drive", "id": 1, "port": 3},
-		{ "type": "motor", "power": "full", "gear": "blue", "x": -4.0, "y": -4.0, "theta": 0.0, "role": "drive", "id": 1, "port": 3},
-
-		{ "type": "wheel", "subtype": "omni", "rpm": 400, "id": 0, "width": 1.0, "diameter": 2.0, "x": 6.0, "y":  6.0, "theta": 0.0},
-		{ "type": "wheel", "subtype": "omni", "rpm": 400, "id": 0, "width": 1.0, "diameter": 2.0, "x": 6.0, "y":  0.0, "theta": 0.0},
-		{ "type": "wheel", "subtype": "omni", "rpm": 400, "id": 0, "width": 1.0, "diameter": 2.0, "x": 6.0, "y": -6.0, "theta": 0.0},
-
-		{ "type": "wheel", "subtype": "omni", "rpm": 400, "id": 1, "width": 1.0, "diameter": 2.0, "x": -6.0, "y":  6.0, "theta": 0.0},
-		{ "type": "wheel", "subtype": "omni", "rpm": 400, "id": 1, "width": 1.0, "diameter": 2.0, "x": -6.0, "y":  0.0, "theta": 0.0},
-		{ "type": "wheel", "subtype": "omni", "rpm": 400, "id": 1, "width": 1.0, "diameter": 2.0, "x": -6.0, "y": -6.0, "theta": 0.0}
-	]
+    "version": 1,
+    "width": 14.746681270825269,
+    "height": 15.71342099319122,
+    "mass": 18.0,
+    "devices": [
+        {
+            "type": "motor",
+            "port": 1,
+            "id": 1,
+            "gear": "blue",
+            "role": "drive",
+            "power": "full",
+            "x": -3.0911424372104084,
+            "y": 0.2500001349999961,
+            "theta": 7.511272307037859
+        },
+        {
+            "type": "motor",
+            "port": 1,
+            "id": 1,
+            "gear": "blue",
+            "role": "drive",
+            "power": "full",
+            "x": -3.0911424372104084,
+            "y": -5.2500028350000045,
+            "theta": 7.735608258497585
+        },
+        {
+            "type": "motor",
+            "port": 1,
+            "id": 1,
+            "gear": "blue",
+            "role": "drive",
+            "power": "half",
+            "x": -3.759083866058613,
+            "y": -2.12500115313194,
+            "theta": 7.756552551187677
+        },
+        {
+            "type": "motor",
+            "port": 1,
+            "id": 1,
+            "gear": "blue",
+            "role": "drive",
+            "power": "full",
+            "x": 3.0911424372104075,
+            "y": 0.2500001349999977,
+            "theta": 5.0550983073213125
+        },
+        {
+            "type": "motor",
+            "port": 1,
+            "id": 1,
+            "gear": "blue",
+            "role": "drive",
+            "power": "full",
+            "x": 3.0911424372104106,
+            "y": -5.250002835000004,
+            "theta": 4.830762355861587
+        },
+        {
+            "type": "motor",
+            "port": 1,
+            "id": 1,
+            "gear": "blue",
+            "role": "drive",
+            "power": "half",
+            "x": 3.7590838660586137,
+            "y": -2.1250011531319384,
+            "theta": 4.8098180631714955
+        }
+    ]
 }
