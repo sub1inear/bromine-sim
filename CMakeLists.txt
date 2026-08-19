@@ -15,13 +15,25 @@ set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(raylib)
 
-
 FetchContent_Declare(
     json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
     GIT_TAG v3.12.0
 )
 FetchContent_MakeAvailable(json)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d
+    GIT_TAG        v3.1.1
+)
+
+set(BOX2D_BUILD_TESTS OFF CACHE INTERNAL "")
+set(BOX2D_BUILD_SAMPLES OFF CACHE INTERNAL "")
+
+FetchContent_MakeAvailable(box2d)
 
 add_executable(CobaltSim
     src/cup.cpp
@@ -42,6 +54,7 @@ target_include_directories(CobaltSim PRIVATE include)
 
 target_link_libraries(CobaltSim PRIVATE raylib)
 target_link_libraries(CobaltSim PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(CobaltSim PRIVATE box2d::box2d)
 
 if(APPLE)
     target_link_libraries(CobaltSim PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")

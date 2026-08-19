@@ -1,6 +1,7 @@
 #pragma once
+#include "circle.hpp"
 #include "object.hpp"
-#include "types.hpp"
+#include "utils.hpp"
 #include <memory>
 
 namespace cobalt
@@ -8,11 +9,10 @@ namespace cobalt
 class Cup : public Object
 {
 public:
-    Point point;
-    Dist radius;
+    IdCircle circle;
     bool up;
-    Cup(float x, float y, bool up, std::unique_ptr<Object> next = nullptr)
-        : point(x, y), radius(1.575f), up(up), Object(std::move(next)) {};
+    Cup(b2WorldId worldId, float x, float y, bool up,
+        std::unique_ptr<Object> next = nullptr);
     void update(float dt) override;
     void draw(Renderer &renderer) const override;
 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "device.hpp"
-#include "types.hpp"
+#include "rect.hpp"
+#include <box2d/box2d.h>
 #include <memory>
 #include <vector>
 
@@ -9,13 +10,10 @@ namespace cobalt
 class Robot
 {
 public:
-    RotatedRect rect;
-    Pose velocity;
-    float mass; // In lbs.
-
+    IdRect rect;
     std::vector<std::unique_ptr<Device>> devices;
 
-    Robot();
+    Robot(b2WorldId worldId);
     void update(float dt);
 };
 

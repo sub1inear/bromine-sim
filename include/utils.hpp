@@ -20,6 +20,10 @@ void error(std::format_string<A...> fmt, A &&...args)
     errorCore(fmt.get(), std::make_format_args(args...));
 }
 
+constexpr float inchesToMeters(float inches) { return inches * 0.0254f; }
+constexpr float ccwToCw(float ccw) { return -ccw; }
+constexpr float poundsToKilograms(float pounds) { return pounds * 0.453592f; }
+
 template <typename T> T expectJsonKey(const json &j, std::string_view key)
 {
     auto it = j.find(key);

@@ -4,47 +4,16 @@
 #include "utils.hpp"
 #include "wheel.hpp"
 #include <algorithm>
-#include <cmath>
 #include <fstream>
-#include <numbers>
 #include <print>
 
 namespace cobalt
 {
 
-static float wrapTheta(float theta)
-{
-    constexpr float twoPi = 2.0f * std::numbers::pi_v<float>;
+constexpr float linearForce = 1;       // Newtons
+constexpr float rotationalForce = 0.1; // Newtons
 
-    while (theta > twoPi)
-    {
-        theta -= twoPi;
-    }
-    while (theta < 0.0f)
-    {
-        theta += twoPi;
-    }
-
-    return theta;
-}
-
-template <typename T> static T sign(T v)
-{
-    if (v > 0)
-    {
-        return static_cast<T>(1);
-    }
-    else if (v < 0)
-    {
-        return static_cast<T>(-1);
-    }
-    else
-    {
-        return static_cast<T>(0);
-    }
-}
-
-Robot::Robot() : velocity(0.0f, 0.0f, 0.0f)
+Robot::Robot(b2WorldId worldId)
 {
     std::ifstream file("assets/robot.json");
     json j;
@@ -64,12 +33,20 @@ Robot::Robot() : velocity(0.0f, 0.0f, 0.0f)
         error("JSON version mismatch: `{}` vs. `{}`", version, 1);
     }
 
-    rect.x = 0.0f;
-    rect.y = 0.0f;
-    rect.theta = 0.0f;
-    rect.w = expectJsonKey<float>(j, "width");
-    rect.h = expectJsonKey<float>(j, "height");
-    mass = expectJsonKey<float>(j, "mass");
+    rect.width = inchesToMeters(expectJsonKey<float>(j, "width"));
+    rect.height = inchesToMeters(expectJsonKey<float>(j, "height"));
+    // TODO: Apply mass.
+    float mass = poundsToKilograms(expectJsonKey<float>(j, "mass"));
+
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position = {0.0f, 0.0f};
+    rect.bodyId = b2CreateBody(worldId, &bodyDef);
+
+    b2Polygon boxDef = b2MakeBox(rect.width / 2.0f, rect.height / 2.0f);
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
+
+    b2ShapeId shapeId = b2CreatePolygonShape(rect.bodyId, &shapeDef, &boxDef);
 
     std::vector<json> vec = expectJsonKey<std::vector<json>>(j, "devices");
 
@@ -93,83 +70,32 @@ Robot::Robot() : velocity(0.0f, 0.0f, 0.0f)
 
 void Robot::update(float dt)
 {
-    Pose force = {0.0f, 0.0f};
-    bool driving = false;
+    b2Vec2 force = {0.0f, 0.0f};
+    float theta = 0.0f;
 
     if (IsKeyDown(KEY_LEFT))
     {
-        driving = true;
-        force.theta -= rotationalForce;
+        theta += rotationalForce;
     }
     if (IsKeyDown(KEY_RIGHT))
     {
-        driving = true;
-        force.theta += rotationalForce;
+        theta -= rotationalForce;
     }
     if (IsKeyDown(KEY_UP))
     {
-        driving = true;
-        force.x += std::sin(rect.theta) * linearForce;
-        force.y += std::cos(rect.theta) * linearForce;
+        b2Rot rotation = b2Body_GetRotation(rect.bodyId);
+        force.x += rotation.c * linearForce;
+        force.y += rotation.s * linearForce;
     }
     if (IsKeyDown(KEY_DOWN))
     {
-        driving = true;
-        force.x -= std::sin(rect.theta) * linearForce;
-        force.y -= std::cos(rect.theta) * linearForce;
-    }
-    // F = m * a, so a = F / m.
-    Pose acceleration = force / mass;
-    velocity += acceleration * dt;
-
-    // Apply (approximate) friction.
-    velocity.x *= linearFriction;
-    velocity.y *= linearFriction;
-    velocity.theta *= rotationalFriction;
-
-    // Apply maximum velocities.
-    float linearVelocity =
-        std::sqrt(velocity.x * velocity.x + velocity.y * velocity.y);
-
-    if (linearVelocity > maxLinearVelocity)
-    {
-        velocity.x = velocity.x / linearVelocity * maxLinearVelocity;
-        velocity.y = velocity.y / linearVelocity * maxLinearVelocity;
+        b2Rot rotation = b2Body_GetRotation(rect.bodyId);
+        force.x -= rotation.c * linearForce;
+        force.y -= rotation.s * linearForce;
     }
 
-    velocity.theta = std::clamp(velocity.theta, -maxRotationalVelocity,
-                                maxRotationalVelocity);
-
-    // Avoid denormalization.
-    if (!driving)
-    {
-        if (std::abs(velocity.x) < epsilon)
-        {
-            velocity.x = 0.0f;
-        }
-        if (std::abs(velocity.y) < epsilon)
-        {
-            velocity.y = 0.0f;
-        }
-        if (std::abs(velocity.theta) < epsilon)
-        {
-            velocity.theta = 0.0f;
-        }
-    }
-    rect += velocity * dt;
-    rect.theta = wrapTheta(rect.theta);
-
-    float halfWidth = rect.w / 2.0f;
-    float halfHeight = rect.h / 2.0f;
-
-    float cosTheta = std::abs(std::cos(rect.theta));
-    float sinTheta = std::abs(std::sin(rect.theta));
-
-    float eHalfWidth = halfWidth * cosTheta + halfHeight * sinTheta;
-    float eHalfHeight = halfWidth * sinTheta + halfWidth * cosTheta;
-
-    rect.x = std::clamp(rect.x, fieldMin + eHalfWidth, fieldMax - eHalfWidth);
-    rect.y = std::clamp(rect.y, fieldMin + eHalfHeight, fieldMax - eHalfHeight);
+    b2Body_ApplyForceToCenter(rect.bodyId, force, true);
+    b2Body_ApplyTorque(rect.bodyId, theta, true);
 
     for (const auto &device : devices)
     {

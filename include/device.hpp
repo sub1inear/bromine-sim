@@ -1,7 +1,8 @@
 #pragma once
+#include "rect.hpp"
 #include "renderer.hpp"
-#include "types.hpp"
 #include "utils.hpp"
+#include <box2d/box2d.h>
 #include <cstdint>
 
 namespace cobalt
@@ -9,20 +10,16 @@ namespace cobalt
 
 struct DeviceContext
 {
-    RotatedRect rect;
+    b2Transform transform;
 };
 
 class Device
 {
 public:
-    RotatedRect rect;
+    Rect rect;
 
-    Device(const json &j)
-        : rect(expectJsonKey<float>(j, "x"), expectJsonKey<float>(j, "y"), 0.0f,
-               0.0f, expectJsonKey<float>(j, "theta"))
-    {
-    }
-    RotatedRect getGlobalPosition(const DeviceContext &context) const;
+    Device(const json &j);
+    Rect getWorldRect(const DeviceContext &context) const;
     virtual void update(float dt) = 0;
     virtual void
     draw(Renderer &renderer,

@@ -1,14 +1,15 @@
 #include "renderer.hpp"
+#include "circle.hpp"
 #include "constants.hpp"
 #include "cup.hpp"
 #include "motor.hpp"
 #include "pin.hpp"
+#include "rect.hpp"
 #include "sim.hpp"
-#include "types.hpp"
+#include "utils.hpp"
 #include "wheel.hpp"
 #include <cassert>
 #include <cmath>
-#include <cstdio>
 #include <raymath.h>
 #include <rlgl.h>
 #include <utility>
@@ -36,7 +37,7 @@ static T remapValue(T value, T fromMin, T fromMax, T toMin, T toMax)
     return remapDist(value, fromMin, fromMax, toMin, toMax);
 }
 
-static float cobaltDistToDist(Dist dist)
+static float distToScreen(float dist)
 {
     assert(GetScreenWidth() == GetScreenHeight());
     float screenWidth = static_cast<float>(GetScreenWidth());
@@ -44,7 +45,7 @@ static float cobaltDistToDist(Dist dist)
     return remapDist(dist, fieldWallMin, fieldWallMax, 0.0f, screenWidth);
 }
 
-static Vector2 cobaltPointToVector2(Point point)
+static Vector2 b2Vec2ToScreen(b2Vec2 point)
 {
     float screenWidth = static_cast<float>(GetScreenWidth());
     float screenHeight = static_cast<float>(GetScreenHeight());
@@ -55,25 +56,40 @@ static Vector2 cobaltPointToVector2(Point point)
     };
 }
 
-static std::pair<Vector2, float> cobaltPoseToVector2Theta(Pose pose)
+static float b2RotToScreen(b2Rot rotation)
 {
-    return std::make_pair<Vector2, float>(
-        cobaltPointToVector2({pose.x, pose.y}), pose.theta * RAD2DEG);
+    return ccwToCw(b2Rot_GetAngle(rotation) * RAD2DEG);
 }
 
-static Rectangle cobaltRectToRectangle(Rect rect)
+static std::pair<Vector2, float> b2TransformToScreen(b2Transform transform)
 {
-    Vector2 vec = cobaltPointToVector2({rect.x, rect.y});
-    return {vec.x, vec.y, cobaltDistToDist(rect.w), cobaltDistToDist(rect.h)};
+    return std::make_pair(b2Vec2ToScreen(transform.p),
+                          b2RotToScreen(transform.q));
+}
+static std::pair<Vector2, float> circleToScreen(Circle circle)
+{
+    return std::make_pair(b2Vec2ToScreen(circle.transform.p),
+                          distToScreen(circle.radius));
 }
 
-static std::pair<Rectangle, float>
-cobaltRotatedRectToRectangleTheta(RotatedRect rect)
+static std::pair<Vector2, float> idCircleToScreen(IdCircle circle)
 {
+    b2Transform transform = b2Body_GetTransform(circle.bodyId);
+    return circleToScreen({transform, circle.radius});
+}
 
-    return std::make_pair<Rectangle, float>(
-        cobaltRectToRectangle({rect.x, rect.y, rect.w, rect.h}),
-        rect.theta * RAD2DEG);
+static std::pair<Rectangle, float> rectToScreen(Rect rect)
+{
+    auto [vec, angle] = b2TransformToScreen(rect.transform);
+    return std::make_pair(Rectangle{vec.x, vec.y, distToScreen(rect.width),
+                                    distToScreen(rect.height)},
+                          angle);
+}
+
+static std::pair<Rectangle, float> idRectToScreen(IdRect rect)
+{
+    b2Transform transform = b2Body_GetTransform(rect.bodyId);
+    return rectToScreen({transform, rect.width, rect.height});
 }
 
 static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
@@ -86,21 +102,6 @@ static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
         rlTranslatef(-origin.x, -origin.y, 0.0f);
         DrawRectangleLinesEx({0.0f, 0.0f, rect.width, rect.height}, thick,
                              color);
-    }
-    rlPopMatrix();
-}
-
-static void DrawRectangleRoundedPro(Rectangle rect, Vector2 origin,
-                                    float rotation, float roundness,
-                                    int segments, Color color)
-{
-    rlPushMatrix();
-    {
-        rlTranslatef(rect.x, rect.y, 0.0f);
-        rlRotatef(rotation, 0.0f, 0.0f, 1.0f);
-        rlTranslatef(-origin.x, -origin.y, 0.0f);
-        DrawRectangleRounded({0.0f, 0.0f, rect.width, rect.height}, roundness,
-                             segments, color);
     }
     rlPopMatrix();
 }
@@ -138,21 +139,22 @@ void Renderer::drawField(const Field &field)
     Vector2 origin = {0.0f, 0.0f};
     DrawTexturePro(fieldTexture, source, dest, origin, 0.0f, WHITE);
 
-    for (const auto &object : field.objects)
-    {
-        drawObject(*object);
-    }
+    // for (const auto &object : field.objects)
+    // {
+    //     drawObject(*object);
+    // }
 }
 
 void Renderer::drawRobot(const Robot &robot)
 {
-    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(robot.rect);
-    Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
-    DrawRectangleRoundedPro(dest, origin, theta, 0.1f, 10, WHITE);
+    auto [rect, angle] = idRectToScreen(robot.rect);
+
+    Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
+    DrawRectanglePro(rect, origin, angle, WHITE);
 
     for (const auto &device : robot.devices)
     {
-        DeviceContext deviceContext = {robot.rect};
+        DeviceContext deviceContext = {b2Body_GetTransform(robot.rect.bodyId)};
         drawDevice(*device, deviceContext);
     }
 }
@@ -168,7 +170,7 @@ void Renderer::drawObject(const Object &object)
 
 void Renderer::drawHorizontalPin(const HorizontalPin &pin)
 {
-    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(pin.rect);
+    auto [dest, theta] = idRectToScreen(pin.rect);
     Rectangle source = {static_cast<float>(pin.type) * 467.0f, 0.0f, 467.0f,
                         static_cast<float>(pinsTexture.height)};
 
@@ -178,7 +180,7 @@ void Renderer::drawHorizontalPin(const HorizontalPin &pin)
 
 void Renderer::drawVerticalPin(const VerticalPin &pin)
 {
-    Vector2 vec = cobaltPointToVector2(pin.point);
+    auto [vec, radius] = idCircleToScreen(pin.circle);
     Color color = WHITE;
     switch (pin.type)
     {
@@ -186,29 +188,29 @@ void Renderer::drawVerticalPin(const VerticalPin &pin)
         color = fieldYellow;
         break;
     case Pin::Type::RedYellow:
-        color = pin.up ? fieldRed : fieldYellow;
+        color = pin.isUp ? fieldRed : fieldYellow;
         break;
     case Pin::Type::BlueYellow:
-        color = pin.up ? fieldBlue : fieldYellow;
+        color = pin.isUp ? fieldBlue : fieldYellow;
         break;
     case Pin::Type::RedBlue:
-        color = pin.up ? fieldRed : fieldBlue;
+        color = pin.isUp ? fieldRed : fieldBlue;
         break;
     }
-    DrawCircleV(vec, cobaltDistToDist(pin.radius), color);
+    DrawCircleV(vec, radius, color);
 }
 
 void Renderer::drawCup(const Cup &cup)
 {
-    Vector2 vec = cobaltPointToVector2(cup.point);
+    auto [vec, radius] = idCircleToScreen(cup.circle);
     Color color = cup.up ? LIGHTGRAY : DARKGRAY;
-    DrawCircleV(vec, cobaltDistToDist(cup.radius), color);
+    DrawCircleV(vec, radius, color);
 }
 
 void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
 {
-    RotatedRect rect = motor.getGlobalPosition(context);
-    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(rect);
+    Rect rect = motor.getWorldRect(context);
+    auto [dest, theta] = rectToScreen(rect);
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
 
@@ -227,12 +229,12 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
     }
 
     DrawRectangleLinesPro(dest, origin, theta, 1.5f, color);
-} // namespace cobalt
+}
 
 void Renderer::drawWheel(const Wheel &wheel, const DeviceContext &context)
 {
-    RotatedRect rect = wheel.getGlobalPosition(context);
-    auto [dest, theta] = cobaltRotatedRectToRectangleTheta(rect);
+    Rect rect = wheel.getWorldRect(context);
+    auto [dest, theta] = rectToScreen(rect);
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
 

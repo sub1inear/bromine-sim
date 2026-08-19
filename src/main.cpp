@@ -1,3 +1,4 @@
+#include "constants.hpp"
 #include "renderer.hpp"
 #include "sim.hpp"
 #include "window.hpp"
@@ -7,7 +8,7 @@ int main()
 {
     cobalt::Window window;
 
-    SetTargetFPS(60);
+    SetTargetFPS(cobalt::fps);
 
     cobalt::Sim sim;
     cobalt::Renderer renderer;

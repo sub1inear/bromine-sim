@@ -31,14 +31,14 @@ Motor::Motor(const json &j)
     if (powerStr == "full")
     {
         power = Power::Full;
-        rect.w = 2.26f;
-        rect.h = 2.82f;
+        rect.width = inchesToMeters(2.26f);
+        rect.height = inchesToMeters(2.82f);
     }
     else if (powerStr == "half")
     {
         power = Power::Half;
-        rect.w = 2.25f;
-        rect.h = 2.5f;
+        rect.width = inchesToMeters(2.25f);
+        rect.height = inchesToMeters(2.5f);
     }
     else
     {

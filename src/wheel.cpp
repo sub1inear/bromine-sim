@@ -1,4 +1,5 @@
 #include "wheel.hpp"
+#include "utils.hpp"
 
 namespace cobalt
 {
@@ -19,8 +20,8 @@ Wheel::Wheel(const json &j)
     {
         subtype = Subtype::Flex;
     }
-    rect.w = expectJsonKey<float>(j, "width");
-    rect.h = expectJsonKey<float>(j, "diameter");
+    rect.width = inchesToMeters(expectJsonKey<float>(j, "width"));
+    rect.height = inchesToMeters(expectJsonKey<float>(j, "diameter"));
 }
 
 void Wheel::update(float dt) {}

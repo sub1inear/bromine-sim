@@ -10,7 +10,7 @@ public:
         Omni,
         Traction,
         Flex,
-        // Mecanum is unsupported.
+        // Mecanum wheels are unsupported.
     };
     Subtype subtype;
     uint32_t rpm;

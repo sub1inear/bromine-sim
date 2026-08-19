@@ -1,17 +1,23 @@
 #include "device.hpp"
+#include "utils.hpp"
+#include <cmath>
 
 namespace cobalt
 {
-RotatedRect Device::getGlobalPosition(const DeviceContext &context) const
+Device::Device(const json &j)
 {
-    float cosTheta = std::cos(context.rect.theta);
-    float sinTheta = std::sin(context.rect.theta);
-
-    Pose offsets = {rect.x * cosTheta + rect.y * sinTheta,
-                    -(rect.x * sinTheta - rect.y * cosTheta), rect.theta};
-
-    return {context.rect.x + offsets.x, context.rect.y + offsets.y,
-            context.rect.theta + offsets.theta, rect.w, rect.h};
+    float theta = expectJsonKey<float>(j, "theta");
+    rect = {{{inchesToMeters(expectJsonKey<float>(j, "x")),
+              inchesToMeters(expectJsonKey<float>(j, "y"))},
+             b2MakeRot(cwToCcw(theta))},
+            0.0f,
+            0.0f};
+}
+Rect Device::getWorldRect(const DeviceContext &context) const
+{
+    // Transform the device to the robot coordinate system.
+    return {b2MulTransforms(context.transform, rect.transform), rect.width,
+            rect.height};
 }
 
 } // namespace cobalt
