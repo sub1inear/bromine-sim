@@ -1,6 +1,6 @@
 #pragma once
-#include "rect.hpp"
 #include "renderer.hpp"
+#include "units.hpp"
 #include "utils.hpp"
 #include <box2d/box2d.h>
 #include <cstdint>
@@ -10,16 +10,16 @@ namespace cobalt
 
 struct DeviceContext
 {
-    b2Transform transform;
+    PhysicsPose pose;
 };
 
 class Device
 {
 public:
-    Rect rect;
+    PhysicsRect rect;
 
     Device(const json &j);
-    Rect getWorldRect(const DeviceContext &context) const;
+    PhysicsRect getWorldRect(const DeviceContext &context) const;
     virtual void update(float dt) = 0;
     virtual void
     draw(Renderer &renderer,

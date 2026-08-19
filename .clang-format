@@ -2,3 +2,5 @@ BasedOnStyle: LLVM
 IndentWidth: 4
 BreakBeforeBraces: Allman
 AccessModifierOffset: -4
+SeparateDefinitionBlocks: Always
+MaxEmptyLinesToKeep: 1

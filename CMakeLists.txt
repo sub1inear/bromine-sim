@@ -48,6 +48,7 @@ add_executable(CobaltSim
     src/utils.cpp
     src/wheel.cpp
     src/device.cpp
+    src/units.cpp
 )
 
 target_include_directories(CobaltSim PRIVATE include)

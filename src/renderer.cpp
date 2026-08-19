@@ -1,11 +1,10 @@
 #include "renderer.hpp"
-#include "circle.hpp"
 #include "constants.hpp"
 #include "cup.hpp"
 #include "motor.hpp"
 #include "pin.hpp"
-#include "rect.hpp"
 #include "sim.hpp"
+#include "units.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
 #include <cassert>
@@ -20,77 +19,6 @@ namespace cobalt
 constexpr Color fieldRed = {209, 46, 81, 255};
 constexpr Color fieldBlue = {87, 156, 189, 255};
 constexpr Color fieldYellow = {199, 191, 120, 255};
-
-template <typename T>
-static T remapDist(T dist, T fromMin, T fromMax, T toMin, T toMax)
-{
-    T fromRange = fromMax - fromMin;
-    T toRange = toMax - toMin;
-    return ((dist * toRange) / fromRange) + toMin;
-}
-
-template <typename T>
-static T remapValue(T value, T fromMin, T fromMax, T toMin, T toMax)
-{
-    value = std::clamp(value, fromMin, fromMax);
-    value -= fromMin;
-    return remapDist(value, fromMin, fromMax, toMin, toMax);
-}
-
-static float distToScreen(float dist)
-{
-    assert(GetScreenWidth() == GetScreenHeight());
-    float screenWidth = static_cast<float>(GetScreenWidth());
-
-    return remapDist(dist, fieldWallMin, fieldWallMax, 0.0f, screenWidth);
-}
-
-static Vector2 b2Vec2ToScreen(b2Vec2 point)
-{
-    float screenWidth = static_cast<float>(GetScreenWidth());
-    float screenHeight = static_cast<float>(GetScreenHeight());
-
-    return {
-        remapValue(point.x, fieldWallMin, fieldWallMax, 0.0f, screenWidth),
-        remapValue(-point.y, fieldWallMin, fieldWallMax, 0.0f, screenHeight),
-    };
-}
-
-static float b2RotToScreen(b2Rot rotation)
-{
-    return ccwToCw(b2Rot_GetAngle(rotation) * RAD2DEG);
-}
-
-static std::pair<Vector2, float> b2TransformToScreen(b2Transform transform)
-{
-    return std::make_pair(b2Vec2ToScreen(transform.p),
-                          b2RotToScreen(transform.q));
-}
-static std::pair<Vector2, float> circleToScreen(Circle circle)
-{
-    return std::make_pair(b2Vec2ToScreen(circle.transform.p),
-                          distToScreen(circle.radius));
-}
-
-static std::pair<Vector2, float> idCircleToScreen(IdCircle circle)
-{
-    b2Transform transform = b2Body_GetTransform(circle.bodyId);
-    return circleToScreen({transform, circle.radius});
-}
-
-static std::pair<Rectangle, float> rectToScreen(Rect rect)
-{
-    auto [vec, angle] = b2TransformToScreen(rect.transform);
-    return std::make_pair(Rectangle{vec.x, vec.y, distToScreen(rect.width),
-                                    distToScreen(rect.height)},
-                          angle);
-}
-
-static std::pair<Rectangle, float> idRectToScreen(IdRect rect)
-{
-    b2Transform transform = b2Body_GetTransform(rect.bodyId);
-    return rectToScreen({transform, rect.width, rect.height});
-}
 
 static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
                                   float rotation, float thick, Color color)
@@ -147,10 +75,11 @@ void Renderer::drawField(const Field &field)
 
 void Renderer::drawRobot(const Robot &robot)
 {
-    auto [rect, angle] = idRectToScreen(robot.rect);
+    ScreenRect rect = physicsIdRectToScreenRect(robot.rect);
 
     Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
-    DrawRectanglePro(rect, origin, angle, WHITE);
+    DrawRectanglePro({rect.x, rect.y, rect.width, rect.height}, origin,
+                     rect.angle, WHITE);
 
     for (const auto &device : robot.devices)
     {
@@ -170,17 +99,19 @@ void Renderer::drawObject(const Object &object)
 
 void Renderer::drawHorizontalPin(const HorizontalPin &pin)
 {
-    auto [dest, theta] = idRectToScreen(pin.rect);
+    ScreenRect dest = physicsIdRectToScreenRect(pin.rect);
     Rectangle source = {static_cast<float>(pin.type) * 467.0f, 0.0f, 467.0f,
                         static_cast<float>(pinsTexture.height)};
 
     Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
-    DrawTexturePro(pinsTexture, source, dest, origin, theta, WHITE);
+    DrawTexturePro(pinsTexture, source,
+                   {dest.x, dest.y, dest.width, dest.height}, origin,
+                   dest.angle, WHITE);
 }
 
 void Renderer::drawVerticalPin(const VerticalPin &pin)
 {
-    auto [vec, radius] = idCircleToScreen(pin.circle);
+    ScreenCircle circle = physicsIdCircleToScreenCircle(pin.circle);
     Color color = WHITE;
     switch (pin.type)
     {
@@ -197,22 +128,22 @@ void Renderer::drawVerticalPin(const VerticalPin &pin)
         color = pin.isUp ? fieldRed : fieldBlue;
         break;
     }
-    DrawCircleV(vec, radius, color);
+    DrawCircleV({circle.x, circle.y}, circle.radius, color);
 }
 
 void Renderer::drawCup(const Cup &cup)
 {
-    auto [vec, radius] = idCircleToScreen(cup.circle);
+    ScreenCircle circle = physicsIdCircleToScreenCircle(cup.circle);
     Color color = cup.up ? LIGHTGRAY : DARKGRAY;
-    DrawCircleV(vec, radius, color);
+    DrawCircleV({circle.x, circle.y}, circle.radius, color);
 }
 
 void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
 {
-    Rect rect = motor.getWorldRect(context);
-    auto [dest, theta] = rectToScreen(rect);
+    PhysicsRect physicsRect = motor.getWorldRect(context);
+    ScreenRect screenRect = physicsRectToScreenRect(physicsRect);
 
-    Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
+    Vector2 origin = {screenRect.width / 2.0f, screenRect.height / 2.0f};
 
     Color color = WHITE;
     switch (motor.role)
@@ -228,17 +159,21 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
         break;
     }
 
-    DrawRectangleLinesPro(dest, origin, theta, 1.5f, color);
+    DrawRectangleLinesPro(
+        {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
+        origin, screenRect.angle, 1.5f, color);
 }
 
 void Renderer::drawWheel(const Wheel &wheel, const DeviceContext &context)
 {
-    Rect rect = wheel.getWorldRect(context);
-    auto [dest, theta] = rectToScreen(rect);
+    PhysicsRect physicsRect = wheel.getWorldRect(context);
+    ScreenRect screenRect = physicsRectToScreenRect(physicsRect);
 
-    Vector2 origin = {dest.width / 2.0f, dest.height / 2.0f};
+    Vector2 origin = {screenRect.width / 2.0f, screenRect.height / 2.0f};
 
-    DrawRectangleLinesPro(dest, origin, theta, 1.5f, PURPLE);
+    DrawRectangleLinesPro(
+        {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
+        origin, screenRect.angle, 1.5f, PURPLE);
 }
 
 void Renderer::drawDevice(const Device &device, const DeviceContext &context)

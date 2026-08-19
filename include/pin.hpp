@@ -1,7 +1,6 @@
 #pragma once
-#include "circle.hpp"
 #include "object.hpp"
-#include "rect.hpp"
+#include "units.hpp"
 
 namespace cobalt
 {
@@ -25,8 +24,9 @@ public:
 class HorizontalPin : public Pin
 {
 public:
-    IdRect rect;
-    HorizontalPin(b2WorldId worldId, float x, float y, float theta, Type type);
+    PhysicsIdRect rect;
+    HorizontalPin(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle,
+                  Type type);
     void update(float dt) override final;
     void draw(Renderer &renderer) const override final;
 };
@@ -34,9 +34,10 @@ public:
 class VerticalPin : public Pin
 {
 public:
-    IdCircle circle;
+    PhysicsIdCircle circle;
     bool isUp;
-    VerticalPin(b2WorldId worldId, float x, float y, bool isUp, Type type);
+    VerticalPin(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle,
+                bool isUp, Type type);
     void update(float dt) override final;
     void draw(Renderer &renderer) const override final;
 };

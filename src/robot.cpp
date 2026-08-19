@@ -33,20 +33,14 @@ Robot::Robot(b2WorldId worldId)
         error("JSON version mismatch: `{}` vs. `{}`", version, 1);
     }
 
-    rect.width = inchesToMeters(expectJsonKey<float>(j, "width"));
-    rect.height = inchesToMeters(expectJsonKey<float>(j, "height"));
-    // TODO: Apply mass.
-    float mass = poundsToKilograms(expectJsonKey<float>(j, "mass"));
+    InputRect inputRect = {0.0f, 0.0f, 0.0f, expectJsonKey<float>(j, "width"),
+                           expectJsonKey<float>(j, "height")};
+    float mass = inputMassToPhysicsMass(expectJsonKey<float>(j, "mass"));
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
-    bodyDef.position = {0.0f, 0.0f};
-    rect.bodyId = b2CreateBody(worldId, &bodyDef);
-
-    b2Polygon boxDef = b2MakeBox(rect.width / 2.0f, rect.height / 2.0f);
     b2ShapeDef shapeDef = b2DefaultShapeDef();
-
-    b2ShapeId shapeId = b2CreatePolygonShape(rect.bodyId, &shapeDef, &boxDef);
+    rect = inputRectToPhysicsIdRect(inputRect, worldId, bodyDef, shapeDef);
 
     std::vector<json> vec = expectJsonKey<std::vector<json>>(j, "devices");
 
