@@ -67,10 +67,10 @@ void Renderer::drawField(const Field &field)
     Vector2 origin = {0.0f, 0.0f};
     DrawTexturePro(fieldTexture, source, dest, origin, 0.0f, WHITE);
 
-    // for (const auto &object : field.objects)
-    // {
-    //     drawObject(*object);
-    // }
+    for (const auto &object : field.objects)
+    {
+        drawObject(*object);
+    }
 }
 
 void Renderer::drawRobot(const Robot &robot)

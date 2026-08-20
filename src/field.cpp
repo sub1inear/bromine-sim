@@ -18,7 +18,7 @@ static std::vector<std::unique_ptr<T>> makeVector(std::unique_ptr<A>... args)
 static PhysicsIdRect makeWall(b2WorldId worldId, InputDist x, InputDist y,
                               InputAngle angle)
 {
-    InputRect rect = {x, y, angle, inputFieldWallSize, inputFieldSize};
+    InputRect rect = {x, y, angle, inputWallSize, inputFieldWallSize};
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_staticBody;
@@ -70,12 +70,12 @@ Field::Field(b2WorldId worldId)
         std::make_unique<Cup>(worldId, -23.5f, 23.5f, 0.0f, true),
         std::make_unique<Cup>(worldId, 23.5f, -23.5f, 0.0f, true),
         std::make_unique<Cup>(worldId, 47.0f, -47.0f, 0.0f, true));
-    // walls = {
-    //     makeWall(worldId, 71.0f, 0.0f, 270.0f),
-    //     makeWall(worldId, 0.0f, 71.0f, 0.0f),
-    //     makeWall(worldId, -71.0f, 0.0f, 90.0f),
-    //     makeWall(worldId, 0.0f, -71.0f, 180.0f),
-    // };
+    walls = {
+        makeWall(worldId, 71.0f, 0.0f, 0.0f),
+        makeWall(worldId, -71.0f, 0.0f, 0.0f),
+        makeWall(worldId, 0.0f, -71.0f, 90.0f),
+        makeWall(worldId, 0.0f, 71.0f, 90.0f),
+    };
 }
 
 void Field::update(float dt)
