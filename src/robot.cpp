@@ -78,14 +78,14 @@ void Robot::update(float dt)
     if (IsKeyDown(KEY_UP))
     {
         b2Rot rotation = b2Body_GetRotation(rect.bodyId);
-        force.x += rotation.c * linearForce;
-        force.y += rotation.s * linearForce;
+        force.x -= rotation.s * linearForce;
+        force.y += rotation.c * linearForce;
     }
     if (IsKeyDown(KEY_DOWN))
     {
         b2Rot rotation = b2Body_GetRotation(rect.bodyId);
-        force.x -= rotation.c * linearForce;
-        force.y -= rotation.s * linearForce;
+        force.x += rotation.s * linearForce;
+        force.y -= rotation.c * linearForce;
     }
 
     b2Body_ApplyForceToCenter(rect.bodyId, force, true);
