@@ -48,6 +48,7 @@ Motor::Motor(const json &j)
 }
 
 void Motor::update(float dt) {}
+
 void Motor::draw(Renderer &renderer, const DeviceContext &context) const
 {
     renderer.drawMotor(*this, context);
