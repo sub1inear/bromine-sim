@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <box2d/box2d.h>
 #include <raylib.h>
 
 namespace cobalt
@@ -25,7 +26,7 @@ public:
     friend class Motor;
     friend class Wheel;
 
-    Renderer();
+    Renderer(b2WorldId worldId);
 
     ~Renderer();
 
@@ -35,6 +36,7 @@ private:
     void drawHorizontalPin(const HorizontalPin &pin);
     void drawVerticalPin(const VerticalPin &pin);
 
+    void drawDebug();
     void drawCup(const Cup &cup);
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
@@ -45,5 +47,7 @@ private:
 
     Texture2D fieldTexture;
     Texture2D pinsTexture;
+    b2WorldId worldId;
+    bool debug;
 };
 } // namespace cobalt

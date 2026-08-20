@@ -7,9 +7,12 @@ namespace cobalt
 {
 class Sim
 {
+public:
     // worldId must be declared first because C++ initializers run in
     // declaration order regardless of positioning in constructor.
     b2WorldId worldId;
+
+private:
     // Accumulated delta time.
     float accum;
 

@@ -7,11 +7,11 @@
 #include "units.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <raymath.h>
 #include <rlgl.h>
-#include <utility>
 
 namespace cobalt
 {
@@ -34,7 +34,7 @@ static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
     rlPopMatrix();
 }
 
-Renderer::Renderer()
+Renderer::Renderer(b2WorldId worldId) : worldId(worldId), debug(false)
 {
     fieldTexture = LoadTexture("assets/field.png");
     pinsTexture = LoadTexture("assets/pins.png");
@@ -46,12 +46,53 @@ Renderer::~Renderer() { UnloadTexture(fieldTexture); }
 
 void Renderer::draw(const Sim &sim)
 {
+    if (IsKeyPressed(KEY_D))
+    {
+        debug = !debug;
+    }
     BeginDrawing();
     {
         drawField(sim.field);
         drawRobot(sim.robot);
+        if (debug)
+        {
+            drawDebug();
+        }
     }
     EndDrawing();
+}
+
+void Renderer::drawDebug()
+{
+    struct b2DebugDraw debugDraw = {};
+    debugDraw.DrawSolidPolygonFcn =
+        [](b2Transform transform, const b2Vec2 *vertices, int vertexCount,
+           float radius, b2HexColor color, void *context)
+    {
+        std::array<ScreenPoint, 32> points;
+        assert(points.size() >= vertexCount);
+        for (int i = 0; i < vertexCount; i++)
+        {
+            points.at(i) = physicsPointToScreenPoint(
+                b2TransformPoint(transform, vertices[i]));
+        }
+        for (int i = 0; i < vertexCount; i++)
+        {
+            ScreenPoint &point = points[i];
+            ScreenPoint &nextPoint = points[(i + 1) % vertexCount];
+            DrawLineV(point, nextPoint, MAGENTA);
+        }
+    };
+    debugDraw.DrawSolidCircleFcn =
+        [](b2Transform transform, float radius, b2HexColor color, void *context)
+    {
+        PhysicsCircle physicsCircle = {transform, radius};
+        ScreenCircle screenCircle = physicsCircleToScreenCircle(physicsCircle);
+        DrawCircleLinesV({screenCircle.x, screenCircle.y}, screenCircle.radius,
+                         MAGENTA);
+    };
+    debugDraw.drawShapes = true;
+    b2World_Draw(worldId, &debugDraw);
 }
 
 void Renderer::drawField(const Field &field)

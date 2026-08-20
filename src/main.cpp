@@ -11,7 +11,7 @@ int main()
     SetTargetFPS(cobalt::fps);
 
     cobalt::Sim sim;
-    cobalt::Renderer renderer;
+    cobalt::Renderer renderer(sim.worldId);
 
     while (!window.shouldClose())
     {
