@@ -9,8 +9,7 @@ HorizontalPin::HorizontalPin(b2WorldId worldId, InputDist x, InputDist y,
                              InputAngle angle, Type type)
     : Pin(type)
 {
-    // TODO: Apply mass.
-    InputRect inputRect = {x, y, angle, 1.6, 6.5};
+    InputRect inputRect = {x, y, angle, 1.6f, 6.5f, 0.158733f};
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.linearDamping = 0.9f;

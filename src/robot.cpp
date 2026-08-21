@@ -33,9 +33,13 @@ Robot::Robot(b2WorldId worldId)
         error("JSON version mismatch: `{}` vs. `{}`", version, 1);
     }
 
-    InputRect inputRect = {0.0f, 0.0f, 0.0f, expectJsonKey<float>(j, "width"),
-                           expectJsonKey<float>(j, "height")};
-    float mass = inputMassToPhysicsMass(expectJsonKey<float>(j, "mass"));
+    InputRect inputRect = {
+        0.0f,
+        0.0f,
+        0.0f,
+        expectJsonKey<float>(j, "width"),
+        expectJsonKey<float>(j, "height"),
+        inputMassToPhysicsMass(expectJsonKey<float>(j, "mass"))};
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.linearDamping = 0.9f;

@@ -51,6 +51,7 @@ struct InputCircle
     InputDist y;
     InputAngle angle;
     InputDist radius;
+    InputMass mass;
 };
 
 struct InputRect
@@ -60,6 +61,7 @@ struct InputRect
     InputDist angle;
     InputDist width;
     InputDist height;
+    InputMass mass;
 };
 
 using PhysicsDist = float;  // meters
@@ -72,6 +74,7 @@ struct PhysicsCircle
 {
     PhysicsPose pose;
     PhysicsDist radius;
+    PhysicsMass mass;
 };
 
 struct PhysicsIdCircle
@@ -85,6 +88,7 @@ struct PhysicsRect
     PhysicsPose pose;
     PhysicsDist width;
     PhysicsDist height;
+    PhysicsMass mass;
 };
 
 struct PhysicsIdRect

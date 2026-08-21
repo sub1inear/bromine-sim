@@ -8,7 +8,7 @@ Cup::Cup(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle, bool up,
          std::unique_ptr<Object> next)
     : Object(std::move(next)), up(up)
 {
-    InputCircle inputCircle = {x, y, angle, 1.575f};
+    InputCircle inputCircle = {x, y, angle, 1.575f, 0.169756f};
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.linearDamping = 0.9f;
