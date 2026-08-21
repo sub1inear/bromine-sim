@@ -38,6 +38,8 @@ Robot::Robot(b2WorldId worldId)
     float mass = inputMassToPhysicsMass(expectJsonKey<float>(j, "mass"));
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.linearDamping = 0.9f;
+    bodyDef.angularDamping = 0.9f;
     bodyDef.type = b2_dynamicBody;
     b2ShapeDef shapeDef = b2DefaultShapeDef();
     rect = inputRectToPhysicsIdRect(inputRect, worldId, bodyDef, shapeDef);

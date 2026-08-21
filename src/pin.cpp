@@ -9,11 +9,12 @@ HorizontalPin::HorizontalPin(b2WorldId worldId, InputDist x, InputDist y,
                              InputAngle angle, Type type)
     : Pin(type)
 {
-    // TODO: Create a polygon.
     // TODO: Apply mass.
     InputRect inputRect = {x, y, angle, 1.6, 6.5};
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.linearDamping = 0.9f;
+    bodyDef.angularDamping = 0.9f;
     bodyDef.type = b2_dynamicBody;
     b2ShapeDef shapeDef = b2DefaultShapeDef();
 

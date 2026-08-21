@@ -11,6 +11,8 @@ Cup::Cup(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle, bool up,
     InputCircle inputCircle = {x, y, angle, 1.575f};
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.linearDamping = 0.9f;
+    bodyDef.angularDamping = 0.9f;
     bodyDef.type = b2_dynamicBody;
     b2ShapeDef shapeDef = b2DefaultShapeDef();
 
