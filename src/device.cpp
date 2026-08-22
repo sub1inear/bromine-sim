@@ -7,7 +7,7 @@ Device::Device(const json &j)
 {
     InputRect inputRect = {expectJsonKey<float>(j, "x"),
                            expectJsonKey<float>(j, "y"),
-                           expectJsonKey<float>(j, "theta"), 0.0f, 0.0f};
+                           expectJsonKey<float>(j, "angle"), 0.0f, 0.0f};
     rect = inputRectToPhysicsRect(inputRect);
 }
 
