@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <raylib.h>
 
-namespace cobalt
+namespace bromine
 {
 Window::Window()
 {
@@ -19,10 +19,10 @@ Window::Window()
     int monitorSize = std::min(monitorWidth, monitorHeight);
     int windowSize = (int)((float)monitorSize * 0.8f);
 
-    InitWindow(windowSize, windowSize, "CobaltSim");
+    InitWindow(windowSize, windowSize, "BromineSim");
 }
 
 Window::~Window() { CloseWindow(); }
 
 bool Window::shouldClose() { return WindowShouldClose(); }
-} // namespace cobalt
+} // namespace bromine

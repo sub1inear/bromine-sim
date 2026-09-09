@@ -1,7 +1,7 @@
 #include "motor.hpp"
 #include "utils.hpp"
 
-namespace cobalt
+namespace bromine
 {
 Motor::Motor(const json &j)
     : Device(j), port(expectJsonKey<uint8_t>(j, "port")),
@@ -54,4 +54,4 @@ void Motor::draw(Renderer &renderer, const DeviceContext &context) const
     renderer.drawMotor(*this, context);
 }
 
-} // namespace cobalt
+} // namespace bromine

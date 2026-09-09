@@ -1,5 +1,5 @@
 /*
-CobaltSim has an extremely complicated unit system.
+BromineSim has an extremely complicated unit system.
 Input units -> (0, 0) at center, inches, lbs, degrees, CW, 0-up.
 Physics units -> (0, 0) at center, meters, kilograms, radians, CCW, 0-up.
 Screen units -> (0, 0) at top left, pixels, degrees, CW, 0-up.
@@ -25,7 +25,7 @@ When drawing, physics units are converted to screen units.
 #include <raylib.h>
 #include <utility>
 
-namespace cobalt
+namespace bromine
 {
 
 using InputDist = float;  // inches
@@ -174,4 +174,4 @@ ScreenCircle physicsIdCircleToScreenCircle(PhysicsIdCircle circle);
 ScreenRect physicsRectToScreenRect(PhysicsRect rect);
 ScreenRect physicsIdRectToScreenRect(PhysicsIdRect rect);
 
-} // namespace cobalt
+} // namespace bromine

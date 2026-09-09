@@ -13,7 +13,7 @@
 #include <raymath.h>
 #include <rlgl.h>
 
-namespace cobalt
+namespace bromine
 {
 
 constexpr Color fieldRed = {209, 46, 81, 255};
@@ -222,4 +222,4 @@ void Renderer::drawDevice(const Device &device, const DeviceContext &context)
     device.draw(*this, context);
 }
 
-} // namespace cobalt
+} // namespace bromine

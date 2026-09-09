@@ -4,7 +4,7 @@
 #include <string>
 #include <string_view>
 
-namespace cobalt
+namespace bromine
 {
 
 using json = nlohmann::json;
@@ -49,4 +49,4 @@ template <typename T> T expectJsonKey(const json &j, std::string_view key)
     }
 }
 
-} // namespace cobalt
+} // namespace bromine

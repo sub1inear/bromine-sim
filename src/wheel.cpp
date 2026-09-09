@@ -1,7 +1,7 @@
 #include "wheel.hpp"
 #include "utils.hpp"
 
-namespace cobalt
+namespace bromine
 {
 Wheel::Wheel(const json &j)
     : Device(j), rpm(expectJsonKey<uint32_t>(j, "rpm")),
@@ -31,4 +31,4 @@ void Wheel::draw(Renderer &renderer, const DeviceContext &context) const
     renderer.drawWheel(*this, context);
 }
 
-} // namespace cobalt
+} // namespace bromine

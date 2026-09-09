@@ -1,6 +1,6 @@
 #include "device.hpp"
 
-namespace cobalt
+namespace bromine
 {
 class Wheel : public Device
 {
@@ -21,4 +21,4 @@ public:
     void update(float dt) override;
     void draw(Renderer &renderer, const DeviceContext &context) const override;
 };
-} // namespace cobalt
+} // namespace bromine

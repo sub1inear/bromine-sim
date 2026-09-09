@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-namespace cobalt
+namespace bromine
 {
 class Robot
 {
@@ -17,4 +17,4 @@ public:
     void update(float dt);
 };
 
-} // namespace cobalt
+} // namespace bromine

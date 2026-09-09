@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-namespace cobalt
+namespace bromine
 {
 class Renderer;
 
@@ -16,4 +16,4 @@ public:
     virtual void update(float dt) = 0;
     virtual void draw(Renderer &renderer) const = 0; // Double-dispatch.
 };
-} // namespace cobalt
+} // namespace bromine

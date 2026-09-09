@@ -7,7 +7,7 @@
 #include <fstream>
 #include <print>
 
-namespace cobalt
+namespace bromine
 {
 
 constexpr float linearForce = 1;       // Newtons
@@ -102,4 +102,4 @@ void Robot::update(float dt)
         device->update(dt);
     }
 }
-} // namespace cobalt
+} // namespace bromine

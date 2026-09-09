@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-namespace cobalt
+namespace bromine
 {
 
 class Field
@@ -19,4 +19,4 @@ private:
     std::array<PhysicsIdRect, 4> walls;
 };
 
-}; // namespace cobalt
+}; // namespace bromine

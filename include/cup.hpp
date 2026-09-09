@@ -4,7 +4,7 @@
 #include "utils.hpp"
 #include <memory>
 
-namespace cobalt
+namespace bromine
 {
 class Cup : public Object
 {
@@ -16,4 +16,4 @@ public:
     void update(float dt) override;
     void draw(Renderer &renderer) const override;
 };
-} // namespace cobalt
+} // namespace bromine

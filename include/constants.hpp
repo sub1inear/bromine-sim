@@ -1,7 +1,7 @@
 #pragma once
 #include "units.hpp"
 
-namespace cobalt
+namespace bromine
 {
 
 constexpr int fps = 60;
@@ -33,4 +33,4 @@ constexpr PhysicsDist physicsFieldWallMin =
 constexpr PhysicsDist physicsFieldWallMax =
     inputDistToPhysicsDist(inputFieldWallMax);
 
-} // namespace cobalt
+} // namespace bromine

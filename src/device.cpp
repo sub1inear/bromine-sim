@@ -1,7 +1,7 @@
 #include "device.hpp"
 #include <cmath>
 
-namespace cobalt
+namespace bromine
 {
 Device::Device(const json &j)
 {
@@ -17,4 +17,4 @@ PhysicsRect Device::getWorldRect(const DeviceContext &context) const
     return {b2MulTransforms(context.pose, rect.pose), rect.width, rect.height};
 }
 
-} // namespace cobalt
+} // namespace bromine

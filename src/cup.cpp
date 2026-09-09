@@ -2,7 +2,7 @@
 #include "renderer.hpp"
 #include "utils.hpp"
 
-namespace cobalt
+namespace bromine
 {
 Cup::Cup(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle, bool up,
          std::unique_ptr<Object> next)
@@ -24,4 +24,4 @@ void Cup::update(float dt) {}
 
 void Cup::draw(Renderer &renderer) const { renderer.drawCup(*this); }
 
-} // namespace cobalt
+} // namespace bromine

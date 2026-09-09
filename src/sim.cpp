@@ -3,7 +3,7 @@
 #include "field.hpp"
 #include <cstdint>
 
-namespace cobalt
+namespace bromine
 {
 constexpr float maxDt = 0.25;
 constexpr float fixedDt = 1.0f / fps;
@@ -52,4 +52,4 @@ void Sim::update(float dt)
         steps++;
     }
 }
-} // namespace cobalt
+} // namespace bromine

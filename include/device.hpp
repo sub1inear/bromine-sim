@@ -5,7 +5,7 @@
 #include <box2d/box2d.h>
 #include <cstdint>
 
-namespace cobalt
+namespace bromine
 {
 
 struct DeviceContext
@@ -26,4 +26,4 @@ public:
          const DeviceContext &context) const = 0; // Double-dispatch.
     virtual ~Device() = default;
 };
-} // namespace cobalt
+} // namespace bromine

@@ -1,4 +1,4 @@
-namespace cobalt
+namespace bromine
 {
 class Window
 {
@@ -7,4 +7,4 @@ public:
     ~Window();
     bool shouldClose();
 };
-} // namespace cobalt
+} // namespace bromine

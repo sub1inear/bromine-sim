@@ -2,7 +2,7 @@
 #include "constants.hpp"
 #include <cassert>
 
-namespace cobalt
+namespace bromine
 {
 
 static void setBodyMass(b2BodyId bodyId, InputMass mass)
@@ -149,4 +149,4 @@ ScreenRect physicsIdRectToScreenRect(PhysicsIdRect rect)
     PhysicsPose pose = b2Body_GetTransform(rect.bodyId);
     return physicsRectToScreenRect({pose, rect.width, rect.height});
 }
-} // namespace cobalt
+} // namespace bromine

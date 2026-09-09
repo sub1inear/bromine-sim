@@ -3,7 +3,7 @@
 #include "robot.hpp"
 #include <box2d/box2d.h>
 
-namespace cobalt
+namespace bromine
 {
 class Sim
 {
@@ -24,4 +24,4 @@ public:
     ~Sim();
     void update(float dt);
 };
-} // namespace cobalt
+} // namespace bromine

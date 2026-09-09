@@ -6,12 +6,12 @@
 
 int main()
 {
-    cobalt::Window window;
+    bromine::Window window;
 
-    SetTargetFPS(cobalt::fps);
+    SetTargetFPS(bromine::fps);
 
-    cobalt::Sim sim;
-    cobalt::Renderer renderer(sim.worldId);
+    bromine::Sim sim;
+    bromine::Renderer renderer(sim.worldId);
 
     while (!window.shouldClose())
     {

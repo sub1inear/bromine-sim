@@ -2,7 +2,7 @@
 #include "object.hpp"
 #include "units.hpp"
 
-namespace cobalt
+namespace bromine
 {
 class Pin : public Object
 {
@@ -42,4 +42,4 @@ public:
     void draw(Renderer &renderer) const override final;
 };
 
-} // namespace cobalt
+} // namespace bromine

@@ -3,7 +3,7 @@
 #include <box2d/box2d.h>
 #include <raylib.h>
 
-namespace cobalt
+namespace bromine
 {
 class Sim;
 class Field;
@@ -50,4 +50,4 @@ private:
     b2WorldId worldId;
     bool debug;
 };
-} // namespace cobalt
+} // namespace bromine

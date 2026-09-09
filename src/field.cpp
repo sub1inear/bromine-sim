@@ -4,7 +4,7 @@
 #include "pin.hpp"
 #include <numbers>
 
-namespace cobalt
+namespace bromine
 {
 template <typename T, typename... A>
 static std::vector<std::unique_ptr<T>> makeVector(std::unique_ptr<A>... args)
@@ -85,4 +85,4 @@ void Field::update(float dt)
         object->update(dt);
     }
 }
-} // namespace cobalt
+} // namespace bromine

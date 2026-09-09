@@ -3,7 +3,7 @@
 #include "renderer.hpp"
 #include "utils.hpp"
 
-namespace cobalt
+namespace bromine
 {
 HorizontalPin::HorizontalPin(b2WorldId worldId, InputDist x, InputDist y,
                              InputAngle angle, Type type)
@@ -45,4 +45,4 @@ void VerticalPin::draw(Renderer &renderer) const
 {
     renderer.drawVerticalPin(*this);
 }
-} // namespace cobalt
+} // namespace bromine

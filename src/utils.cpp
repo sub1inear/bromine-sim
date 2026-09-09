@@ -11,7 +11,7 @@
 #define IS_ATTY(fd) 0
 #endif
 
-namespace cobalt
+namespace bromine
 {
 void errorCore(std::string_view fmt, std::format_args args)
 {
@@ -24,4 +24,4 @@ void errorCore(std::string_view fmt, std::format_args args)
     std::println(stderr, "{}: {}", error, msg);
     abort();
 }
-} // namespace cobalt
+} // namespace bromine
