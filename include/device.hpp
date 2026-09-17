@@ -13,12 +13,12 @@ class Device
 {
 public:
     PhysicsRect rect;
+    Robot &robot;
 
-    Device(const json &j);
-    PhysicsRect getWorldRect(PhysicsPose pose) const;
-    virtual void update(float dt, Robot &robot) = 0;
-    virtual void draw(Renderer &renderer,
-                      PhysicsPose parentPose) const = 0; // Double-dispatch.
+    Device(const json &j, Robot &robot);
+    PhysicsRect getWorldRect() const;
+    virtual void update(float dt) = 0;
+    virtual void draw(Renderer &renderer) const = 0; // Double-dispatch.
     virtual ~Device() = default;
 };
 } // namespace bromine

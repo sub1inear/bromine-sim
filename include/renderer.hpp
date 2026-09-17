@@ -42,9 +42,9 @@ private:
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
     void drawObject(const Object &object);
-    void drawMotor(const Motor &motor, PhysicsPose parentPose);
-    void drawWheel(const Wheel &wheel, PhysicsPose parentPose);
-    void drawDevice(const Device &device, PhysicsPose parentPose);
+    void drawMotor(const Motor &motor);
+    void drawWheel(const Wheel &wheel);
+    void drawDevice(const Device &device);
 
     Texture2D fieldTexture;
     Texture2D pinsTexture;

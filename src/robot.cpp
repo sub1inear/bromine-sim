@@ -39,7 +39,8 @@ Robot::Robot(b2WorldId worldId)
         0.0f,
         expectJsonKey<float>(j, "width"),
         expectJsonKey<float>(j, "height"),
-        inputMassToPhysicsMass(expectJsonKey<float>(j, "mass"))};
+        inputMassToPhysicsMass(expectJsonKey<float>(j, "mass")),
+    };
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.linearDamping = 0.9f;
@@ -55,11 +56,11 @@ Robot::Robot(b2WorldId worldId)
         std::string_view type = expectJsonKey<std::string_view>(elem, "type");
         if (type == "motor")
         {
-            devices.push_back(std::make_unique<Motor>(elem));
+            devices.push_back(std::make_unique<Motor>(elem, *this));
         }
         else if (type == "wheel")
         {
-            devices.push_back(std::make_unique<Wheel>(elem));
+            devices.push_back(std::make_unique<Wheel>(elem, *this));
         }
         else
         {
@@ -72,7 +73,7 @@ void Robot::update(float dt)
 {
     for (const auto &device : devices)
     {
-        device->update(dt, *this);
+        device->update(dt);
     }
 }
 } // namespace bromine

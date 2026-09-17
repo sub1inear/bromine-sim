@@ -4,8 +4,8 @@
 
 namespace bromine
 {
-Wheel::Wheel(const json &j)
-    : Device(j), rpm(expectJsonKey<uint32_t>(j, "rpm")),
+Wheel::Wheel(const json &j, Robot &robot)
+    : Device(j, robot), rpm(expectJsonKey<uint32_t>(j, "rpm")),
       id(expectJsonKey<uint32_t>(j, "id"))
 {
     std::string_view subtypeStr = expectJsonKey<std::string_view>(j, "subtype");
@@ -25,11 +25,8 @@ Wheel::Wheel(const json &j)
     rect.height = inchesToMeters(expectJsonKey<float>(j, "diameter"));
 }
 
-void Wheel::update(float dt, Robot &robot) {}
+void Wheel::update(float dt) {}
 
-void Wheel::draw(Renderer &renderer, PhysicsPose parentPose) const
-{
-    renderer.drawWheel(*this, parentPose);
-}
+void Wheel::draw(Renderer &renderer) const { renderer.drawWheel(*this); }
 
 } // namespace bromine

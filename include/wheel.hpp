@@ -18,8 +18,8 @@ public:
     uint32_t id;
     float size;
 
-    Wheel(const json &j);
-    void update(float dt, Robot &robot) override;
-    void draw(Renderer &renderer, PhysicsPose parentPose) const override;
+    Wheel(const json &j, Robot &robot);
+    void update(float dt) override;
+    void draw(Renderer &renderer) const override;
 };
 } // namespace bromine

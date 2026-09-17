@@ -5,8 +5,8 @@
 
 namespace bromine
 {
-Motor::Motor(const json &j)
-    : Device(j), port(expectJsonKey<uint8_t>(j, "port")),
+Motor::Motor(const json &j, Robot &robot)
+    : Device(j, robot), port(expectJsonKey<uint8_t>(j, "port")),
       id(expectJsonKey<uint32_t>(j, "id"))
 {
     std::string_view roleStr = expectJsonKey<std::string_view>(j, "role");
@@ -49,7 +49,7 @@ Motor::Motor(const json &j)
     }
 }
 
-void Motor::update(float dt, Robot &robot)
+void Motor::update(float dt)
 {
     for (auto &device : robot.devices)
     {
@@ -57,19 +57,14 @@ void Motor::update(float dt, Robot &robot)
         {
             if (wheel->id == id)
             {
-                PhysicsRect rect =
-                    wheel->getWorldRect(b2Body_GetTransform(robot.rect.bodyId));
+                PhysicsRect rect = wheel->getWorldRect();
                 PhysicsPoint force = b2RotateVector(rect.pose.q, {0.0f, 0.01f});
-
                 b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p, true);
             }
         }
     }
 }
 
-void Motor::draw(Renderer &renderer, PhysicsPose parentPose) const
-{
-    renderer.drawMotor(*this, parentPose);
-}
+void Motor::draw(Renderer &renderer) const { renderer.drawMotor(*this); }
 
 } // namespace bromine
