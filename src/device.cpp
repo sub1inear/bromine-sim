@@ -11,10 +11,10 @@ Device::Device(const json &j)
     rect = inputRectToPhysicsRect(inputRect);
 }
 
-PhysicsRect Device::getWorldRect(const DeviceContext &context) const
+PhysicsRect Device::getWorldRect(PhysicsPose pose) const
 {
     // Transform the device to the robot coordinate system.
-    return {b2MulTransforms(context.pose, rect.pose), rect.width, rect.height};
+    return {b2MulTransforms(pose, rect.pose), rect.width, rect.height};
 }
 
 } // namespace bromine

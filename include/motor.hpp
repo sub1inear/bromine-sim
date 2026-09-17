@@ -25,7 +25,7 @@ public:
     uint8_t port;
 
     Motor(const json &j);
-    void update(float dt) override;
-    void draw(Renderer &renderer, const DeviceContext &context) const override;
+    void update(float dt, Robot &robot) override;
+    void draw(Renderer &renderer, PhysicsPose parentPose) const override;
 };
 } // namespace bromine

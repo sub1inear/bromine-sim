@@ -62,11 +62,3 @@ if(APPLE)
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(BromineSim PRIVATE m pthread dl X11)
 endif()
-
-
-add_custom_command(
-    TARGET BromineSim POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_SOURCE_DIR}/assets
-        $<TARGET_FILE_DIR:BromineSim>/assets
-)

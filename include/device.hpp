@@ -7,11 +7,7 @@
 
 namespace bromine
 {
-
-struct DeviceContext
-{
-    PhysicsPose pose;
-};
+class Robot;
 
 class Device
 {
@@ -19,11 +15,10 @@ public:
     PhysicsRect rect;
 
     Device(const json &j);
-    PhysicsRect getWorldRect(const DeviceContext &context) const;
-    virtual void update(float dt) = 0;
-    virtual void
-    draw(Renderer &renderer,
-         const DeviceContext &context) const = 0; // Double-dispatch.
+    PhysicsRect getWorldRect(PhysicsPose pose) const;
+    virtual void update(float dt, Robot &robot) = 0;
+    virtual void draw(Renderer &renderer,
+                      PhysicsPose parentPose) const = 0; // Double-dispatch.
     virtual ~Device() = default;
 };
 } // namespace bromine

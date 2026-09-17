@@ -1,4 +1,5 @@
 #pragma once
+#include "units.hpp"
 #include <algorithm>
 #include <box2d/box2d.h>
 #include <raylib.h>
@@ -41,9 +42,9 @@ private:
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
     void drawObject(const Object &object);
-    void drawMotor(const Motor &motor, const DeviceContext &context);
-    void drawWheel(const Wheel &wheel, const DeviceContext &context);
-    void drawDevice(const Device &device, const DeviceContext &context);
+    void drawMotor(const Motor &motor, PhysicsPose parentPose);
+    void drawWheel(const Wheel &wheel, PhysicsPose parentPose);
+    void drawDevice(const Device &device, PhysicsPose parentPose);
 
     Texture2D fieldTexture;
     Texture2D pinsTexture;

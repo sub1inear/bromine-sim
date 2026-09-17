@@ -1,4 +1,5 @@
 #include "wheel.hpp"
+#include "robot.hpp"
 #include "utils.hpp"
 
 namespace bromine
@@ -24,11 +25,11 @@ Wheel::Wheel(const json &j)
     rect.height = inchesToMeters(expectJsonKey<float>(j, "diameter"));
 }
 
-void Wheel::update(float dt) {}
+void Wheel::update(float dt, Robot &robot) {}
 
-void Wheel::draw(Renderer &renderer, const DeviceContext &context) const
+void Wheel::draw(Renderer &renderer, PhysicsPose parentPose) const
 {
-    renderer.drawWheel(*this, context);
+    renderer.drawWheel(*this, parentPose);
 }
 
 } // namespace bromine

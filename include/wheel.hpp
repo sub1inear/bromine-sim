@@ -1,4 +1,5 @@
 #include "device.hpp"
+#include "units.hpp"
 
 namespace bromine
 {
@@ -18,7 +19,7 @@ public:
     float size;
 
     Wheel(const json &j);
-    void update(float dt) override;
-    void draw(Renderer &renderer, const DeviceContext &context) const override;
+    void update(float dt, Robot &robot) override;
+    void draw(Renderer &renderer, PhysicsPose parentPose) const override;
 };
 } // namespace bromine

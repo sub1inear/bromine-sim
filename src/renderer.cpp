@@ -124,8 +124,7 @@ void Renderer::drawRobot(const Robot &robot)
 
     for (const auto &device : robot.devices)
     {
-        DeviceContext deviceContext = {b2Body_GetTransform(robot.rect.bodyId)};
-        drawDevice(*device, deviceContext);
+        drawDevice(*device, b2Body_GetTransform(robot.rect.bodyId));
     }
 }
 
@@ -179,9 +178,9 @@ void Renderer::drawCup(const Cup &cup)
     DrawCircleV({circle.x, circle.y}, circle.radius, color);
 }
 
-void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
+void Renderer::drawMotor(const Motor &motor, PhysicsPose parentPose)
 {
-    PhysicsRect physicsRect = motor.getWorldRect(context);
+    PhysicsRect physicsRect = motor.getWorldRect(parentPose);
     ScreenRect screenRect = physicsRectToScreenRect(physicsRect);
 
     Vector2 origin = {screenRect.width / 2.0f, screenRect.height / 2.0f};
@@ -205,9 +204,9 @@ void Renderer::drawMotor(const Motor &motor, const DeviceContext &context)
         origin, screenRect.angle, 1.5f, color);
 }
 
-void Renderer::drawWheel(const Wheel &wheel, const DeviceContext &context)
+void Renderer::drawWheel(const Wheel &wheel, PhysicsPose parentPose)
 {
-    PhysicsRect physicsRect = wheel.getWorldRect(context);
+    PhysicsRect physicsRect = wheel.getWorldRect(parentPose);
     ScreenRect screenRect = physicsRectToScreenRect(physicsRect);
 
     Vector2 origin = {screenRect.width / 2.0f, screenRect.height / 2.0f};
@@ -217,9 +216,9 @@ void Renderer::drawWheel(const Wheel &wheel, const DeviceContext &context)
         origin, screenRect.angle, 1.5f, PURPLE);
 }
 
-void Renderer::drawDevice(const Device &device, const DeviceContext &context)
+void Renderer::drawDevice(const Device &device, PhysicsPose parentPose)
 {
-    device.draw(*this, context);
+    device.draw(*this, parentPose);
 }
 
 } // namespace bromine

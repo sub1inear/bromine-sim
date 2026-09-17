@@ -10,8 +10,8 @@
 namespace bromine
 {
 
-constexpr float linearForce = 1;       // Newtons
-constexpr float rotationalForce = 0.1; // Newtons
+constexpr float throttleCoeff = 1;
+constexpr float turnCoeff = 0.1;
 
 Robot::Robot(b2WorldId worldId)
 {
@@ -70,36 +70,9 @@ Robot::Robot(b2WorldId worldId)
 
 void Robot::update(float dt)
 {
-    b2Vec2 force = {0.0f, 0.0f};
-    float theta = 0.0f;
-
-    if (IsKeyDown(KEY_LEFT))
-    {
-        theta += rotationalForce;
-    }
-    if (IsKeyDown(KEY_RIGHT))
-    {
-        theta -= rotationalForce;
-    }
-    if (IsKeyDown(KEY_UP))
-    {
-        b2Rot rotation = b2Body_GetRotation(rect.bodyId);
-        force.x -= rotation.s * linearForce;
-        force.y += rotation.c * linearForce;
-    }
-    if (IsKeyDown(KEY_DOWN))
-    {
-        b2Rot rotation = b2Body_GetRotation(rect.bodyId);
-        force.x += rotation.s * linearForce;
-        force.y -= rotation.c * linearForce;
-    }
-
-    b2Body_ApplyForceToCenter(rect.bodyId, force, true);
-    b2Body_ApplyTorque(rect.bodyId, theta, true);
-
     for (const auto &device : devices)
     {
-        device->update(dt);
+        device->update(dt, *this);
     }
 }
 } // namespace bromine

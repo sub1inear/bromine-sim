@@ -1,5 +1,7 @@
 #include "motor.hpp"
+#include "robot.hpp"
 #include "utils.hpp"
+#include "wheel.hpp"
 
 namespace bromine
 {
@@ -47,11 +49,27 @@ Motor::Motor(const json &j)
     }
 }
 
-void Motor::update(float dt) {}
-
-void Motor::draw(Renderer &renderer, const DeviceContext &context) const
+void Motor::update(float dt, Robot &robot)
 {
-    renderer.drawMotor(*this, context);
+    for (auto &device : robot.devices)
+    {
+        if (Wheel *wheel = dynamic_cast<Wheel *>(device.get()))
+        {
+            if (wheel->id == id)
+            {
+                PhysicsRect rect =
+                    wheel->getWorldRect(b2Body_GetTransform(robot.rect.bodyId));
+                PhysicsPoint force = b2RotateVector(rect.pose.q, {0.0f, 0.01f});
+
+                b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p, true);
+            }
+        }
+    }
+}
+
+void Motor::draw(Renderer &renderer, PhysicsPose parentPose) const
+{
+    renderer.drawMotor(*this, parentPose);
 }
 
 } // namespace bromine
