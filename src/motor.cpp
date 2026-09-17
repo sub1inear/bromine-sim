@@ -49,8 +49,11 @@ Motor::Motor(const json &j, Robot &robot)
     }
 }
 
-void Motor::update(float dt)
+void Motor::update(float dt) {}
+
+void Motor::setVoltage(int32_t voltage)
 {
+    this->voltage = voltage;
     for (auto &device : robot.devices)
     {
         if (Wheel *wheel = dynamic_cast<Wheel *>(device.get()))
@@ -58,12 +61,15 @@ void Motor::update(float dt)
             if (wheel->id == id)
             {
                 PhysicsRect rect = wheel->getWorldRect();
-                PhysicsPoint force = b2RotateVector(rect.pose.q, {0.0f, 0.01f});
+                PhysicsPoint force =
+                    b2RotateVector(rect.pose.q, {0.0f, 0.00001f * voltage});
                 b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p, true);
             }
         }
     }
 }
+
+int32_t Motor::getVoltage() { return voltage; }
 
 void Motor::draw(Renderer &renderer) const { renderer.drawMotor(*this); }
 

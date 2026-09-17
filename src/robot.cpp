@@ -71,9 +71,13 @@ Robot::Robot(b2WorldId worldId)
 
 void Robot::update(float dt)
 {
-    for (const auto &device : devices)
+    for (auto &device : devices)
     {
         device->update(dt);
+        if (Motor *motor = dynamic_cast<Motor *>(device.get()))
+        {
+            motor->setVoltage(14000);
+        }
     }
 }
 } // namespace bromine
