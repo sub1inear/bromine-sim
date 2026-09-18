@@ -52,4 +52,11 @@ void Sim::update(float dt)
         steps++;
     }
 }
+
+Sim &getSim()
+{
+    // Construct on first use to avoid Static Initialization Order Fiasco.
+    static Sim sim;
+    return sim;
+}
 } // namespace bromine

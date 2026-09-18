@@ -24,4 +24,6 @@ public:
     ~Sim();
     void update(float dt);
 };
+
+Sim &getSim();
 } // namespace bromine

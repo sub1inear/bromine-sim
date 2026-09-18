@@ -10,7 +10,7 @@ int main()
 
     SetTargetFPS(bromine::fps);
 
-    bromine::Sim sim;
+    bromine::Sim &sim = bromine::getSim();
     bromine::Renderer renderer(sim.worldId);
 
     while (!window.shouldClose())
