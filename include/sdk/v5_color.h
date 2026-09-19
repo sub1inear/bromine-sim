@@ -14,12 +14,44 @@
 #ifndef _VEX_COLORS
 #define _VEX_COLORS
 
+/*-----------------------------------------------------------------------------*/
+/** @file    v5_color.h
+ * @brief   Named color constants for the V5 display API
+ *
+ * @details
+ *  Every color in this file is stored as a 32 bit word in the same packed
+ *  format the display functions accept:
+ *
+ *      bits 31-24  unused, always zero
+ *      bits 23-16  red
+ *      bits 15-8   green
+ *      bits 7-0    blue
+ *
+ *  The constants can be passed directly to vexDisplayForegroundColor(),
+ *  vexDisplayBackgroundColor() and vexDeviceLedRgbSet(), and they match the
+ *  per pixel format used by the buffers given to vexDisplayCopyRect(),
+ *  vexImageBmpRead() and vexImagePngRead().
+ *//*---------------------------------------------------------------------------*/
+
 //*****************************************************************************
 //
 // A set of color definitions.  This set is the subset of the X11 colors (from
 // rgb.txt) that are supported by typical web browsers.
 //
 //*****************************************************************************
+
+/**
+ * @name    X11 named colors
+ * @brief   The subset of the X11 rgb.txt palette that typical web browsers
+ *          support, encoded as 0x00RRGGBB.
+ *
+ * @details
+ *  Names follow the CSS/X11 spelling, so ClrAqua and ClrCyan are the same
+ *  value, as are ClrFuchsia and ClrMagenta. ClrGray, ClrSlateGray and the
+ *  other "Gray" names use the American spelling except for ClrLightGrey,
+ *  which keeps the X11 spelling it was defined with.
+ * @{
+ */
 #define ClrAliceBlue 0x00F0F8FF
 #define ClrAntiqueWhite 0x00FAEBD7
 #define ClrAqua 0x0000FFFF
@@ -160,17 +192,45 @@
 #define ClrWhiteSmoke 0x00F5F5F5
 #define ClrYellow 0x00FFFF00
 #define ClrYellowGreen 0x009ACD32
+/** @} */
 
 //*****************************************************************************
 //
 // Masks and shifts to aid in color format translation by drivers.
 //
 //*****************************************************************************
+
+/**
+ * @name    Channel masks and shifts
+ * @brief   Helpers for splitting a packed color into its components, or for
+ *          building one from separate channel values.
+ *
+ * @details
+ *  To extract a channel, mask it off and shift it down:
+ *
+ *      uint8_t red = (color & ClrRedMask) >> ClrRedShift;
+ *
+ *  To build a color, shift each channel up and combine them:
+ *
+ *      uint32_t color = (red   << ClrRedShift)   |
+ *                       (green << ClrGreenShift) |
+ *                       (blue  << ClrBlueShift);
+ * @{
+ */
+
+/** Selects the red channel of a packed color. */
 #define ClrRedMask 0x00FF0000
+/** Bit position of the red channel within a packed color. */
 #define ClrRedShift 16
+/** Selects the green channel of a packed color. */
 #define ClrGreenMask 0x0000FF00
+/** Bit position of the green channel within a packed color. */
 #define ClrGreenShift 8
+/** Selects the blue channel of a packed color. */
 #define ClrBlueMask 0x000000FF
+/** Bit position of the blue channel within a packed color. */
 #define ClrBlueShift 0
 
-#endif  // _VEX_COLORS
+/** @} */
+
+#endif // _VEX_COLORS
