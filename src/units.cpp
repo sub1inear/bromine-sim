@@ -62,7 +62,7 @@ PhysicsIdCircle inputCircleToPhysicsIdCircle(InputCircle circle,
     b2Circle circleDef = {{0.0f, 0.0f}, out.radius};
     b2ShapeId shapeId = b2CreateCircleShape(out.bodyId, &shapeDef, &circleDef);
 
-    // setBodyMass(out.bodyId, circle.mass);
+    setBodyMass(out.bodyId, circle.mass);
     return out;
 }
 
@@ -89,7 +89,7 @@ PhysicsIdRect inputRectToPhysicsIdRect(InputRect rect, b2WorldId worldId,
     b2Polygon boxDef = b2MakeBox(out.width * 0.5f, out.height * 0.5f);
     b2ShapeId shapeId = b2CreatePolygonShape(out.bodyId, &shapeDef, &boxDef);
 
-    // setBodyMass(out.bodyId, rect.mass);
+    setBodyMass(out.bodyId, rect.mass);
     return out;
 }
 
