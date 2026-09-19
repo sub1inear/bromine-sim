@@ -169,11 +169,12 @@ typedef enum
         12, ///< 3-Wire Expander, or the brain's built in 3-Wire ports.
     kDeviceTypeRes1Sensor =
         13, ///< Reserved. Reported for the partner controller.
-    kDeviceTypeRes2Sensor = 14,    ///< Reserved. Reported for the battery.
-    kDeviceTypeRes3Sensor = 15,    ///< Reserved.
-    kDeviceTypeOpticalSensor = 16, ///< V5 Optical Sensor.
-    kDeviceTypeMagnetSensor = 17,  ///< Workcell electromagnet.
-    kDeviceTypeGpsSensor = 20,     ///< V5 GPS Sensor.
+    kDeviceTypeRes2Sensor = 14,     ///< Reserved. Reported for the battery.
+    kDeviceTypeRes3Sensor = 15,     ///< Reserved.
+    kDeviceTypeOpticalSensor = 16,  ///< V5 Optical Sensor.
+    kDeviceTypeMagnetSensor = 17,   ///< Workcell electromagnet.
+    kDeviceTypeGpsSensor = 20,      ///< V5 GPS Sensor.
+    kDeviceTypeAiVisionSensor = 29, ///< VEX AI Vision Sensor.
     kDeviceTypeBumperSensor =
         0x40, ///< Bumper switch, development hardware only.
     kDeviceTypeGyroSensor =
@@ -630,6 +631,102 @@ typedef struct __attribute__((__packed__)) _V5_DeviceVisionRgb
     uint8_t blue;       ///< Blue channel, 0 to 255.
     uint8_t brightness; /// not used yet
 } V5_DeviceVisionRgb;
+
+/*----------------------------------------------------------------------------*/
+/** @brief      VEX AI Vision sensor definitions */
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @brief   One color descriptor stored on the AI Vision Sensor.
+ * @details The sensor holds seven descriptors, addressed by id. A pixel
+ *          matches when its hue is within hangle of the descriptor's color and
+ *          its saturation is within hdsat, so the two ranges are what decides
+ *          how forgiving the match is.
+ * @see     vexDeviceAiVisionColorSet
+ */
+typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionColor
+{
+    uint8_t id;   ///< Descriptor slot, 1 to 7.
+    uint8_t red;  ///< Red channel of the reference color, 0 to 255.
+    uint8_t grn;  ///< Green channel of the reference color, 0 to 255.
+    uint8_t blu;  ///< Blue channel of the reference color, 0 to 255.
+    float hangle; ///< Accepted hue deviation in degrees, roughly 1 to 40.
+    float hdsat;  ///< Accepted saturation deviation, roughly 0.1 to 1.
+} V5_DeviceAiVisionColor;
+
+/**
+ * @brief   One code descriptor stored on the AI Vision Sensor.
+ * @details A code merges neighbouring objects matching two to five of the
+ *          color descriptors into a single detection. Only the first len
+ *          entries of c1 through c5 are used; the rest are ignored.
+ * @see     vexDeviceAiVisionCodeSet
+ */
+typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionCode
+{
+    uint8_t id;  ///< Descriptor slot, 1 to 5.
+    uint8_t len; ///< How many of c1 through c5 make up the code, 2 to 5.
+    int16_t c1;  ///< Id of the first color descriptor.
+    int16_t c2;  ///< Id of the second color descriptor.
+    int16_t c3;  ///< Id of the third color descriptor.
+    int16_t c4;  ///< Id of the fourth color descriptor.
+    int16_t c5;  ///< Id of the fifth color descriptor.
+} V5_DeviceAiVisionCode;
+
+/**
+ * @brief   One object reported by the AI Vision Sensor.
+ * @details Which member of the union holds the object's geometry is decided by
+ *          type, and what id means changes with it: a color or code
+ *          descriptor's id for a color detection, the AprilTag's id for a tag,
+ *          and the AI model's element id for a model detection.
+ *
+ *          The sensor's frame is 320 by 240 pixels with the origin at the top
+ *          left, so the coordinates are not interchangeable with the 316 by 212
+ *          frame the older Vision Sensor reports through
+ *          V5_DeviceVisionObject.
+ * @see     vexDeviceAiVisionObjectGet
+ */
+typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionObject
+{
+    uint8_t id;   ///< Descriptor, tag or element id, depending on type.
+    uint8_t type; ///< Which kind of detection this is, and so which union
+                  ///< member is filled in.
+
+    union
+    {
+        /** @brief  A color or code detection, as an upright bounding box. */
+        struct __attribute__((__packed__))
+        {
+            uint16_t xoffset; ///< Left edge of the box.
+            uint16_t yoffset; ///< Top edge of the box.
+            uint16_t width;   ///< Width of the box.
+            uint16_t height;  ///< Height of the box.
+            uint16_t angle;   ///< Orientation in 0.1 degree units.
+        } color;
+
+        /** @brief  An AprilTag detection, as its four corners. */
+        struct __attribute__((__packed__))
+        {
+            int16_t x0; ///< X of the first corner.
+            int16_t y0; ///< Y of the first corner.
+            int16_t x1; ///< X of the second corner.
+            int16_t y1; ///< Y of the second corner.
+            int16_t x2; ///< X of the third corner.
+            int16_t y2; ///< Y of the third corner.
+            int16_t x3; ///< X of the fourth corner.
+            int16_t y3; ///< Y of the fourth corner.
+        } tag;
+
+        /** @brief  An AI model detection, as a bounding box and a score. */
+        struct __attribute__((__packed__))
+        {
+            uint16_t xoffset; ///< Left edge of the box.
+            uint16_t yoffset; ///< Top edge of the box.
+            uint16_t width;   ///< Width of the box.
+            uint16_t height;  ///< Height of the box.
+            uint16_t score;   ///< Confidence in the classification.
+        } model;
+    } object; ///< The detection itself, selected by type.
+} V5_DeviceAiVisionObject;
 
 /*----------------------------------------------------------------------------*/
 /** @brief      V5 IMU sensor definitions */

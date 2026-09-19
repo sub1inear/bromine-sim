@@ -126,6 +126,20 @@ void vexAdiValueSet(uint32_t index, uint32_t port, int32_t value);
 int32_t vexAdiValueGet(uint32_t index, uint32_t port);
 
 /**
+ * @brief   Writes a run of colors to an addressable LED strip.
+ * @param   index   Zero based smart port index.
+ * @param   port    Channel number, 0 to 7.
+ * @param   pData   Colors to write, one 0x00RRGGBB word per LED.
+ * @param   nOffset Index of the first LED to write.
+ * @param   nLength Number of LEDs to write.
+ * @param   options Option flags. VEX does not publish their meaning.
+ * @return  The number of LEDs written.
+ * @see     vexDeviceAdiAddrLedSet
+ */
+int32_t vexAdiAddrLedSet(uint32_t index, uint32_t port, uint32_t *pData,
+                         uint32_t nOffset, uint32_t nLength, uint32_t options);
+
+/**
  * @brief   Reads a smart port bumper switch.
  * @param   index Zero based smart port index.
  * @return  Whether the switch is pressed.
@@ -533,6 +547,14 @@ void vexMotorGearingSet(uint32_t index, V5MotorGearset value);
 V5MotorGearset vexMotorGearingGet(uint32_t index);
 
 /**
+ * @brief   Reads which kind of smart motor is on a port.
+ * @param   index Zero based smart port index.
+ * @return  0 for the 11W V5 motor and 1 for the 5.5W EXP motor.
+ * @see     vexDeviceMotorTypeGet
+ */
+int32_t vexMotorTypeGet(uint32_t index);
+
+/**
  * @brief   Feeds a motor one point of an externally generated motion
  * profile.
  * @param   index    Zero based smart port index.
@@ -714,6 +736,121 @@ void vexVisionWifiModeSet(uint32_t index, V5VisionWifiMode mode);
  * @see     vexDeviceVisionWifiModeGet
  */
 V5VisionWifiMode vexVisionWifiModeGet(uint32_t index);
+
+/**
+ * @brief   Returns the AI Vision Sensor to its power on state.
+ * @param   index Zero based smart port index.
+ * @see     vexDeviceAiVisionReset
+ */
+void vexAiVisionReset(uint32_t index);
+
+/**
+ * @brief   Turns individual kinds of detection on or off.
+ * @param   index   Zero based smart port index.
+ * @param   bits    New state for the kinds selected by bitmask.
+ * @param   bitmask Which kinds of detection the call applies to.
+ * @see     vexDeviceAiVisionEnableSet
+ */
+void vexAiVisionEnableSet(uint32_t index, uint8_t bits, uint8_t bitmask);
+
+/**
+ * @brief   Reads back which kinds of detection are enabled.
+ * @param   index Zero based smart port index.
+ * @return  A bitfield of the enabled kinds.
+ * @see     vexDeviceAiVisionEnableGet
+ */
+uint8_t vexAiVisionEnableGet(uint32_t index);
+
+/**
+ * @brief   Sets the AI Vision Sensor's mode word.
+ * @param   index Zero based smart port index.
+ * @param   mode  Packed mode word.
+ * @see     vexDeviceAiVisionModeSet
+ */
+void vexAiVisionModeSet(uint32_t index, uint32_t mode);
+
+/**
+ * @brief   Reads the AI Vision Sensor's status word.
+ * @param   index Zero based smart port index.
+ * @return  The packed status word.
+ * @see     vexDeviceAiVisionStatusGet
+ */
+uint32_t vexAiVisionStatusGet(uint32_t index);
+
+/**
+ * @brief   Counts the objects the AI Vision Sensor is currently reporting.
+ * @param   index Zero based smart port index.
+ * @return  The number of objects available.
+ * @see     vexDeviceAiVisionObjectCountGet
+ */
+int32_t vexAiVisionObjectCountGet(uint32_t index);
+
+/**
+ * @brief   Reads one detected object.
+ * @param   index    Zero based smart port index.
+ * @param   indexObj Zero based object index.
+ * @param   pObject  Structure filled in with the object's data.
+ * @return  The number of objects copied.
+ * @see     vexDeviceAiVisionObjectGet
+ */
+int32_t vexAiVisionObjectGet(uint32_t index, uint32_t indexObj,
+                             V5_DeviceAiVisionObject *pObject);
+
+/**
+ * @brief   Writes a color descriptor to the AI Vision Sensor.
+ * @param   index  Zero based smart port index.
+ * @param   pColor Descriptor to store, with its id set to the target slot.
+ * @see     vexDeviceAiVisionColorSet
+ */
+void vexAiVisionColorSet(uint32_t index, V5_DeviceAiVisionColor *pColor);
+
+/**
+ * @brief   Reads a color descriptor back from the AI Vision Sensor.
+ * @param   index  Zero based smart port index.
+ * @param   id     Descriptor slot, 1 to 7.
+ * @param   pColor Structure filled in with the stored descriptor.
+ * @return  True if the descriptor was read.
+ * @see     vexDeviceAiVisionColorGet
+ */
+bool vexAiVisionColorGet(uint32_t index, uint32_t id,
+                         V5_DeviceAiVisionColor *pColor);
+
+/**
+ * @brief   Writes a code descriptor to the AI Vision Sensor.
+ * @param   index Zero based smart port index.
+ * @param   pCode Descriptor to store, with its id set to the target slot.
+ * @see     vexDeviceAiVisionCodeSet
+ */
+void vexAiVisionCodeSet(uint32_t index, V5_DeviceAiVisionCode *pCode);
+
+/**
+ * @brief   Reads a code descriptor back from the AI Vision Sensor.
+ * @param   index Zero based smart port index.
+ * @param   id    Descriptor slot, 1 to 5.
+ * @param   pCode Structure filled in with the stored descriptor.
+ * @return  True if the descriptor was read.
+ * @see     vexDeviceAiVisionCodeGet
+ */
+bool vexAiVisionCodeGet(uint32_t index, uint32_t id,
+                        V5_DeviceAiVisionCode *pCode);
+
+/**
+ * @brief   Reads the name of one of the AI model's classes.
+ * @param   index Zero based smart port index.
+ * @param   id    Class index, or -1 to ask how many classes there are.
+ * @param   pName Buffer of at least 20 bytes for the name.
+ * @return  The number of classes when id is -1, otherwise unspecified.
+ * @see     vexDeviceAiVisionClassNameGet
+ */
+int32_t vexAiVisionClassNameGet(uint32_t index, int32_t id, uint8_t *pName);
+
+/**
+ * @brief   Reads the AI Vision Sensor's internal temperature.
+ * @param   index Zero based smart port index.
+ * @return  The temperature in degrees Celsius.
+ * @see     vexDeviceAiVisionTemperatureGet
+ */
+double vexAiVisionTemperatureGet(uint32_t index);
 
 /**
  * @brief   Starts calibrating the Inertial Sensor.
@@ -1349,6 +1486,65 @@ int32_t vexGenericSerialReceive(uint32_t index, uint8_t *buffer,
  * @see     vexDeviceGenericSerialFlush
  */
 void vexGenericSerialFlush(uint32_t index);
+
+// Radio link between two brains
+
+/**
+ * @brief   Joins a VEXnet radio to a named link.
+ * @param   index   Zero based smart port index.
+ * @param   link_id Name shared by the two brains that are to be paired.
+ * @param   type    0 for the receiving end and 1 for the transmitting end.
+ * @param   ov      Whether to override an existing link on the radio.
+ * @see     vexDeviceGenericRadioConnection
+ */
+void vexGenericRadioConnection(uint32_t index, char *link_id, int32_t type,
+                               bool ov);
+
+/**
+ * @brief   Reports whether a radio link is up.
+ * @param   index Zero based smart port index.
+ * @return  True once the two radios have paired.
+ * @see     vexDeviceGenericRadioLinkStatus
+ */
+bool vexGenericRadioLinkStatus(uint32_t index);
+
+/**
+ * @brief   Reports how much room is left in the link's transmit buffer.
+ * @param   index Zero based smart port index.
+ * @return  The number of free bytes.
+ * @see     vexDeviceGenericRadioWriteFree
+ */
+uint32_t vexGenericRadioWriteFree(uint32_t index);
+
+/**
+ * @brief   Queues a buffer for transmission over the link.
+ * @param   index  Zero based smart port index.
+ * @param   buffer Bytes to send.
+ * @param   length Number of bytes to send.
+ * @return  The number of bytes queued.
+ * @see     vexDeviceGenericRadioTransmit
+ */
+uint32_t vexGenericRadioTransmit(uint32_t index, uint8_t *buffer,
+                                 uint32_t length);
+
+/**
+ * @brief   Reports how many bytes the link has waiting to be read.
+ * @param   index Zero based smart port index.
+ * @return  The number of buffered bytes.
+ * @see     vexDeviceGenericRadioReceiveAvail
+ */
+uint32_t vexGenericRadioReceiveAvail(uint32_t index);
+
+/**
+ * @brief   Reads buffered bytes from the link into a caller supplied buffer.
+ * @param   index  Zero based smart port index.
+ * @param   buffer Destination buffer.
+ * @param   length Maximum number of bytes to read.
+ * @return  The number of bytes actually read.
+ * @see     vexDeviceGenericRadioReceive
+ */
+uint32_t vexGenericRadioReceive(uint32_t index, uint8_t *buffer,
+                                uint32_t length);
 
 #ifdef __cplusplus
 }

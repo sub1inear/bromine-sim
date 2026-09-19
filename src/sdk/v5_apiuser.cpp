@@ -62,6 +62,14 @@ int32_t vexAdiValueGet(uint32_t index, uint32_t port)
     return vexDeviceAdiValueGet(device, port);
 }
 
+int32_t vexAdiAddrLedSet(uint32_t index, uint32_t port, uint32_t *pData,
+                         uint32_t nOffset, uint32_t nLength, uint32_t options)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAdiAddrLedSet(device, port, pData, nOffset, nLength,
+                                  options);
+}
+
 V5_DeviceBumperState vexBumperGet(uint32_t index)
 {
     VEX_DEVICE_GET(device, index);
@@ -364,6 +372,12 @@ V5MotorGearset vexMotorGearingGet(uint32_t index)
     return vexDeviceMotorGearingGet(device);
 }
 
+int32_t vexMotorTypeGet(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceMotorTypeGet(device);
+}
+
 void vexMotorExternalProfileSet(uint32_t index, double position,
                                 int32_t velocity)
 {
@@ -491,6 +505,87 @@ V5VisionWifiMode vexVisionWifiModeGet(uint32_t index)
 {
     VEX_DEVICE_GET(device, index);
     return vexDeviceVisionWifiModeGet(device);
+}
+
+void vexAiVisionReset(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    vexDeviceAiVisionReset(device);
+}
+
+void vexAiVisionEnableSet(uint32_t index, uint8_t bits, uint8_t bitmask)
+{
+    VEX_DEVICE_GET(device, index);
+    vexDeviceAiVisionEnableSet(device, bits, bitmask);
+}
+
+uint8_t vexAiVisionEnableGet(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionEnableGet(device);
+}
+
+void vexAiVisionModeSet(uint32_t index, uint32_t mode)
+{
+    VEX_DEVICE_GET(device, index);
+    vexDeviceAiVisionModeSet(device, mode);
+}
+
+uint32_t vexAiVisionStatusGet(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionStatusGet(device);
+}
+
+int32_t vexAiVisionObjectCountGet(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionObjectCountGet(device);
+}
+
+int32_t vexAiVisionObjectGet(uint32_t index, uint32_t indexObj,
+                             V5_DeviceAiVisionObject *pObject)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionObjectGet(device, indexObj, pObject);
+}
+
+void vexAiVisionColorSet(uint32_t index, V5_DeviceAiVisionColor *pColor)
+{
+    VEX_DEVICE_GET(device, index);
+    vexDeviceAiVisionColorSet(device, pColor);
+}
+
+bool vexAiVisionColorGet(uint32_t index, uint32_t id,
+                         V5_DeviceAiVisionColor *pColor)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionColorGet(device, id, pColor);
+}
+
+void vexAiVisionCodeSet(uint32_t index, V5_DeviceAiVisionCode *pCode)
+{
+    VEX_DEVICE_GET(device, index);
+    vexDeviceAiVisionCodeSet(device, pCode);
+}
+
+bool vexAiVisionCodeGet(uint32_t index, uint32_t id,
+                        V5_DeviceAiVisionCode *pCode)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionCodeGet(device, id, pCode);
+}
+
+int32_t vexAiVisionClassNameGet(uint32_t index, int32_t id, uint8_t *pName)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionClassNameGet(device, id, pName);
+}
+
+double vexAiVisionTemperatureGet(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceAiVisionTemperatureGet(device);
 }
 
 void vexImuReset(uint32_t index)
@@ -958,4 +1053,45 @@ void vexGenericSerialFlush(uint32_t index)
 {
     VEX_DEVICE_GET(device, index);
     vexDeviceGenericSerialFlush(device);
+}
+
+// Radio link between two brains
+
+void vexGenericRadioConnection(uint32_t index, char *link_id, int32_t type,
+                               bool ov)
+{
+    VEX_DEVICE_GET(device, index);
+    vexDeviceGenericRadioConnection(device, link_id, type, ov);
+}
+
+bool vexGenericRadioLinkStatus(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceGenericRadioLinkStatus(device);
+}
+
+uint32_t vexGenericRadioWriteFree(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceGenericRadioWriteFree(device);
+}
+
+uint32_t vexGenericRadioTransmit(uint32_t index, uint8_t *buffer,
+                                 uint32_t length)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceGenericRadioTransmit(device, buffer, length);
+}
+
+uint32_t vexGenericRadioReceiveAvail(uint32_t index)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceGenericRadioReceiveAvail(device);
+}
+
+uint32_t vexGenericRadioReceive(uint32_t index, uint8_t *buffer,
+                                uint32_t length)
+{
+    VEX_DEVICE_GET(device, index);
+    return vexDeviceGenericRadioReceive(device, buffer, length);
 }

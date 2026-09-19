@@ -151,6 +151,13 @@ void vexDeviceAdiValueSet(V5_DeviceT device, uint32_t port, int32_t value) {}
 
 int32_t vexDeviceAdiValueGet(V5_DeviceT device, uint32_t port) { return 0; }
 
+int32_t vexDeviceAdiAddrLedSet(V5_DeviceT device, uint32_t port,
+                               uint32_t *pData, uint32_t nOffset,
+                               uint32_t nLength, uint32_t options)
+{
+    return 0;
+}
+
 // Bumper switch
 
 V5_DeviceBumperState vexDeviceBumperGet(V5_DeviceT device)
@@ -291,6 +298,8 @@ V5MotorGearset vexDeviceMotorGearingGet(V5_DeviceT device)
     return kMotorGearSet_18;
 }
 
+int32_t vexDeviceMotorTypeGet(V5_DeviceT device) { return 0; }
+
 void vexDeviceMotorExternalProfileSet(V5_DeviceT device, double position,
                                       int32_t velocity)
 {
@@ -375,6 +384,77 @@ V5VisionWifiMode vexDeviceVisionWifiModeGet(V5_DeviceT device)
 {
     return kVisionWifiModeOff;
 }
+
+// AI Vision sensor
+
+void vexDeviceAiVisionReset(V5_DeviceT device) {}
+
+void vexDeviceAiVisionEnableSet(V5_DeviceT device, uint8_t bits,
+                                uint8_t bitmask)
+{
+}
+
+uint8_t vexDeviceAiVisionEnableGet(V5_DeviceT device) { return 0; }
+
+void vexDeviceAiVisionModeSet(V5_DeviceT device, uint32_t mode) {}
+
+uint32_t vexDeviceAiVisionStatusGet(V5_DeviceT device) { return 0; }
+
+int32_t vexDeviceAiVisionObjectCountGet(V5_DeviceT device) { return 0; }
+
+int32_t vexDeviceAiVisionObjectGet(V5_DeviceT device, uint32_t indexObj,
+                                   V5_DeviceAiVisionObject *pObject)
+{
+    if (pObject != nullptr)
+    {
+        *pObject = {};
+    }
+    return 0;
+}
+
+void vexDeviceAiVisionColorSet(V5_DeviceT device,
+                               V5_DeviceAiVisionColor *pColor)
+{
+}
+
+bool vexDeviceAiVisionColorGet(V5_DeviceT device, uint32_t id,
+                               V5_DeviceAiVisionColor *pColor)
+{
+    if (pColor != nullptr)
+    {
+        *pColor = {};
+    }
+    return false;
+}
+
+void vexDeviceAiVisionCodeSet(V5_DeviceT device, V5_DeviceAiVisionCode *pCode)
+{
+}
+
+bool vexDeviceAiVisionCodeGet(V5_DeviceT device, uint32_t id,
+                              V5_DeviceAiVisionCode *pCode)
+{
+    if (pCode != nullptr)
+    {
+        *pCode = {};
+    }
+    return false;
+}
+
+// Only the terminator is written, rather than the whole 20 byte buffer the
+// caller is asked for, so the name reads as an empty string without assuming
+// more of the caller's memory than one byte.
+int32_t vexDeviceAiVisionClassNameGet(V5_DeviceT device, int32_t id,
+                                      uint8_t *pName)
+{
+    if (pName != nullptr)
+    {
+        pName[0] = '\0';
+    }
+    return 0;
+}
+
+double vexDeviceAiVisionTemperatureGet(V5_DeviceT device) { return 0.0; }
 
 // IMU
 
@@ -643,6 +723,31 @@ int32_t vexDeviceGenericSerialReceive(V5_DeviceT device, uint8_t *buffer,
 }
 
 void vexDeviceGenericSerialFlush(V5_DeviceT device) {}
+
+// Radio link between two brains
+
+void vexDeviceGenericRadioConnection(V5_DeviceT device, char *link_id,
+                                     int32_t type, bool ov)
+{
+}
+
+bool vexDeviceGenericRadioLinkStatus(V5_DeviceT device) { return false; }
+
+uint32_t vexDeviceGenericRadioWriteFree(V5_DeviceT device) { return 0; }
+
+uint32_t vexDeviceGenericRadioTransmit(V5_DeviceT device, uint8_t *buffer,
+                                       uint32_t length)
+{
+    return 0;
+}
+
+uint32_t vexDeviceGenericRadioReceiveAvail(V5_DeviceT device) { return 0; }
+
+uint32_t vexDeviceGenericRadioReceive(V5_DeviceT device, uint8_t *buffer,
+                                      uint32_t length)
+{
+    return 0;
+}
 
 // Display/graphics
 

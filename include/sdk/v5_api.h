@@ -426,6 +426,26 @@ void vexDeviceAdiValueSet(V5_DeviceT device, uint32_t port, int32_t value);
  */
 int32_t vexDeviceAdiValueGet(V5_DeviceT device, uint32_t port);
 
+/**
+ * @brief   Writes a run of colors to an addressable LED strip.
+ * @param   device  Handle to the brain's 3-Wire ports or a 3-Wire Expander.
+ * @param   port    Channel number, 0 to 7, for the ports labelled A to H.
+ * @param   pData   Colors to write, one 0x00RRGGBB word per LED.
+ * @param   nOffset Index of the first LED to write, counting from the end of
+ *                  the strip nearest the brain.
+ * @param   nLength Number of LEDs to write.
+ * @param   options Option flags. VEX does not publish their meaning; PROS
+ *                  passes 0.
+ * @return  The number of LEDs written.
+ * @details The channel has to be configured as #kAdiPortTypeDigitalOut first.
+ *          VEX ships this as a private API, so it is absent from the published
+ *          v5_api.h and the PROS kernel declares it itself in
+ *          devices/vdml_ext_adi.c.
+ */
+int32_t vexDeviceAdiAddrLedSet(V5_DeviceT device, uint32_t port,
+                               uint32_t *pData, uint32_t nOffset,
+                               uint32_t nLength, uint32_t options);
+
 // Bumper switch
 
 /**
@@ -860,6 +880,16 @@ void vexDeviceMotorGearingSet(V5_DeviceT device, V5MotorGearset value);
 V5MotorGearset vexDeviceMotorGearingGet(V5_DeviceT device);
 
 /**
+ * @brief   Reads which kind of smart motor is on a port.
+ * @param   device Device handle.
+ * @return  0 for the 11W V5 motor and 1 for the 5.5W EXP motor.
+ * @details Unlike the cartridge, this is reported by the motor rather than
+ * configured, so it tells user code which power and current limits apply.
+ *          PROS surfaces the return value as motor_type_e_t.
+ */
+int32_t vexDeviceMotorTypeGet(V5_DeviceT device);
+
+/**
  * @brief   Feeds a motor one point of an externally generated motion
  * profile.
  * @param   device   Device handle.
@@ -1038,6 +1068,139 @@ void vexDeviceVisionWifiModeSet(V5_DeviceT device, V5VisionWifiMode mode);
  * @return  The current mode.
  */
 V5VisionWifiMode vexDeviceVisionWifiModeGet(V5_DeviceT device);
+
+// AI Vision sensor
+
+/**
+ * @brief   Returns the AI Vision Sensor to its power on state.
+ * @param   device Device handle.
+ * @details Clears the stored color and code descriptors along with the rest of
+ *          the configuration, so anything written before the call has to be
+ *          written again.
+ */
+void vexDeviceAiVisionReset(V5_DeviceT device);
+
+/**
+ * @brief   Turns individual kinds of detection on or off.
+ * @param   device  Device handle.
+ * @param   bits    New state for the kinds selected by bitmask.
+ * @param   bitmask Which kinds of detection the call applies to.
+ * @details Only the bits set in bitmask are touched, so one kind can be
+ * changed without disturbing the others. The bit positions are the ones PROS
+ *          exposes as aivision_mode_type_e_t.
+ */
+void vexDeviceAiVisionEnableSet(V5_DeviceT device, uint8_t bits,
+                                uint8_t bitmask);
+
+/**
+ * @brief   Reads back which kinds of detection are enabled.
+ * @param   device Device handle.
+ * @return  A bitfield in the same layout as the bits argument of
+ *          vexDeviceAiVisionEnableSet().
+ */
+uint8_t vexDeviceAiVisionEnableGet(V5_DeviceT device);
+
+/**
+ * @brief   Sets the AI Vision Sensor's mode word.
+ * @param   device Device handle.
+ * @param   mode   Packed mode word.
+ * @details The word carries several unrelated settings at once, among them the
+ *          AprilTag family to look for, the USB bounding box overlay and the
+ *          request to run auto white balance. Read the current word back with
+ *          vexDeviceAiVisionStatusGet() and change only the fields wanted,
+ *          since writing a field implicitly writes all of them.
+ */
+void vexDeviceAiVisionModeSet(V5_DeviceT device, uint32_t mode);
+
+/**
+ * @brief   Reads the AI Vision Sensor's status word.
+ * @param   device Device handle.
+ * @return  The packed status word, in the same layout as the mode word.
+ * @see     vexDeviceAiVisionModeSet
+ */
+uint32_t vexDeviceAiVisionStatusGet(V5_DeviceT device);
+
+/**
+ * @brief   Counts the objects the AI Vision Sensor is currently reporting.
+ * @param   device Device handle.
+ * @return  The number of objects available.
+ * @details Call this before vexDeviceAiVisionObjectGet(), since the count
+ *          changes from frame to frame.
+ */
+int32_t vexDeviceAiVisionObjectCountGet(V5_DeviceT device);
+
+/**
+ * @brief   Reads one detected object.
+ * @param   device   Device handle.
+ * @param   indexObj Zero based object index, below the current object count.
+ * @param   pObject  Structure filled in with the object's data.
+ * @return  The number of objects copied, so 1 on success and 0 if the index is
+ *          out of range.
+ * @details The object's type decides which member of the returned union holds
+ *          its geometry.
+ */
+int32_t vexDeviceAiVisionObjectGet(V5_DeviceT device, uint32_t indexObj,
+                                   V5_DeviceAiVisionObject *pObject);
+
+/**
+ * @brief   Writes a color descriptor to the AI Vision Sensor.
+ * @param   device Device handle.
+ * @param   pColor Descriptor to store, with its id set to the target slot.
+ * @details Writing a slot that already holds a descriptor overwrites it. Color
+ *          detection has to be enabled separately with
+ *          vexDeviceAiVisionEnableSet().
+ */
+void vexDeviceAiVisionColorSet(V5_DeviceT device,
+                               V5_DeviceAiVisionColor *pColor);
+
+/**
+ * @brief   Reads a color descriptor back from the AI Vision Sensor.
+ * @param   device Device handle.
+ * @param   id     Descriptor slot, 1 to 7.
+ * @param   pColor Structure filled in with the stored descriptor.
+ * @return  True if the descriptor was read.
+ * @details Reading a slot that has never been written gives undefined data
+ *          rather than an error.
+ */
+bool vexDeviceAiVisionColorGet(V5_DeviceT device, uint32_t id,
+                               V5_DeviceAiVisionColor *pColor);
+
+/**
+ * @brief   Writes a code descriptor to the AI Vision Sensor.
+ * @param   device Device handle.
+ * @param   pCode  Descriptor to store, with its id set to the target slot.
+ * @details The color descriptors the code refers to have to be written first.
+ */
+void vexDeviceAiVisionCodeSet(V5_DeviceT device, V5_DeviceAiVisionCode *pCode);
+
+/**
+ * @brief   Reads a code descriptor back from the AI Vision Sensor.
+ * @param   device Device handle.
+ * @param   id     Descriptor slot, 1 to 5.
+ * @param   pCode  Structure filled in with the stored descriptor.
+ * @return  True if the descriptor was read.
+ */
+bool vexDeviceAiVisionCodeGet(V5_DeviceT device, uint32_t id,
+                              V5_DeviceAiVisionCode *pCode);
+
+/**
+ * @brief   Reads the name of one of the AI model's classes.
+ * @param   device Device handle.
+ * @param   id     Class index, or -1 to ask how many classes there are.
+ * @param   pName  Buffer of at least 20 bytes for the name.
+ * @return  The number of classes when id is -1, otherwise unspecified.
+ * @details The sensor does not report class names reliably for the first few
+ *          hundred milliseconds after it is plugged in.
+ */
+int32_t vexDeviceAiVisionClassNameGet(V5_DeviceT device, int32_t id,
+                                      uint8_t *pName);
+
+/**
+ * @brief   Reads the AI Vision Sensor's internal temperature.
+ * @param   device Device handle.
+ * @return  The temperature in degrees Celsius.
+ */
+double vexDeviceAiVisionTemperatureGet(V5_DeviceT device);
 
 // IMU
 
@@ -1709,6 +1872,66 @@ int32_t vexDeviceGenericSerialReceive(V5_DeviceT device, uint8_t *buffer,
  * @param   device Device handle.
  */
 void vexDeviceGenericSerialFlush(V5_DeviceT device);
+
+// Radio link between two brains
+
+/**
+ * @brief   Joins a VEXnet radio to a named link.
+ * @param   device  Device handle for the radio.
+ * @param   link_id Name shared by the two brains that are to be paired.
+ * @param   type    0 for the receiving end and 1 for the transmitting end.
+ * @param   ov      Whether to override an existing link on the radio.
+ * @details Two brains pair when both set the same link_id and take opposite
+ *          types. Pairing is not instant, so vexDeviceGenericRadioLinkStatus()
+ *          keeps reporting false for a while after the call. Only one radio
+ *          per brain can be linked. VEXos reports a linked radio's port as
+ *          #kDeviceTypeGenericSerial rather than #kDeviceTypeRadioSensor.
+ */
+void vexDeviceGenericRadioConnection(V5_DeviceT device, char *link_id,
+                                     int32_t type, bool ov);
+
+/**
+ * @brief   Reports whether a radio link is up.
+ * @param   device Device handle.
+ * @return  True once the two radios have paired.
+ */
+bool vexDeviceGenericRadioLinkStatus(V5_DeviceT device);
+
+/**
+ * @brief   Reports how much room is left in the link's transmit buffer.
+ * @param   device Device handle.
+ * @return  The number of free bytes.
+ */
+uint32_t vexDeviceGenericRadioWriteFree(V5_DeviceT device);
+
+/**
+ * @brief   Queues a buffer for transmission over the link.
+ * @param   device Device handle.
+ * @param   buffer Bytes to send.
+ * @param   length Number of bytes to send.
+ * @return  The number of bytes queued.
+ * @details May queue fewer bytes than asked for if the transmit buffer fills
+ *          up, so check the return value rather than assuming it all went.
+ */
+uint32_t vexDeviceGenericRadioTransmit(V5_DeviceT device, uint8_t *buffer,
+                                       uint32_t length);
+
+/**
+ * @brief   Reports how many bytes the link has waiting to be read.
+ * @param   device Device handle.
+ * @return  The number of buffered bytes.
+ */
+uint32_t vexDeviceGenericRadioReceiveAvail(V5_DeviceT device);
+
+/**
+ * @brief   Reads buffered bytes from the link into a caller supplied buffer.
+ * @param   device Device handle.
+ * @param   buffer Destination buffer.
+ * @param   length Maximum number of bytes to read.
+ * @return  The number of bytes actually read.
+ */
+uint32_t vexDeviceGenericRadioReceive(V5_DeviceT device, uint8_t *buffer,
+                                      uint32_t length);
 
 // Display/graphics
 
