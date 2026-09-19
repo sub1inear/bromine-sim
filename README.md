@@ -13,6 +13,7 @@ Planned features:
 Not planned:
 - 3D physics simulation
 - Full QEMU-based emulation
+- Vexide Simulator Protocol support
 - Full sensor support
 - VEXCode support
 - Auto-generation of robot configuration from other CAD softwares
