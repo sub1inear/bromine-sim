@@ -19,9 +19,16 @@ Not planned:
 - Auto-generation of robot configuration from other CAD softwares
 
 ## Architecture
-- [`src/pros`] Modified PROS source code to run on Windows/POSIX
-- [`src/sdk`] VEX SDK wrappers to connect PROS and the simulator
-- [`src/sim`] Simulator code (graphics, physics, etc.)
-- [`include/pros`] PROS headers
-- [`include/sdk`] Documented VEX SDK headers
-- [`include/sim`] Simulator headers
+- [`src/pros`]: Modified PROS source code to run on Windows/POSIX
+- [`src/sdk`]: VEX SDK wrappers to connect PROS and the simulator
+- [`src/sim`]: Simulator code (graphics, physics, etc.)
+- [`include/pros`]: PROS headers
+- [`include/sdk`]: Documented VEX SDK headers
+- [`include/sim`]: Simulator headers
+
+[`src/pros`]: ./src/pros
+[`src/sdk`]: ./src/sdk
+[`src/sim`]: ./src/sim
+[`include/pros`]: ./include/pros
+[`include/sdk`]: ./include/sdk
+[`include/sim`]: ./include/sim
