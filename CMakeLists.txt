@@ -39,19 +39,19 @@ set(BOX2D_BUILD_SAMPLES OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(box2d)
 
 add_executable(BromineSim
-    src/cup.cpp
-    src/device.cpp
-    src/field.cpp
-    src/main.cpp
-    src/motor.cpp
-    src/pin.cpp
-    src/renderer.cpp
-    src/robot.cpp
-    src/sim.cpp
-    src/units.cpp
-    src/utils.cpp
-    src/wheel.cpp
-    src/window.cpp
+    src/sim/cup.cpp
+    src/sim/device.cpp
+    src/sim/field.cpp
+    src/sim/main.cpp
+    src/sim/motor.cpp
+    src/sim/pin.cpp
+    src/sim/renderer.cpp
+    src/sim/robot.cpp
+    src/sim/sim.cpp
+    src/sim/units.cpp
+    src/sim/utils.cpp
+    src/sim/wheel.cpp
+    src/sim/window.cpp
     src/pros/common/cobs.c
     src/pros/common/gid.c
     src/pros/common/posix.c
@@ -140,8 +140,10 @@ endif()
 message(STATUS "BromineSim: using the ${PROS_PORT_NAME} FreeRTOS port")
 
 target_include_directories(BromineSim PRIVATE include)
+target_include_directories(BromineSim PRIVATE include/sim)
 target_include_directories(BromineSim PRIVATE include/pros)
 target_include_directories(BromineSim PRIVATE include/sdk)
+
 
 target_include_directories(BromineSim PRIVATE include/pros/rtos)
 target_include_directories(BromineSim PRIVATE include/pros/rtos/${PROS_PORT_NAME})
