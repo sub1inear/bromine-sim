@@ -32,3 +32,16 @@ Not planned:
 [`include/pros`]: ./include/pros
 [`include/sdk`]: ./include/sdk
 [`include/sim`]: ./include/sim
+
+## Usage
+
+Requirements:
+- CMake
+- Python
+- GCC or Clang (MSVC is not supported)
+
+1. Clone the repository.
+2. Run `scripts/setup.py path/to/pros/project` with Python (`python` on Windows, `python3` on Linux/MacOS) to set up everything.
+3. Build it with CMake.
+4. Run the resulting executable inside the root directory.
+
