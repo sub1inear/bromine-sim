@@ -1,7 +1,9 @@
 #include "sim.hpp"
 #include "constants.hpp"
 #include "field.hpp"
+#include "pros/system/startup.h"
 #include <cstdint>
+#include <thread>
 
 namespace bromine
 {
@@ -21,6 +23,10 @@ static b2WorldId createWorld()
 // this via a static function.
 Sim::Sim() : worldId(createWorld()), robot(worldId), field(worldId), accum(0.0f)
 {
+    // PROS's startup_main() will never return
+    // and Raylib requires the main thread,
+    // so we run startup_main() in a detached thread.
+    std::thread(startup_main).detach();
 }
 
 Sim::~Sim()
