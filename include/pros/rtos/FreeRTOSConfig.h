@@ -192,8 +192,8 @@ FreeRTOS/Source/tasks.c for limitations. */
 extern void vInitialiseTimerForRunTimeStats( void );
 extern uint32_t vexSystemWatchdogGet( void );
 #define configGENERATE_RUN_TIME_STATS 1
-// #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vInitialiseTimerForRunTimeStats()
-// #define portGET_RUN_TIME_COUNTER_VALUE()         vexSystemWatchdogGet()
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vInitialiseTimerForRunTimeStats()
+#define portGET_RUN_TIME_COUNTER_VALUE()         vexSystemWatchdogGet()
 
 /* The size of the global output buffer that is available for use when there
 are multiple command interpreters running at once (for example, one on a UART
