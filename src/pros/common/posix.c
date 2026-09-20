@@ -13,9 +13,6 @@ int dprintf(int fd, const char* fmt, ...) __attribute__((format(printf, 2, 3)))
     } else {
         f = stderr;
     }
-    if (fd == 3) {
-        fprintf(stderr, "kerr: ");
-    }
 
     int retval = vfprintf(stderr, fmt, args);
     va_end(args);

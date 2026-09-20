@@ -6,10 +6,10 @@
 
 int main()
 {
-    bromine::Window window;
-
-    SetTargetFPS(bromine::fps);
     SetTraceLogLevel(LOG_NONE);
+    SetTargetFPS(bromine::fps);
+
+    bromine::Window window;
 
     bromine::Sim &sim = bromine::getSim();
     bromine::Renderer renderer(sim.worldId);
