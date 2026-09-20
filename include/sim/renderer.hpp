@@ -28,8 +28,9 @@ public:
     friend class Wheel;
 
     Renderer(b2WorldId worldId);
-
     ~Renderer();
+    Renderer(const Renderer &) = delete;
+    Renderer &operator=(const Renderer &) = delete;
 
     void draw(const Sim &sim);
 
