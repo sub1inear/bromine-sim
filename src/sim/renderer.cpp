@@ -42,7 +42,11 @@ Renderer::Renderer(b2WorldId worldId) : worldId(worldId), debug(false)
     SetTextureFilter(pinsTexture, TEXTURE_FILTER_TRILINEAR);
 }
 
-Renderer::~Renderer() { UnloadTexture(fieldTexture); }
+Renderer::~Renderer()
+{
+    UnloadTexture(pinsTexture);
+    UnloadTexture(fieldTexture);
+}
 
 void Renderer::draw(const Sim &sim)
 {
