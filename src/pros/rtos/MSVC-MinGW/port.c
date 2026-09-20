@@ -225,11 +225,9 @@ static BOOL WINAPI prvEndProcess( DWORD dwCtrlType )
 /*-----------------------------------------------------------*/
 
 StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
-                                     StackType_t * pxEndOfStack,
                                      TaskFunction_t pxCode,
                                      void * pvParameters )
 {
-    ( void ) pxEndOfStack;
     ThreadState_t * pxThreadState = NULL;
     int8_t * pcTopOfStack = ( int8_t * ) pxTopOfStack;
     const SIZE_T xStackSize = 1024; /* Set the size to a small number which will get rounded up to the minimum possible. */
