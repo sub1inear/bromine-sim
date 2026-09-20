@@ -15,7 +15,7 @@
  */
 
 #include <errno.h>
-#include <sys/stat.h>
+#include "common/posix.h"
 
 int chdir(const char* path) {
 	errno = ENOSYS;

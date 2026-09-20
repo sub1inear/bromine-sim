@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <stdexcept>
 
+#include "kapi.h"
 #include "rtos/FreeRTOS.h"
 #include "rtos/task.h"
 #include "v5_api.h"

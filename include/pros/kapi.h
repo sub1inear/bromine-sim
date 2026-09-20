@@ -20,6 +20,7 @@
 
 #include "api.h"
 #include "pros/apix.h"
+#include "pros/rtos.h"
 #include "rtos/FreeRTOS.h"
 #include "rtos/stream_buffer.h"
 
@@ -191,5 +192,7 @@ int32_t xTaskGetSchedulerState();
 #undef task_t
 #undef task_fn_t
 #undef mutex_t
+#undef sem_t
+#undef queue_t
 }
 #endif

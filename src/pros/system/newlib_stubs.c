@@ -16,15 +16,14 @@
 
 #include <errno.h>
 #include <stdint.h>
-#include <sys/time.h>
-#include <unistd.h>
 #include <stdio.h>
 
 #include "rtos/task.h"
 #include "v5_api.h"
 
-#include "hot.h"
+#include "system/hot.h"
 #include "pros/misc.h"
+#include "common/posix.h"
 
 #define SEC_TO_MSEC 1000
 #define SEC_TO_MICRO 1000000
@@ -54,7 +53,7 @@ int usleep( useconds_t period ) {
 		return 0;
 	}
 	uint64_t endTime = vexSystemHighResTimeGet() + period;
-	while(vexSystemHighResTimeGet() < endTime) asm("YIELD");
+	while(vexSystemHighResTimeGet() < endTime) portYIELD();
 	return 0;
 }
 
@@ -68,14 +67,14 @@ int getentropy(void *_buffer, size_t _length) {
 	return -1;
 }
 
-// HACK: this helps confused libc++ functions call the right instruction. for
-// info see https://github.com/purduesigbots/pros/issues/153#issuecomment-519335375
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Winfinite-recursion"
-void __sync_synchronize(void) {
-	__sync_synchronize();
-}
-#pragma GCC diagnostic pop
+// // HACK: this helps confused libc++ functions call the right instruction. for
+// // info see https://github.com/purduesigbots/pros/issues/153#issuecomment-519335375
+// #pragma GCC diagnostic push
+// #pragma GCC diagnostic ignored "-Winfinite-recursion"
+// void __sync_synchronize(void) {
+// 	__sync_synchronize();
+// }
+// #pragma GCC diagnostic pop
 
 // These variables are used to store the user-set time.
 // When user_time_set is false, the realtime clock will use the timestamp as the
@@ -143,8 +142,8 @@ int clock_gettime(clockid_t clock_id, struct timespec* tp) {
 //
 // This function pointer serves as a callback so that _gettimeofday() can call
 // a function inside the hot package. Without this, _gettimeofday() cannot
-// access any symbols in the hot package (where _PROS_COMPILE_TIMESTAMP_INT 
-// lives), and linker errors occur. 
+// access any symbols in the hot package (where _PROS_COMPILE_TIMESTAMP_INT
+// lives), and linker errors occur.
 //
 // When the hot package is initialized, it calls set_get_timestamp_int_func()
 // and sets the callback to a function that returns the unix timestamp.
@@ -153,7 +152,7 @@ int clock_gettime(clockid_t clock_id, struct timespec* tp) {
 //   1) Pass the get_timestamp_int_func to the cold package
 //   2) When the cold package (this library) needs to access the timestamp,
 //      call the callback
-//   3) Then the cold package 
+//   3) Then the cold package
 static const int (*get_timestamp_int_func)(void) = NULL;
 
 void set_get_timestamp_int_func(const int (*func)(void))
@@ -182,7 +181,7 @@ int _gettimeofday(struct timeval* tp, void* tzvp) {
 	else {
 		// When competition isn't connected, the vex's date/time functions do
 		// not work. Here we use a timestamp compiled into the program and then
-		// add the number of microseconds the program has been running to get 
+		// add the number of microseconds the program has been running to get
 		// the best estimate.
 		tp->tv_sec = get_timestamp_int_func();
 		tp->tv_usec = vexSystemHighResTimeGet();

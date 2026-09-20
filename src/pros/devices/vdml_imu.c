@@ -11,7 +11,10 @@
  */
 
 #include <errno.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
+#include "common/posix.h"
 #include "pros/imu.h"
 #include "v5_api.h"
 #include "vdml/registry.h"

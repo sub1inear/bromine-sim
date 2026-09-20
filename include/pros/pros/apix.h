@@ -30,6 +30,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
 #pragma GCC diagnostic pop
+#include "pros/rtos.h"
 #include "pros/serial.h"
 
 #ifdef __cplusplus

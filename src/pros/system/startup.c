@@ -25,7 +25,6 @@ extern void graphical_context_daemon_initialize(void);
 extern __attribute__((weak)) void display_initialize(void) {}
 extern void rtos_sched_start();
 extern void vdml_initialize();
-extern void invoke_install_hot_table();
 
 // XXX: pros_init happens inside __libc_init_array, and before any global
 // C++ constructors are invoked. This is accomplished by instructing
@@ -51,10 +50,13 @@ __attribute__((constructor(102))) static void pros_init(void) {
 	// https://github.com/purduesigbots/pros/pull/144/#issuecomment-496901942
 	system_daemon_initialize();
 
-	invoke_install_hot_table();
+	// NOTE: the V5 build calls invoke_install_hot_table() here to link up a
+	// separately-uploaded hot package. The simulator is a single binary with no
+	// hot/cold split, so HOT_TABLE stays NULL and user_functions.c calls the
+	// user's functions directly.
 }
 
-int main() {
+int startup_main() {
 	rtos_sched_start();
 
 	vexDisplayPrintf(10, 60, 1, "failed to start scheduler\n");

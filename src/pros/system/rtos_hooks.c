@@ -22,64 +22,22 @@
 #include "v5_api.h"
 #include "v5_color.h"
 
-// Fast interrupt handler
-void FIQInterrupt() {
-	vexSystemFIQInterrupt();
-}
-// Replacement for DataAbortInterrupt
-void DataAbortInterrupt() {
-	taskDISABLE_INTERRUPTS();
-	register int sp;
-	asm("add %0,sp,#8\n" : "=r"(sp));
-	extern void report_fatal_error(uint32_t _sp, const char* error_name);
-	report_fatal_error(sp, "DATA ABORT EXCEPTION");
-	for(uint8_t i = 1; i <= 21; i++) {
-		motor_move_voltage(i, 0);
-	}
-	for (;;) {
-		vexBackgroundProcessing();
-		extern void ser_output_flush();
-		ser_output_flush();
-	}
-}
-// Replacement for PrefetchAbortInterrupt
-void PrefetchAbortInterrupt() {
-	taskDISABLE_INTERRUPTS();
-	register int sp;
-	asm("add %0,sp,#8\n" : "=r"(sp));
-	extern void report_fatal_error(uint32_t _sp, const char* error_name);
-	report_fatal_error(sp, "PREFETCH ABORT EXCEPTION");
-	for(uint8_t i = 1; i <= 21; i++) {
-		motor_move_voltage(i, 0);
-	}
-	for (;;) {
-		vexBackgroundProcessing();
-		extern void ser_output_flush();
-		ser_output_flush();
-	}
-}
-
 void _boot() {
 	vexSystemBoot();
 }
 
-extern void vPortInstallFreeRTOSVectorTable(void);
 void rtos_initialize() {
 	vexSystemTimerStop();
-
-	portDISABLE_INTERRUPTS();
-
-	vPortInstallFreeRTOSVectorTable();
 
 	void task_notify_when_deleting_init();
 	task_notify_when_deleting_init();
 }
 
-extern void FreeRTOS_Tick_Handler(void);
-void rtos_tick_interrupt_config() {
-	vexSystemTimerReinitForRtos(portLOWEST_USABLE_INTERRUPT_PRIORITY << portPRIORITY_SHIFT,
-	                            (void (*)(void*))FreeRTOS_Tick_Handler);
-}
+// On the V5 brain the Cortex-A port installs FreeRTOS_Tick_Handler on a Zynq
+// timer peripheral. The simulator's MSVC-MinGW and Posix ports generate ticks
+// themselves (from a dedicated timer thread that calls xTaskIncrementTick), so
+// there is no peripheral to configure and no FreeRTOS_Tick_Handler to install.
+void rtos_tick_interrupt_config() {}
 
 void rtos_tick_interrupt_clear() {
 	vexSystemTimerClearInterrupt();

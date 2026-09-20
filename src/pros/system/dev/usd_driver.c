@@ -14,11 +14,10 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 #include "common/set.h"
 #include "common/string.h"
+#include "common/posix.h"
 #include "kapi.h"
 #include "system/dev/usd.h"
 #include "system/dev/vfs.h"
@@ -43,7 +42,7 @@ enum fa_flags {
 /******************************************************************************/
 /**                         newlib driver functions                          **/
 /******************************************************************************/
-int usd_read_r(struct _reent* r, void* const arg, uint8_t* buffer, const size_t len) {
+ssize_t usd_read_r(struct _reent* r, void* const arg, uint8_t* buffer, const size_t len) {
 	usd_file_arg_t* file_arg = (usd_file_arg_t*)arg;
 	// TODO: mutex here. Global or file lock?
 	int32_t result = vexFileRead((char*)buffer, sizeof(*buffer), len, file_arg->ifi_fptr);

@@ -35,7 +35,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #endif /* __cplusplus */
 
 #include "pros/adi.h"

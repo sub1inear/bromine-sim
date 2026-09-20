@@ -36,61 +36,7 @@ extern "C" {
 /******************************************************************************
 *   Defines
 ******************************************************************************/
-/* Type definitions. */
-#define portCHAR                 char
-#define portFLOAT                float
-#define portDOUBLE               double
-#define portLONG                 long
-#define portSHORT                short
-#define portSTACK_TYPE           size_t
-#define portPOINTER_SIZE_TYPE    size_t
-
-typedef portSTACK_TYPE           StackType_t;
-
-#if defined( __x86_64__ ) || defined( _M_X64 )
-    #define portBASE_TYPE    long long
-    typedef long long            BaseType_t;
-    typedef unsigned long long   UBaseType_t;
-#else
-    #define portBASE_TYPE    long
-    typedef long                 BaseType_t;
-    typedef unsigned long        UBaseType_t;
-#endif
-
-
-#if ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_16_BITS )
-    typedef uint16_t             TickType_t;
-    #define portMAX_DELAY              ( TickType_t ) 0xffff
-#elif ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_32_BITS )
-    typedef uint32_t             TickType_t;
-    #define portMAX_DELAY              ( TickType_t ) 0xffffffffUL
-
-/* 32-bit tick type on a 32/64-bit architecture, so reads of the tick
- * count do not need to be guarded with a critical section. */
-    #define portTICK_TYPE_IS_ATOMIC    1
-#elif ( configTICK_TYPE_WIDTH_IN_BITS == TICK_TYPE_WIDTH_64_BITS )
-    typedef uint64_t             TickType_t;
-    #define portMAX_DELAY              ( TickType_t ) 0xffffffffffffffffULL
-
-#if defined( __x86_64__ ) || defined( _M_X64 )
-/* 64-bit tick type on a 64-bit architecture, so reads of the tick
- * count do not need to be guarded with a critical section. */
-    #define portTICK_TYPE_IS_ATOMIC    1
-#endif
-#else
-    #error configTICK_TYPE_WIDTH_IN_BITS set to unsupported tick type width.
-#endif
-
-/* Hardware specifics. */
-#define portSTACK_GROWTH          ( -1 )
-#define portTICK_PERIOD_MS        ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
-#define portINLINE                __inline
-
-#if defined( __x86_64__ ) || defined( _M_X64 )
-    #define portBYTE_ALIGNMENT    8
-#else
-    #define portBYTE_ALIGNMENT    4
-#endif
+#include "../pros_port.h"
 
 #define portYIELD()    vPortGenerateSimulatedInterrupt( portINTERRUPT_YIELD )
 
@@ -183,6 +129,8 @@ void vPortExitCritical( void );
 #define portINTERRUPT_YIELD                        ( 0UL )
 #define portINTERRUPT_TICK                         ( 1UL )
 #define portINTERRUPT_APPLICATION_DEFINED_START    ( 2UL )
+
+#define portNOP()                               __asm volatile ( "NOP" )
 
 /*
  * Raise a simulated interrupt represented by the bit mask in ulInterruptMask.

@@ -12,8 +12,9 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 
+#include "common/posix.h"
+#include "common/string.h"
 #include "kapi.h"
 #include "v5_api.h"
 #include "vdml/vdml.h"
@@ -149,10 +150,10 @@ int32_t controller_set_text(controller_id_e_t id, uint8_t line, uint8_t col, con
 	else
 		col++;
 
-	char* buf = strndup(str, CONTROLLER_MAX_CHARS + 1);
+	char* buf = kstrndup(str, CONTROLLER_MAX_CHARS + 1);
 
 	uint32_t rtn_val = vexControllerTextSet(id, line, col, buf);
-	free(buf);
+	kfree(buf);
 	internal_port_mutex_give(port);
 
 	if (!rtn_val) {

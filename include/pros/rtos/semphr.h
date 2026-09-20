@@ -382,7 +382,7 @@ uint8_t sem_wait(sem_t sem, uint32_t block_time);
  * \ingroup Semaphores
  */
 #if( configUSE_RECURSIVE_MUTEXES == 1 )
-	uint8_t mutex_recursive_take(mutex_t mutex, uint32_t block_time);
+	bool mutex_recursive_take(mutex_t mutex, uint32_t block_time);
 #endif
 
 /**
@@ -531,7 +531,7 @@ uint8_t sem_post(sem_t sem);
  * \ingroup Semaphores
  */
 #if( configUSE_RECURSIVE_MUTEXES == 1 )
-	uint8_t mutex_recursive_give(mutex_t mutex);
+	bool mutex_recursive_give(mutex_t mutex);
 #endif
 
 /**

@@ -40,6 +40,11 @@ must be set in the compiler's include path. */
 	#include "portmacro.h"
 #endif
 
+/* NB: do not include kapi.h here. FreeRTOS.h includes this file partway through
+itself, so kapi.h's own "#include rtos/FreeRTOS.h" would no-op and kapi.h would
+then reference static_task_s_t et al before FreeRTOS.h has declared them.
+task_stack_t comes from pros_port.h via portmacro.h above. */
+
 #if portBYTE_ALIGNMENT == 32
 	#define portBYTE_ALIGNMENT_MASK ( 0x001f )
 #endif

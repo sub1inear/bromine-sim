@@ -39,44 +39,7 @@
 #include <limits.h>
 #include <stdint.h>
 
-/*-----------------------------------------------------------
- * Port specific definitions.
- *
- * The settings in this file configure FreeRTOS correctly for the
- * given hardware and compiler.
- *
- * These settings should not be altered.
- *-----------------------------------------------------------
- */
-
-/* Type definitions. */
-#define portCHAR                 char
-#define portFLOAT                float
-#define portDOUBLE               double
-#define portLONG                 long
-#define portSHORT                short
-#define portSTACK_TYPE           unsigned long
-#define portBASE_TYPE            long
-#define portPOINTER_SIZE_TYPE    intptr_t
-
-typedef portSTACK_TYPE   StackType_t;
-typedef long             BaseType_t;
-typedef unsigned long    UBaseType_t;
-
-typedef unsigned long    TickType_t;
-#define portMAX_DELAY              ( ( TickType_t ) ULONG_MAX )
-
-#define portTICK_TYPE_IS_ATOMIC    1
-
-/*-----------------------------------------------------------*/
-
-/* Architecture specifics. */
-#define portSTACK_GROWTH                   ( -1 )
-#define portHAS_STACK_OVERFLOW_CHECKING    ( 1 )
-#define portTICK_PERIOD_MS                 ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
-#define portTICK_RATE_MICROSECONDS         ( ( TickType_t ) 1000000 / configTICK_RATE_HZ )
-#define portBYTE_ALIGNMENT                 8
-/*-----------------------------------------------------------*/
+#include "../pros_port.h"
 
 /* Scheduler utilities. */
 extern void vPortYield( void );
@@ -143,6 +106,8 @@ extern void vPortCancelThread( void * pxTaskToDelete );
 extern uint32_t ulPortGetRunTime( void );
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()    /* no-op */
 #define portGET_RUN_TIME_COUNTER_VALUE()            ulPortGetRunTime()
+
+#define portNOP()                                   __asm volatile ( "NOP" )
 
 /* *INDENT-OFF* */
 #ifdef __cplusplus

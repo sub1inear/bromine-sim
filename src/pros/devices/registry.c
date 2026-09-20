@@ -16,6 +16,7 @@
 #include <stdio.h>
 
 #include "api.h"
+#include "common/posix.h"
 #include "kapi.h"
 #include "pros/misc.h"
 #include "v5_api.h"

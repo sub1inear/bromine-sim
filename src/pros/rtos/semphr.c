@@ -194,12 +194,12 @@ mutex_t mutex_create(void) {
 	return (mutex_t)xQueueCreateMutex(queueQUEUE_TYPE_MUTEX);
 }
 
-uint8_t mutex_give(mutex_t mutex) {
-	return xQueueGenericSend((queue_t)(mutex), NULL, semGIVE_BLOCK_TIME, queueSEND_TO_BACK);
+bool mutex_give(mutex_t mutex) {
+	return (bool)xQueueGenericSend((queue_t)(mutex), NULL, semGIVE_BLOCK_TIME, queueSEND_TO_BACK);
 }
 
-uint8_t mutex_take(mutex_t mutex, uint32_t timeout) {
-	return xQueueSemaphoreTake( ( mutex ), ( timeout ) );
+bool mutex_take(mutex_t mutex, uint32_t timeout) {
+	return (bool)xQueueSemaphoreTake( ( mutex ), ( timeout ) );
 }
 
 void mutex_delete(mutex_t mutex){
@@ -416,8 +416,8 @@ mutex_t mutex_recursive_create(void) {
  * \defgroup mutex_recursive_give mutex_recursive_give
  * \ingroup Semaphores
  */
-uint8_t mutex_recursive_give(mutex_t mutex) {
-	return xQueueGiveMutexRecursive((mutex));
+bool mutex_recursive_give(mutex_t mutex) {
+	return (bool)xQueueGiveMutexRecursive((mutex));
 }
 
 /**
@@ -511,8 +511,8 @@ uint8_t mutex_recursive_give(mutex_t mutex) {
  * \defgroup mutex_recursive_take mutex_recursive_take
  * \ingroup Semaphores
  */
-uint8_t mutex_recursive_take(mutex_t mutex, uint32_t timeout) {
-	return xQueueTakeMutexRecursive((mutex), (timeout));
+bool mutex_recursive_take(mutex_t mutex, uint32_t timeout) {
+	return (bool)xQueueTakeMutexRecursive((mutex), (timeout));
 }
 
 sem_t sem_create(uint32_t max_count, uint32_t init_count) {

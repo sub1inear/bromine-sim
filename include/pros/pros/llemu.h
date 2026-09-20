@@ -3,6 +3,9 @@
 
 // TODO:? Should there be weak symbols for the C api in here as well?
 
+/* NB: do not include kapi.h here. api.h includes this file, so kapi.h would be
+entered partway through apix.h and its "#include pros/apix.h" would no-op,
+leaving sem_t/queue_t undeclared at kapi.h's static-allocation prototypes. */
 #include "stdbool.h"
 #include "stdint.h"
 
@@ -42,7 +45,7 @@ namespace c {
  * \return True if the operation was successful, or false otherwise, setting
  * errno values as specified above.
  */
-bool __attribute__((weak)) lcd_print(__attribute__((unused)) int16_t line, __attribute__((unused)) const char* fmt, ...)  {
+static inline bool lcd_print(__attribute__((unused)) int16_t line, __attribute__((unused)) const char* fmt, ...)  {
     return false;
 }
 

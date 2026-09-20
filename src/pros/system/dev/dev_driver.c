@@ -17,11 +17,10 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 #include "common/set.h"
 #include "common/string.h"
+#include "common/posix.h"
 #include "kapi.h"
 #include "system/dev/dev.h"
 #include "system/dev/vfs.h"
@@ -39,7 +38,7 @@ typedef struct dev_file_arg {
 /******************************************************************************/
 /**                         newlib driver functions                          **/
 /******************************************************************************/
-int dev_read_r(struct _reent* r, void* const arg, uint8_t* buffer, const size_t len) {
+ssize_t dev_read_r(struct _reent* r, void* const arg, uint8_t* buffer, const size_t len) {
 	dev_file_arg_t* file_arg = (dev_file_arg_t*)arg;
 	uint32_t port = file_arg->port;
 	int32_t recv = 0;

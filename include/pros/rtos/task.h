@@ -26,6 +26,7 @@
  */
 
 #include "FreeRTOS.h"
+#include "pros/rtos.h"
 
 #ifndef INC_TASK_H
 #define INC_TASK_H
@@ -38,6 +39,10 @@
 
 #ifdef __cplusplus
 extern "C" {
+#define task_t pros::task_t
+#define task_fn_t pros::task_fn_t
+#define task_state_e_t pros::task_state_e_t
+#define notify_action_e_t pros::notify_action_e_t
 #endif
 
 /*-----------------------------------------------------------
@@ -49,44 +54,11 @@ extern "C" {
 #define tskKERNEL_VERSION_MINOR 0
 #define tskKERNEL_VERSION_BUILD 1
 
-/**
- * task. h
- *
- * Type by which tasks are referenced.  For example, a call to task_create
- * returns (via a pointer parameter) an task_t variable that can then
- * be used as a parameter to task_delete to delete the task.
- *
- * \defgroup task_t task_t
- * \ingroup Tasks
- */
-typedef void * task_t;
-
 /*
  * Defines the prototype to which the application task hook function must
  * conform.
  */
 typedef int32_t (*TaskHookFunction_t)( void * );
-
-/* Task states returned by task_get_state. */
-typedef enum
-{
-	E_TASK_STATE_RUNNING = 0,	/* A task is querying the state of itself, so must be running. */
-	E_TASK_STATE_READY,			/* The task being queried is in a read or pending ready list. */
-	E_TASK_STATE_BLOCKED,		/* The task being queried is in the Blocked state. */
-	E_TASK_STATE_SUSPENDED,		/* The task being queried is in the Suspended state, or is in the Blocked state with an infinite time out. */
-	E_TASK_STATE_DELETED,		/* The task being queried has been deleted, but its TCB has not yet been freed. */
-	E_TASK_STATE_INVALID			/* Used as an 'invalid state' value. */
-} task_state_e_t;
-
-/* Actions that can be performed when vTaskNotify() is called. */
-typedef enum
-{
-	E_NOTIFY_ACTION_NONE = 0,				/* Notify the task without updating its notify value. */
-	E_NOTIFY_ACTION_BITS,					/* Set bits in the task's notification value. */
-	E_NOTIFY_ACTION_INCR,					/* Increment the task's notification value. */
-	E_NOTIFY_ACTION_OWRITE,		/* Set the task's notification value to a specific value even if the previous value has not yet been read by the task. */
-	E_NOTIFY_ACTION_NO_OWRITE	/* Set the task's notification value if the previous value has been read by the task. */
-} notify_action_e_t;
 
 /*
  * Used internally only.
@@ -203,10 +175,11 @@ typedef enum
 /* Definitions returned by xTaskGetSchedulerState().  taskSCHEDULER_SUSPENDED is
 0 to generate more optimal code when configASSERT() is defined as the constant
 is used in assert() statements. */
+#ifndef taskSCHEDULER_SUSPENDED
 #define taskSCHEDULER_SUSPENDED		( ( int32_t ) 0 )
 #define taskSCHEDULER_NOT_STARTED	( ( int32_t ) 1 )
 #define taskSCHEDULER_RUNNING		( ( int32_t ) 2 )
-
+#endif
 
 /*-----------------------------------------------------------
  * TASK CREATION API
@@ -601,7 +574,7 @@ void task_delay_until( uint32_t * const pxPreviousWakeTime, const uint32_t xTime
  * \defgroup task_abort_delay task_abort_delay
  * \ingroup TaskCtrl
  */
-int32_t task_abort_delay( task_t xTask ) ;
+bool task_abort_delay( task_t xTask ) ;
 
 /**
  * task. h
@@ -1533,7 +1506,7 @@ void vTaskGetRunTimeStats( char *pcWriteBuffer ) ; /*lint !e971 Unqualified char
  * \defgroup xTaskNotify xTaskNotify
  * \ingroup TaskNotifications
  */
-int32_t task_notify_ext( task_t xTaskToNotify, uint32_t ulValue, notify_action_e_t eAction, uint32_t *pulPreviousNotificationValue ) ;
+uint32_t task_notify_ext( task_t xTaskToNotify, uint32_t ulValue, notify_action_e_t eAction, uint32_t *pulPreviousNotificationValue ) ;
 #define xTaskNotify( xTaskToNotify, ulValue, eAction ) task_notify_ext( ( xTaskToNotify ), ( ulValue ), ( eAction ), NULL )
 #define xTaskNotifyAndQuery( xTaskToNotify, ulValue, eAction, pulPreviousNotifyValue ) task_notify_ext( ( xTaskToNotify ), ( ulValue ), ( eAction ), ( pulPreviousNotifyValue ) )
 
@@ -1747,7 +1720,7 @@ int32_t task_notify_wait( uint32_t ulBitsToClearOnEntry, uint32_t ulBitsToClearO
  * \defgroup xTaskNotifyGive xTaskNotifyGive
  * \ingroup TaskNotifications
  */
-int32_t task_notify(task_t xTaskToNotify);
+uint32_t task_notify(task_t xTaskToNotify);
 
 /**
  * task. h
@@ -1887,7 +1860,7 @@ uint32_t task_notify_take( bool xClearCountOnExit, uint32_t xTicksToWait ) ;
  * \defgroup task_notify_clear task_notify_clear
  * \ingroup TaskNotifications
  */
-int32_t task_notify_clear( task_t xTask );
+bool task_notify_clear( task_t xTask );
 
 /*-----------------------------------------------------------
  * SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
@@ -2102,5 +2075,9 @@ void vTaskInternalSetTimeOutState( TimeOut_t * const pxTimeOut ) ;
 
 #ifdef __cplusplus
 }
+#undef task_t
+#undef task_fn_t
+#undef task_state_e_t
+#undef notify_action_e_t
 #endif
 #endif /* INC_TASK_H */

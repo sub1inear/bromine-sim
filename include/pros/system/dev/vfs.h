@@ -17,8 +17,10 @@
 
 #include <errno.h>
 #include <stdint.h>
-#include <sys/stat.h>
-#include <unistd.h>
+
+#include "common/posix.h"
+
+#define _isatty newlib_isatty
 
 struct fs_driver {
 	ssize_t (*read_r)(struct _reent*, void* const, uint8_t*, const size_t);

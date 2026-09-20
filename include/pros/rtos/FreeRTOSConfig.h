@@ -72,7 +72,7 @@
 
 //#include "xparameters.h"
 // fix memset warnings
-#include "string.h"
+#include <string.h>
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -113,7 +113,13 @@
 #define configMAX_API_CALL_INTERRUPT_PRIORITY   18
 
 #define configCPU_CLOCK_HZ                      100000000UL
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
+/**
+ * NOTE:
+ * This must be 0 because on Windows, the code assumes size_t
+ * when PROS makes the type be uint32_t, causing a type mismatch.
+ * Yes, this is a hack, but it works for now.
+ */
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
 #define configUSE_TICKLESS_IDLE                 0
 #define configTICK_RATE_HZ                      ( ( uint32_t ) 1000 )
 #define configPERIPHERAL_CLOCK_HZ               ( 33333000UL )
@@ -138,7 +144,7 @@
 #define configUSE_COUNTING_SEMAPHORES           1
 #define configUSE_QUEUE_SETS                    0
 #define configSUPPORT_STATIC_ALLOCATION         1
-#define configUSE_NEWLIB_REENTRANT              1
+#define configUSE_NEWLIB_REENTRANT              0 // DISABLED from original PROS, may cause problems
 #define configSTACK_DEPTH_TYPE                  size_t
 
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 2

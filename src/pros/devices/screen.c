@@ -16,12 +16,45 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <sys/_stdint.h>
 
 #include "common/linkedlist.h"
+#include "common/posix.h"
 #include "kapi.h"
 #include "pros/apix.h"
 #include "v5_api.h"  // vexDisplay* 
+
+#ifdef _WIN32
+int vasprintf(char** strp, const char* format, va_list ap) {
+	// Create a copy of va_list because _vscprintf consumes it
+	va_list ap_copy;
+	va_copy(ap_copy, ap);
+
+	// Find the required buffer size (excluding null terminator)
+	int len = _vscprintf(format, ap_copy);
+	va_end(ap_copy);
+
+	if (len < 0) {
+		*strp = NULL;
+		return -1;
+	}
+
+	// Allocate buffer (+1 for the null terminator)
+	*strp = (char*)malloc(len + 1);
+	if (!*strp) {
+		return -1;
+	}
+
+	// Write the formatted string safely
+	int written = vsprintf_s(*strp, len + 1, format, ap);
+	if (written < 0) {
+		free(*strp);
+		*strp = NULL;
+		return -1;
+	}
+
+	return written;
+}
+#endif
 
 /******************************************************************************/
 /**                  Screen Graphical Display Functions                      **/
@@ -444,8 +477,8 @@ static task_stack_t touch_handle_task_stack[TASK_STACK_DEPTH_DEFAULT];
 static static_task_s_t touch_handle_task_buffer;
 static task_t touch_handle_task;
 
-// volatile because some linters think this is going to be optimized out
-static volatile void _handle_cb(ll_node_s_t* current, void* extra_data) {
+__attribute__((used)) static void _handle_cb(__attribute__((unused)) ll_node_s_t* current,
+                                             __attribute__((unused)) void* extra_data) {
 	(current->payload.func)();
 }
 

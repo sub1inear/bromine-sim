@@ -23,7 +23,6 @@
 
 #include <errno.h>
 #include <stdint.h>
-#include <unistd.h>
 
 #include "common/gid.h"
 #include "common/string.h"
@@ -56,8 +55,8 @@ void vfs_initialize(void) {
 	ser_initialize();
 
 	// Force _GLOBAL_REENT initialization for C++ stdio to work. See D97
-	extern void __sinit(struct _reent * s);
-	if (!_GLOBAL_REENT->__cleanup) __sinit(_GLOBAL_REENT);
+	// extern void __sinit(struct _reent * s);
+	// if (!_GLOBAL_REENT->__cleanup) __sinit(_GLOBAL_REENT);
 }
 
 // adds an entry to the the file system

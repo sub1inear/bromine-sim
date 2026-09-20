@@ -2354,7 +2354,7 @@ implementations require configUSE_TICKLESS_IDLE to be set to a value other than
 
 #if ( INCLUDE_xTaskAbortDelay == 1 )
 
-	int32_t task_abort_delay(task_t task)
+	bool task_abort_delay(task_t task)
 	{
 	TCB_t *pxTCB = ( TCB_t * ) task;
 	int32_t xReturn;
@@ -2422,7 +2422,7 @@ implementations require configUSE_TICKLESS_IDLE to be set to a value other than
 		}
 		( void ) rtos_resume_all();
 
-		return xReturn;
+		return ( bool ) xReturn;
 	}
 
 #endif /* INCLUDE_xTaskAbortDelay */
@@ -4386,10 +4386,10 @@ uint32_t uxReturn;
 
 #if( configUSE_TASK_NOTIFICATIONS == 1 )
 
-	int32_t task_notify_ext(task_t task, uint32_t value, notify_action_e_t action, uint32_t* prev_value)
+	uint32_t task_notify_ext(task_t task, uint32_t value, notify_action_e_t action, uint32_t* prev_value)
 	{
 	TCB_t * pxTCB;
-	int32_t xReturn = pdPASS;
+	uint32_t xReturn = pdPASS;
 	uint8_t ucOriginalNotifyState;
 
 		configASSERT( task );
@@ -4705,7 +4705,7 @@ uint32_t uxReturn;
 
 #if( configUSE_TASK_NOTIFICATIONS == 1 )
 
-	int32_t task_notify_clear(task_t task)
+	bool task_notify_clear(task_t task)
 	{
 	TCB_t *pxTCB;
 	int32_t xReturn;
@@ -4728,7 +4728,7 @@ uint32_t uxReturn;
 		}
 		taskEXIT_CRITICAL();
 
-		return xReturn;
+		return ( bool ) xReturn;
 	}
 
 #endif /* configUSE_TASK_NOTIFICATIONS */
@@ -4738,8 +4738,8 @@ uint32_t uxReturn;
 
 #if( configUSE_TASK_NOTIFICATIONS == 1 )
 
-	int32_t task_notify(task_t task) {
-	        return task_notify_ext((task), (0), E_NOTIFY_ACTION_INCR, NULL);
+	uint32_t task_notify(task_t task) {
+	        return ( uint32_t )task_notify_ext((task), (0), E_NOTIFY_ACTION_INCR, NULL);
 	}
 
 #endif /* configUSE_TASK_NOTIFICATIONS */

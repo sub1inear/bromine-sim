@@ -14,6 +14,7 @@
  */
 
  #include "pros/link.h"
+ #include "common/posix.h"
  #include "kapi.h"
  #include "pros/apix.h"
  #include "vdml/vdml.h"
