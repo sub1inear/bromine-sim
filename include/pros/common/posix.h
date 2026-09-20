@@ -21,15 +21,10 @@
 #define STDERR_FILENO 2
 #endif
 
-#ifndef F_OK
-#define F_OK 0
-#endif
-
 typedef int mode_t;
 typedef long long ssize_t;
 typedef uint32_t useconds_t;
 typedef long suseconds_t;
-typedef int32_t clockid_t;
 
 int dprintf(int fd, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 #define O_ACCMODE 0x0003
@@ -47,7 +42,10 @@ struct timespec {
     long   tv_nsec; /* Nanoseconds [0, 999999999] */
 };
 
-int gettimeofday(struct timeval* tp, void* tzp);
+
+#ifndef F_OK
+#define F_OK 0
+#endif
 
 #ifndef TIMEVAL_TO_TIMESPEC
 #define TIMEVAL_TO_TIMESPEC(tv, ts)       \
@@ -57,7 +55,15 @@ int gettimeofday(struct timeval* tp, void* tzp);
     } while (0)
 #endif
 
+typedef int32_t clockid_t;
+
+#else
+#include <unistd.h>
+#include <sys/time.h>
 #endif
+
+
+int gettimeofday(struct timeval* tp, void* tzp);
 
 struct _reent { int _errno; int dummy; };
 

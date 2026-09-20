@@ -15,6 +15,8 @@
 
 #pragma once
 
+#include "common/posix.h"
+
 /**
  * strdup but uses the kernel heap
  *

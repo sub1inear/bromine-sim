@@ -209,7 +209,6 @@ static void prvPortSetCurrentThreadName( const char * pxThreadName )
  * See header file for description.
  */
 StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
-                                     StackType_t * pxEndOfStack,
                                      TaskFunction_t pxCode,
                                      void * pvParameters )
 {
@@ -227,8 +226,8 @@ StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
     pxTopOfStack = ( StackType_t * ) thread - 1;
 
     /* Ensure that there is enough space to store Thread_t on the stack. */
-    ulStackSize = ( size_t ) ( pxTopOfStack + 1 - pxEndOfStack ) * sizeof( *pxTopOfStack );
-    configASSERT( ulStackSize > sizeof( Thread_t ) );
+    // ulStackSize = ( size_t ) ( pxTopOfStack + 1 - pxEndOfStack ) * sizeof( *pxTopOfStack );
+    // configASSERT( ulStackSize > sizeof( Thread_t ) );
     ( void ) ulStackSize; /* suppress set but not used warning */
 
     thread->pxCode = pxCode;
