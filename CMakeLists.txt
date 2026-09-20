@@ -109,14 +109,12 @@ add_executable(BromineSim
     src/pros/system/envlock.c
     src/pros/system/hot.c
     src/pros/system/mlock.c
-    src/pros/system/newlib_stubs.c
     src/pros/system/rtos_hooks.c
     src/pros/system/startup.c
     src/pros/system/system_daemon.c
     src/pros/system/unwind.c
     src/pros/system/user_functions.c
     src/pros/system/cpp_support.cpp
-    src/pros/system/newlib_stubs_support.cpp
     src/pros/system/dev/dev_driver.c
     src/pros/system/dev/file_system_stubs.c
     src/pros/system/dev/ser_daemon.c
