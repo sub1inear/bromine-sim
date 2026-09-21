@@ -66,8 +66,11 @@ Keyboard controls:
 | Key | Action |
 |-----|--------|
 | D | Toggle debug overlay |
+| Esc | Exit |
 | R (TODO) | Reset |
 | Space (TODO) | Pause/Resume |
 | M (TODO) | Start match |
 | O (TODO) | Start driver skills |
 | A (TODO) | Start auton skills |
+
+The first controller detected will be the "master" controller, and the second controller will be the "partner" controller; any others will be ignored.
