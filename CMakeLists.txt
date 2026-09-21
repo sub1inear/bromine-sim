@@ -47,7 +47,6 @@ add_executable(BromineSim
     src/sim/field.cpp
     src/sim/main.cpp
     src/sim/motor.cpp
-    src/sim/msg.cpp
     src/sim/pin.cpp
     src/sim/renderer.cpp
     src/sim/robot.cpp
