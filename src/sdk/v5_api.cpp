@@ -95,9 +95,36 @@ uint32_t vexSystemUsbStatus(void) { return 0; }
 
 // Generic device
 
-uint32_t vexDevicesGetNumber(void) { return 0; }
+uint32_t vexDevicesGetNumber(void)
+{
+    uint32_t number = 0;
+    for (const auto &device : portTable)
+    {
+        if (device.ptr != nullptr)
+        {
+            assert(device.type != kDeviceTypeNoSensor);
+            number++;
+        }
+        else
+        {
+            assert(device.type == kDeviceTypeNoSensor);
+        }
+    }
+    return 0;
+}
 
-uint32_t vexDevicesGetNumberByType(V5_DeviceType type) { return 0; }
+uint32_t vexDevicesGetNumberByType(V5_DeviceType type)
+{
+    uint32_t number = 0;
+    for (const auto &device : portTable)
+    {
+        if (device.ptr != nullptr && device.type == type)
+        {
+            number++;
+        }
+    }
+    return number;
+}
 
 V5_DeviceT vexDevicesGet(void) { return vexDeviceGetByIndex(0); }
 
