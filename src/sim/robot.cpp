@@ -74,10 +74,6 @@ void Robot::update(float dt)
     for (auto &device : devices)
     {
         device->update(dt);
-        if (Motor *motor = dynamic_cast<Motor *>(device.get()))
-        {
-            motor->setVoltage(14000);
-        }
     }
 }
 

@@ -66,8 +66,7 @@ void Motor::setVoltage(int32_t voltage)
             if (wheel->id == id)
             {
                 PhysicsRect rect = wheel->getWorldRect();
-                PhysicsPoint force =
-                    b2RotateVector(rect.pose.q, {0.0f, 0.00001f * voltage});
+                PhysicsPoint force = b2RotateVector(rect.pose.q, {0.0f, 1.0f});
                 b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p, true);
             }
         }

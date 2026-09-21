@@ -126,7 +126,7 @@ uint32_t vexDevicesGetNumberByType(V5_DeviceType type)
     return number;
 }
 
-V5_DeviceT vexDevicesGet(void) { return vexDeviceGetByIndex(0); }
+V5_DeviceT vexDevicesGet(void) { return nullptr; }
 
 V5_DeviceT vexDeviceGetByIndex(uint32_t index)
 {
@@ -136,10 +136,7 @@ V5_DeviceT vexDeviceGetByIndex(uint32_t index)
 
 int32_t vexDeviceGetStatus(V5_DeviceType *buffer)
 {
-    if (buffer == nullptr)
-    {
-        return -1;
-    }
+    assert(buffer != nullptr);
     for (uint32_t i = 0; i < V5_MAX_DEVICE_PORTS; i++)
     {
         buffer[i] = portTable[i].type;
@@ -234,7 +231,13 @@ void vexDeviceMotorVelocitySet(V5_DeviceT device, int32_t velocity) {}
 
 void vexDeviceMotorVelocityUpdate(V5_DeviceT device, int32_t velocity) {}
 
-void vexDeviceMotorVoltageSet(V5_DeviceT device, int32_t value) {}
+void vexDeviceMotorVoltageSet(V5_DeviceT device, int32_t value)
+{
+    if (bromine::Motor *motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        motor->setVoltage(value);
+    }
+}
 
 int32_t vexDeviceMotorVelocityGet(V5_DeviceT device) { return 0; }
 
@@ -267,7 +270,14 @@ void vexDeviceMotorVelocityPidSet(V5_DeviceT device, V5_DeviceMotorPid *pid) {}
 
 int32_t vexDeviceMotorCurrentGet(V5_DeviceT device) { return 0; }
 
-int32_t vexDeviceMotorVoltageGet(V5_DeviceT device) { return 0; }
+int32_t vexDeviceMotorVoltageGet(V5_DeviceT device)
+{
+    if (bromine::Motor *motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        return motor->getVoltage();
+    }
+    return 0;
+}
 
 double vexDeviceMotorPowerGet(V5_DeviceT device) { return 0.0; }
 
