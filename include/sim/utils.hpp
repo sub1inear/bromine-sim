@@ -1,24 +1,11 @@
 #pragma once
-#include <format>
+#include "msg.hpp"
 #include <nlohmann/json.hpp>
-#include <string>
-#include <string_view>
 
 namespace bromine
 {
 
 using json = nlohmann::json;
-
-// Implementation, not meant to be called directly.
-[[noreturn]]
-void errorCore(std::string_view fmt, std::format_args args);
-
-template <typename... A>
-[[noreturn]]
-void error(std::format_string<A...> fmt, A &&...args)
-{
-    errorCore(fmt.get(), std::make_format_args(args...));
-}
 
 constexpr float inchesToMeters(float inches) { return inches * 0.0254f; }
 

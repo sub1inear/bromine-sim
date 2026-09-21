@@ -47,6 +47,7 @@ add_executable(BromineSim
     src/sim/field.cpp
     src/sim/main.cpp
     src/sim/motor.cpp
+    src/sim/msg.cpp
     src/sim/pin.cpp
     src/sim/renderer.cpp
     src/sim/robot.cpp
@@ -183,3 +184,11 @@ add_custom_target(pros_build_info
 add_dependencies(BromineSim pros_build_info)
 set_source_files_properties("${PROS_BUILD_INFO_C}" PROPERTIES GENERATED TRUE)
 target_sources(BromineSim PRIVATE "${PROS_BUILD_INFO_C}")
+
+file(GLOB USER_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/user/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/user/*.c"
+)
+target_sources(BromineSim PRIVATE ${USER_SOURCES})
+
+target_include_directories(BromineSim PRIVATE include/user)

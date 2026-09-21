@@ -22,6 +22,9 @@
 #include "v5_api.h"
 #include "v5_color.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 void _boot() {
 	vexSystemBoot();
 }
@@ -96,20 +99,22 @@ void vApplicationIdleHook(void) {
 }
 
 void vAssertCalled(const char* pcFile, unsigned long ulLine) {
-	volatile unsigned long ul = 0;
+	fprintf(stderr, "FreeRTOS assert failed: %s:%lu\n", pcFile, ulLine);
+	abort();
+	// volatile unsigned long ul = 0;
 
-	(void)pcFile;
-	(void)ulLine;
+	// (void)pcFile;
+	// (void)ulLine;
 
-	taskENTER_CRITICAL();
-	{
-		// Set ul to a non-zero value using the debugger to step out of
-		// this function.
-		while (ul == 0) {
-			portNOP();
-		}
-	}
-	taskEXIT_CRITICAL();
+	// taskENTER_CRITICAL();
+	// {
+	// 	// Set ul to a non-zero value using the debugger to step out of
+	// 	// this function.
+	// 	while (ul == 0) {
+	// 		portNOP();
+	// 	}
+	// }
+	// taskEXIT_CRITICAL();
 }
 
 // FreeRTOS V9 now allows static memory allocation for tasks

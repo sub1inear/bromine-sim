@@ -1,8 +1,11 @@
 #include "constants.hpp"
+#include "pros/system/startup.h"
 #include "renderer.hpp"
 #include "sim.hpp"
 #include "window.hpp"
+#include <cstdint>
 #include <raylib.h>
+#include <thread>
 
 int main()
 {
@@ -14,11 +17,21 @@ int main()
     bromine::Sim &sim = bromine::getSim();
     bromine::Renderer renderer(sim.worldId);
 
+    // Boot the PROS kernel with startup_main().
+    // This will never return and Raylib requires the main thread,
+    // so we run startup_main() in a detached thread.
+    std::thread(startup_main).detach();
+
     while (!window.shouldClose())
     {
         sim.update(GetFrameTime());
         renderer.draw(sim);
     }
 
-    return 0;
+    // HACK: Exit the program without destructing to avoid PROS accessing the
+    // simulator's memory after it has been freed.
+    // This can be fixed with complicated lock systems, but letting the OS clean
+    // up is far easier. Object destructors should still be kept up to date for
+    // testing.
+    std::_Exit(0);
 }

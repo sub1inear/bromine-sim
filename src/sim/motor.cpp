@@ -1,14 +1,19 @@
 #include "motor.hpp"
+#include "msg.hpp"
 #include "robot.hpp"
-#include "utils.hpp"
 #include "wheel.hpp"
 
 namespace bromine
 {
 Motor::Motor(const json &j, Robot &robot)
-    : Device(j, robot), port(expectJsonKey<uint8_t>(j, "port")),
-      id(expectJsonKey<uint32_t>(j, "id"))
+    : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id"))
 {
+    port = expectJsonKey<uint8_t>(j, "port");
+    if (port < 1 || port > 21)
+    {
+        error("motor port must be in range [1, 21], got {}", port);
+    }
+
     std::string_view roleStr = expectJsonKey<std::string_view>(j, "role");
     if (roleStr == "input")
     {

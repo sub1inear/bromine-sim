@@ -17,6 +17,35 @@
  */
 
 #include "v5_api.h"
+#include "device.hpp"
+#include "motor.hpp"
+#include "msg.hpp"
+#include "robot.hpp"
+#include "sim.hpp"
+#include <array>
+#include <cassert>
+
+struct _V5_Device
+{
+    bromine::Device *ptr;
+    V5_DeviceType type;
+};
+
+// Port table: 0-indexed, nullptr for unplugged.
+// 0-20 are the physical smart ports and 21-31 are the internal ports.
+static std::array<_V5_Device, V5_MAX_DEVICE_PORTS> portTable;
+
+static size_t portToIdx(uint8_t port)
+{
+    assert(port != 0);
+    return static_cast<size_t>(port - 1);
+}
+
+static size_t idxToPort(size_t idx)
+{
+    assert(idx < V5_MAX_DEVICE_PORTS);
+    return idx + 1;
+}
 
 void vexBackgroundProcessing(void) {}
 
@@ -83,9 +112,13 @@ uint32_t vexDevicesGetNumber(void) { return 0; }
 
 uint32_t vexDevicesGetNumberByType(V5_DeviceType type) { return 0; }
 
-V5_DeviceT vexDevicesGet(void) { return nullptr; }
+V5_DeviceT vexDevicesGet(void) { return vexDeviceGetByIndex(0); }
 
-V5_DeviceT vexDeviceGetByIndex(uint32_t index) { return nullptr; }
+V5_DeviceT vexDeviceGetByIndex(uint32_t index)
+{
+    assert(index < V5_MAX_DEVICE_PORTS);
+    return &portTable[index];
+}
 
 int32_t vexDeviceGetStatus(V5_DeviceType *buffer)
 {
@@ -95,7 +128,7 @@ int32_t vexDeviceGetStatus(V5_DeviceType *buffer)
     }
     for (uint32_t i = 0; i < V5_MAX_DEVICE_PORTS; i++)
     {
-        buffer[i] = kDeviceTypeNoSensor;
+        buffer[i] = portTable[i].type;
     }
     return V5_MAX_DEVICE_PORTS;
 }
@@ -987,7 +1020,60 @@ uint32_t vexSystemWatchdogGet(void) { return 0; }
 // Hooks into the interrupt system, some of these will be used by FreeRTOS
 // the others are just placeholders for now
 
-void vexSystemBoot(void) {}
+void vexSystemBoot(void)
+{
+    // Convert device vector to LUT.
+    bromine::Sim &sim = bromine::getSim();
+
+    // First 21 ports can actually be devices, so scan the simulator's device
+    // list for their ports. Could be faster but for 32 devices it doesn't
+    // matter.
+    for (size_t i = 0; i < 21; i++)
+    {
+        struct _V5_Device elem = {nullptr, kDeviceTypeNoSensor};
+        for (auto &device : sim.robot.devices)
+        {
+            uint8_t port;
+            V5_DeviceType type;
+
+            if (bromine::Motor *motor =
+                    dynamic_cast<bromine::Motor *>(device.get()))
+            {
+                port = motor->port;
+                type = kDeviceTypeMotorSensor;
+            }
+            else
+            {
+                continue;
+            }
+
+            if (i == portToIdx(port))
+            {
+                if (elem.ptr != nullptr)
+                {
+                    // PROS doesn't do anything about duplicate ports, so we
+                    // shouldn't either, but it's best to at least warn about
+                    // it.
+                    bromine::warning("multiple devices on port {}",
+                                     idxToPort(i));
+                }
+                else
+                {
+                    elem.ptr = device.get();
+                    elem.type = type;
+                }
+            }
+        }
+        portTable[i] = elem;
+    }
+
+    // Rest of the ports are reserved internally for the radio, controller, etc.
+    // Clear them for now.
+    for (size_t i = 21; i < portTable.size(); i++)
+    {
+        portTable[i] = {nullptr, kDeviceTypeNoSensor};
+    }
+}
 
 void vexSystemUndefinedException(void) {}
 
