@@ -13,69 +13,69 @@
             "power": "full",
             "x": -3.0911424372104084,
             "y": 0.2500001349999961,
-            "angle": 180.0
+            "angle": 0.0
         },
         {
             "type": "motor",
-            "port": 1,
-            "id": 0,
-            "gear": "blue",
-            "role": "drive",
-            "power": "full",
-            "x": -3.0911424372104084,
-            "y": -5.2500028350000045,
-            "angle": 180.0
-        },
-        {
-            "type": "motor",
-            "port": 1,
+            "port": 2,
             "id": 0,
             "gear": "blue",
             "role": "drive",
             "power": "half",
             "x": -3.759083866058613,
             "y": -2.12500115313194,
-            "angle": 180.00000000000003
+            "angle": 0.0
         },
         {
             "type": "motor",
-            "port": 1,
+            "port": 3,
+            "id": 0,
+            "gear": "blue",
+            "role": "drive",
+            "power": "full",
+            "x": -3.0911424372104084,
+            "y": -5.2500028350000045,
+            "angle": 0.0
+        },
+        {
+            "type": "motor",
+            "port": 4,
             "id": 1,
             "gear": "blue",
             "role": "drive",
             "power": "full",
             "x": 3.0911424372104075,
             "y": 0.2500001349999977,
-            "angle": 180.0
+            "angle": 0.0
         },
         {
             "type": "motor",
-            "port": 1,
-            "id": 1,
-            "gear": "blue",
-            "role": "drive",
-            "power": "full",
-            "x": 3.0911424372104106,
-            "y": -5.250002835000004,
-            "angle": 180.0
-        },
-        {
-            "type": "motor",
-            "port": 1,
+            "port": 5,
             "id": 1,
             "gear": "blue",
             "role": "drive",
             "power": "half",
             "x": 3.7590838660586137,
             "y": -2.1250011531319384,
-            "angle": 180.0
+            "angle": 0.0
+        },
+        {
+            "type": "motor",
+            "port": 6,
+            "id": 1,
+            "gear": "blue",
+            "role": "drive",
+            "power": "full",
+            "x": 3.0911424372104106,
+            "y": -5.250002835000004,
+            "angle": 0.0
         },
         {
             "type": "wheel",
             "subtype": "omni",
-            "id": 1,
+            "id": 0,
             "rpm": 400,
-            "x": 5.0,
+            "x": -5.0,
             "y": 5.0,
             "angle": 0.0,
             "width": 1.225,
@@ -84,9 +84,9 @@
         {
             "type": "wheel",
             "subtype": "omni",
-            "id": 1,
+            "id": 0,
             "rpm": 400,
-            "x": 5.0,
+            "x": -5.0,
             "y": -5.0,
             "angle": 0.0,
             "width": 1.225,
@@ -95,9 +95,9 @@
         {
             "type": "wheel",
             "subtype": "omni",
-            "id": 0,
+            "id": 1,
             "rpm": 400,
-            "x": -5.0,
+            "x": 5.0,
             "y": 5.0,
             "angle": 0.0,
             "width": 1.225,
@@ -106,9 +106,9 @@
         {
             "type": "wheel",
             "subtype": "omni",
-            "id": 0,
+            "id": 1,
             "rpm": 400,
-            "x": -5.0,
+            "x": 5.0,
             "y": -5.0,
             "angle": 0.0,
             "width": 1.225,
