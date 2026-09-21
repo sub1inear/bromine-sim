@@ -11,6 +11,7 @@
 #include "utils.hpp"
 #include <array>
 #include <cassert>
+#include <raylib.h>
 
 struct _V5_Device
 {
@@ -152,13 +153,84 @@ uint32_t vexDeviceButtonStateGet(void) { return 0; }
 
 // Controller
 
+static int32_t gamepadAxisToVex(int gamepad, int axis)
+{
+    float value = GetGamepadAxisMovement(gamepad, axis);
+    return static_cast<int32_t>(value * 127.0f);
+}
+
+static int32_t gamepadTriggerToVex(int gamepad, int button, int trigger)
+{
+    if (IsGamepadButtonDown(gamepad, button))
+    {
+        return 1;
+    }
+    float value = GetGamepadAxisMovement(gamepad, trigger);
+    return value > 0.5f ? 1 : 0;
+}
+
 int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
 {
-    return 0;
+    if (!IsGamepadAvailable(id))
+    {
+        return 0;
+    }
+    // NOTE: Y axes must be inverted to match PROS up is positive convention.
+    switch (index)
+    {
+    case AnaLeftX:
+        return gamepadAxisToVex(id, GAMEPAD_AXIS_LEFT_X);
+    case AnaLeftY:
+        return -gamepadAxisToVex(id, GAMEPAD_AXIS_LEFT_Y);
+    case AnaRightX:
+        return gamepadAxisToVex(id, GAMEPAD_AXIS_RIGHT_X);
+    case AnaRightY:
+        return -gamepadAxisToVex(id, GAMEPAD_AXIS_RIGHT_Y);
+    case ButtonX:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_UP);
+    case ButtonB:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+    case ButtonY:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_LEFT);
+    case ButtonA:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
+    case ButtonL1:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_TRIGGER_1);
+    case ButtonR1:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_TRIGGER_1);
+    case ButtonL2:
+        return gamepadTriggerToVex(id, GAMEPAD_BUTTON_LEFT_TRIGGER_2,
+                                   GAMEPAD_AXIS_LEFT_TRIGGER);
+    case ButtonR2:
+        return gamepadTriggerToVex(id, GAMEPAD_BUTTON_RIGHT_TRIGGER_2,
+                                   GAMEPAD_AXIS_RIGHT_TRIGGER);
+    case ButtonUp:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_UP);
+    case ButtonDown:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_DOWN);
+    case ButtonLeft:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
+    case ButtonRight:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
+    case ButtonSEL:
+        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_MIDDLE_LEFT) ||
+               IsGamepadButtonDown(id, GAMEPAD_BUTTON_MIDDLE) ||
+               IsGamepadButtonDown(id, GAMEPAD_BUTTON_MIDDLE_RIGHT);
+    case BatteryCapacity:
+        return 100;
+    case BatteryLevel:
+        return 100;
+    default:
+        return 0;
+    }
 }
 
 V5_ControllerStatus vexControllerConnectionStatusGet(V5_ControllerId id)
 {
+    if (IsGamepadAvailable(id))
+    {
+        return kV5ControllerTethered;
+    }
     return kV5ControllerOffline;
 }
 
@@ -499,8 +571,8 @@ bool vexDeviceAiVisionCodeGet(V5_DeviceT device, uint32_t id,
 }
 
 // Only the terminator is written, rather than the whole 20 byte buffer the
-// caller is asked for, so the name reads as an empty string without assuming
-// more of the caller's memory than one byte.
+// caller is asked for, so the name reads as an empty string without
+// assuming more of the caller's memory than one byte.
 int32_t vexDeviceAiVisionClassNameGet(V5_DeviceT device, int32_t id,
                                       uint8_t *pName)
 {
@@ -1049,9 +1121,9 @@ void vexSystemBoot(void)
     // Convert device vector to LUT.
     bromine::Sim &sim = bromine::getSim();
 
-    // First 21 ports can actually be devices, so scan the simulator's device
-    // list for their ports. Could be faster but for 32 devices it doesn't
-    // matter.
+    // First 21 ports can actually be devices, so scan the simulator's
+    // device list for their ports. Could be faster but for 32 devices it
+    // doesn't matter.
     for (size_t i = 0; i < 21; i++)
     {
         struct _V5_Device elem = {nullptr, kDeviceTypeNoSensor};
@@ -1076,8 +1148,8 @@ void vexSystemBoot(void)
                 if (elem.ptr != nullptr)
                 {
                     // PROS doesn't do anything about duplicate ports, so we
-                    // shouldn't either, but it's best to at least warn about
-                    // it.
+                    // shouldn't either, but it's best to at least warn
+                    // about it.
                     bromine::warning("multiple devices on port {}",
                                      idxToPort(i));
                 }
@@ -1091,8 +1163,8 @@ void vexSystemBoot(void)
         portTable[i] = elem;
     }
 
-    // Rest of the ports are reserved internally for the radio, controller, etc.
-    // Clear them for now.
+    // Rest of the ports are reserved internally for the radio, controller,
+    // etc. Clear them for now.
     for (size_t i = 21; i < portTable.size(); i++)
     {
         portTable[i] = {nullptr, kDeviceTypeNoSensor};
@@ -1144,7 +1216,10 @@ bool vexStdlibVersionVerify(void) { return false; }
 
 // comp status
 
-uint32_t vexCompetitionStatus(void) { return 0; }
+uint32_t vexCompetitionStatus(void)
+{
+    return V5_COMP_BIT_GAME | V5_COMP_BIT_COMP;
+}
 
 void vexCompetitionControl(uint32_t data) {}
 

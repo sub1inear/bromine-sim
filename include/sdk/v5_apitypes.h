@@ -1071,7 +1071,7 @@ typedef struct _V5_TouchStatus
 #define V5_COMP_BIT_EBL 1  // if set then robot disabled
 #define V5_COMP_BIT_MODE 2 // if set then robot in autonomous
 #define V5_COMP_BIT_COMP                                                       \
-    4 // if set then either comp switch or field control connected
+    4 // if set then field control else comp switch connected
 #define V5_COMP_BIT_GAME 8 // if set then field control connected
 
 /** @} */

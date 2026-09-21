@@ -45,3 +45,29 @@ Requirements:
 3. Build it with CMake.
 4. Run the resulting executable inside the root directory.
 
+## Controls
+BromineSim supports any gamepad for input, including VEX V5 controllers.
+| V5 | Nintendo | Xbox | PlayStation |
+|----|----------|------|-------------|
+| Left Stick | Left Stick | Left Stick |
+| Right Stick | Right Stick | Right Stick | Right Stick |
+| D-Pad | D-Pad | D-Pad | D-Pad |
+| L1 | L | LB | L1 |
+| L2 | ZL | LT | L2 |
+| R1 | R | RB | R1 |
+| R2 | ZR | RT | R2 |
+| A (right) | A | B | Circle |
+| B (bottom) | B | A | Cross |
+| X (top) | X | Y | Triangle |
+| Y (left) | Y | X | Square |
+| Power (⏻) | + / − | Menu / View | Options / Create |
+
+Keyboard controls:
+| Key | Action |
+|-----|--------|
+| D | Toggle debug overlay |
+| R (TODO) | Reset |
+| Space (TODO) | Pause/Resume |
+| M (TODO) | Start match |
+| O (TODO) | Start driver skills |
+| A (TODO) | Start auton skills |
