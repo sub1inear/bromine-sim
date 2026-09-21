@@ -111,7 +111,7 @@ uint32_t vexDevicesGetNumber(void)
             assert(device.type == kDeviceTypeNoSensor);
         }
     }
-    return 0;
+    return number;
 }
 
 uint32_t vexDevicesGetNumberByType(V5_DeviceType type)
