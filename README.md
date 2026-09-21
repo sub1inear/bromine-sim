@@ -37,11 +37,11 @@ Not planned:
 
 Requirements:
 - CMake
-- Python
+- Python (with `pip` or `uv`)
 - GCC or Clang (MSVC is not supported)
 
 1. Clone the repository.
-2. Run `scripts/setup.py path/to/pros/project` with Python (`python` on Windows, `python3` on Linux/MacOS) to set up everything.
+2. Run `scripts/setup.py path/to/pros/project` with `pip`/`pip3`/`uv` to set up the repository with your PROS project.
 3. Build it with CMake.
 4. Run the resulting executable inside the root directory.
 
