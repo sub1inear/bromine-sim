@@ -3,6 +3,8 @@
  * @brief   Stubs for the V5 jumptable API declared in v5_api.h.
  */
 
+// TODO: The whole file should be properly made thread-safe.
+
 #include "v5_api.h"
 #include "device.hpp"
 #include "motor.hpp"
@@ -16,6 +18,7 @@
 
 struct _V5_Device
 {
+    // TODO: Make this a std::shared_ptr<Device>!
     bromine::Device *ptr;
     V5_DeviceType type;
 };
