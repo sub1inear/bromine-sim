@@ -11,6 +11,7 @@
 #include "utils.hpp"
 #include <array>
 #include <cassert>
+#include <chrono>
 #include <raylib.h>
 
 struct _V5_Device
@@ -22,6 +23,8 @@ struct _V5_Device
 // Port table: 0-indexed, nullptr for unplugged.
 // 0-20 are the physical smart ports and 21-31 are the internal ports.
 static std::array<_V5_Device, V5_MAX_DEVICE_PORTS> portTable;
+
+auto startTime = std::chrono::steady_clock::now();
 
 static size_t portToIdx(uint8_t port)
 {
@@ -86,7 +89,17 @@ uint32_t vexSystemStartupOptions(void) { return 0; }
 
 void vexSystemExitRequest(void) {}
 
-uint64_t vexSystemHighResTimeGet(void) { return 0; }
+uint64_t vexSystemHighResTimeGet(void)
+{
+    auto now = std::chrono::steady_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::microseconds>(now - startTime);
+
+    long long us = duration.count();
+    assert(us >= 0);
+
+    return static_cast<uint64_t>(us);
+}
 
 uint64_t vexSystemPowerupTimeGet(void) { return 0; }
 
