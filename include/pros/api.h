@@ -76,4 +76,7 @@
 #include "pros/vision.hpp"
 #endif
 
+// Let the end user know this is a simulator version in case anything needs to be done differently.
+#define BROMINE_SIM 1
+
 #endif  // _PROS_API_H_
