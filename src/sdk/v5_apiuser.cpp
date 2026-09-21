@@ -5,8 +5,7 @@
  * @details
  *  Each wrapper looks up the device handle for a zero based port index and
  *  hands the call to its vexDevice counterpart in v5_api.cpp, which is where
- *  the behaviour lives. They are stubs only for as long as the functions they
- *  call are.
+ *  the behaviour lives.
  */
 
 #include "v5_api.h"

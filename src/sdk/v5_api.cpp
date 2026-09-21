@@ -1,19 +1,6 @@
 /**
  * @file    v5_api.cpp
  * @brief   Stubs for the V5 jumptable API declared in v5_api.h.
- *
- * @details
- *  Every function VEXos exposes through its jumptable is defined here, so that
- *  code written against the SDK links against the simulator. None of it is
- *  simulated yet: calls that only command hardware do nothing, calls that read
- *  hardware return a zero or default value, and calls that fill in a caller
- *  supplied structure zero it, so an unimplemented reading is a predictable
- *  zero rather than whatever was left on the stack. The exception is a
- *  structure the caller owns memory through, such as the v5_image passed to
- *  the image decoders, which is left alone.
- *
- *  The port indexed wrappers in v5_apiuser.cpp forward to these functions, so
- *  implementing one here brings its wrapper to life with it.
  */
 
 #include "v5_api.h"
