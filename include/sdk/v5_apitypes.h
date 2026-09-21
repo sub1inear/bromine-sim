@@ -200,10 +200,10 @@ typedef struct _V5_Device *V5_DeviceT;
 
 /**
  * @brief   Upper bound on the number of device port indexes VEXos can report.
- * @details Larger than the number of physical smart ports because VEXos also
- *          exposes internal ports for the controllers, the battery and the
- *          brain. Use this as the length of any buffer passed to
- *          vexDeviceGetStatus().
+ * @details Larger than the number of physical smart ports, and larger than the
+ *          count vexDevicesGetNumber() reports. PROS addresses the battery at
+ *          index 24 and the two controllers at 25 and 26. Use this as the
+ *          length of any buffer passed to vexDeviceGetStatus().
  */
 #define V5_MAX_DEVICE_PORTS 32
 
@@ -251,7 +251,8 @@ typedef enum _V5_ControllerIndex
     Button8L, ///< Left on the right button cluster.
     Button8R, ///< Right on the right button cluster.
 
-    ButtonSEL, ///< Centre select button, normally consumed by VEXos.
+    ButtonSEL, ///< Centre button. PROS exposes it as
+               ///< E_CONTROLLER_DIGITAL_POWER.
 
     BatteryLevel, ///< Controller battery level as a percentage.
 
@@ -461,8 +462,9 @@ typedef enum _V5MotorGearset
 /**
  * @brief   Raw encoder counts per output revolution for the 36:1 cartridge.
  * @details The 18:1 cartridge produces 900 counts per revolution and the 6:1
- *          cartridge produces 300, because all three share the same encoder on
- *          the motor's input shaft.
+ *          cartridge produces 300. All three work out to 50 counts per turn of
+ *          the motor's own shaft, which is consistent with the encoder sitting
+ *          before the gearbox.
  */
 #define V5_MOTOR_COUNTS_PER_ROT 1800.0
 
@@ -961,9 +963,10 @@ typedef struct __attribute__((__packed__)) _V5_DeviceGpsRaw
 
 /**
  * @brief   Opaque file handle.
- * @details Returned as a FIL* by vexFileOpen() and the other open calls.
- * The structure belongs to VEXos and must not be dereferenced or freed.
- *          VEXos supports a limited number of files open at once.
+ * @details Returned as a FIL* by vexFileOpen() and the other open calls. The
+ *          structure belongs to VEXos and must not be dereferenced or freed.
+ *          Only a limited number can be open at once; PROS records the limit
+ *          as 8 as of VEXos 0.7.4b55.
  */
 typedef void FIL;
 
@@ -1059,10 +1062,10 @@ typedef struct _V5_TouchStatus
  *          vexCompetitionControl().
  *
  * @details
- *  V5_COMP_BIT_COMP is set whenever anything is plugged into the competition
- *  port, and V5_COMP_BIT_GAME distinguishes real field control from a plain
- *  competition switch. The autonomous bit is only meaningful while the robot is
- *  enabled.
+ *  PROS reads these as follows: V5_COMP_BIT_COMP set means something is
+ *  attached to the competition port, and V5_COMP_BIT_GAME then distinguishes
+ *  real field control from a plain competition switch. Note that
+ *  V5_COMP_BIT_EBL is set when the robot is disabled, not enabled.
  * @{
  */
 #define V5_COMP_BIT_EBL 1  // if set then robot disabled

@@ -32,11 +32,12 @@
  *  vexDeviceGetByIndex(). v5_apiuser.h declares a parallel set of wrappers that
  *  take a port index instead, which is usually more convenient.
  *
- *  Two conventions run through the whole API. Device calls do not validate the
- *  handle or the device type, so reading a motor function on a port holding a
- *  sensor returns a meaningless value rather than an error. And device readings
- *  come from a shared memory buffer that VEXos refreshes in the background, so
- *  values only change as fast as that buffer is updated, normally every 10 ms.
+ *  Two things are worth knowing up front. Nothing here validates the handle or
+ *  checks that the port holds the kind of device being asked about, which is
+ *  why PROS makes that check itself before every call; what VEXos returns for a
+ *  mismatched device is not documented. And device readings come from a shared
+ *  memory buffer that VEXos refreshes in the background, so values only change
+ *  as fast as that buffer is updated, which PROS documents as every 10 ms.
  *//*---------------------------------------------------------------------------*/
 
 #include "v5_apitypes.h"
@@ -60,27 +61,30 @@ extern "C"
 
 /**
  * @brief   Runs one pass of VEXos background processing.
- * @details VEXos schedules its own work cooperatively on the user
- * processor. This call gives it the chance to move data between the user
- *          processor and the device processor, refresh device readings,
- * flush serial output and service USB. A program that never calls it, or
- *          that blocks for a long time without calling it, will see stale
- *          device data and stalled console output.
+ * @details VEXos schedules its own work cooperatively on the user processor,
+ *          and this call gives it a slice of time to do that work. PROS relies
+ *          on it for two things in particular: device readings only refresh
+ *          while it runs, which is why PROS calls it in a loop when waiting for
+ *          the Inertial Sensor's calibration flag, and console output only
+ *          drains while it runs, which is why PROS calls it from its system
+ *          daemon and from its fault handlers.
  *
  *          Runtimes with their own scheduler normally call this from a
- *          background task. It is also the right thing to call inside a
- * tight loop that cannot yield, such as a fault handler that still needs to
- *          get its diagnostics out over the serial link.
+ *          background task. It is also what to call inside a loop that cannot
+ *          yield, such as a fault handler that still needs to get diagnostics
+ *          out over the serial link.
  */
 void vexBackgroundProcessing(void);
 
 // Console output
 
 /**
- * @brief   Writes a formatted message to the VEXos debug output.
+ * @brief   Writes a formatted message using VEXos's own printf.
  * @param   fmt printf style format string.
  * @param   ... Arguments consumed by the format string.
  * @return  The number of characters written.
+ * @details Where the output is routed is not documented, and no public runtime
+ *          calls this. Use vex_printf() for the serial console.
  */
 int32_t vexDebug(char const *fmt, ...);
 
@@ -89,10 +93,10 @@ int32_t vexDebug(char const *fmt, ...);
  * @param   fmt printf style format string.
  * @param   ... Arguments consumed by the format string.
  * @return  The number of characters written.
- * @details This is the formatter built into VEXos rather than the one from
- * the C library the program is linked against. Output goes to serial
- *          channel 1, the same channel vexSerialWriteBuffer() uses for
- * stdio.
+ * @details This is the formatter built into VEXos rather than the one from the
+ *          C library the program is linked against. Output goes to the serial
+ *          console; VEX does not document which vexSerialWriteBuffer() channel
+ *          number that corresponds to.
  */
 int32_t vex_printf(char const *fmt, ...);
 
@@ -227,9 +231,12 @@ uint32_t vexSystemUsbStatus(void);
 
 /**
  * @brief   Returns the number of device port indexes this brain exposes.
- * @return  The port count.
- * @details Larger than the 21 smart ports, because VEXos also reports
- * internal ports for the controllers and the battery.
+ * @return  The port count. This is 23 on VEXos 1.1.4.
+ * @details More than the 21 smart ports, because VEXos also exposes internal
+ *          port indexes. VEX does not document which index is which, and the
+ *          indexes PROS uses for the battery and the two controllers sit above
+ *          this count, so size buffers with #V5_MAX_DEVICE_PORTS rather than
+ *          with this value.
  */
 uint32_t vexDevicesGetNumber(void);
 
@@ -241,11 +248,7 @@ uint32_t vexDevicesGetNumber(void);
 uint32_t vexDevicesGetNumberByType(V5_DeviceType type);
 
 /**
- * @brief   Returns a handle to the first entry in the device array.
- * @return  Handle to port index 0.
- * @details The remaining ports follow it in order, but using
- *          vexDeviceGetByIndex() is clearer and does not rely on the array
- *          layout.
+ * Unknown function, perhaps returns a pointer to the first device.
  */
 V5_DeviceT vexDevicesGet(void);
 
@@ -253,18 +256,19 @@ V5_DeviceT vexDevicesGet(void);
  * @brief   Returns the handle for one device port.
  * @param   index Zero based port index, so 0 for smart port 1.
  * @return  Handle to that port.
- * @details The handle is valid even when nothing is plugged in, and stays
- *          valid if the device is unplugged and replaced. Check the port's
- *          type with vexDeviceGetStatus() before trusting readings from it.
+ * @details PROS fetches every port's handle once at startup and keeps using it
+ *          afterwards, so in practice a handle survives a device being
+ *          unplugged and replaced, but VEX does not document that. Check the
+ *          port's type with vexDeviceGetStatus() before trusting readings.
  */
 V5_DeviceT vexDeviceGetByIndex(uint32_t index);
 
 /**
  * @brief   Reads the type of every device port into a buffer.
  * @param   buffer Array of at least #V5_MAX_DEVICE_PORTS entries.
- * @return  The number of entries written, or -1 if buffer is null.
- * @details This is the only way to tell what is currently plugged in, and
- * it is cheap enough to call every time a port is used.
+ * @return  The number of entries written.
+ * @details PROS calls this to refresh its own view of the ports, then compares
+ *          each entry against what the port is expected to hold.
  */
 int32_t vexDeviceGetStatus(V5_DeviceType *buffer);
 
@@ -282,6 +286,9 @@ int32_t vexDeviceGetTimestamp(V5_DeviceT device);
  * @brief   Reads a device's internal timestamp by port index.
  * @param   index Zero based port index.
  * @return  The device's timestamp in milliseconds.
+ * @details Port index counterpart to vexDeviceGetTimestamp(). It is declared
+ *          here but absent from the published jumptable bindings, and no
+ *          public runtime calls it.
  */
 int32_t vexDeviceGetTimestampByIndex(int32_t index);
 
@@ -332,13 +339,14 @@ V5_ControllerStatus vexControllerConnectionStatusGet(V5_ControllerId id);
  * @param   col  One based column, 1 to 20.
  * @param   str  Null terminated string, truncated past 31 characters.
  * @return  True if the request was accepted.
- * @details The screen is small and the link is slow, so VEXos rate limits
- * these updates. Writing more often than about once every 50 ms will start
- *          dropping requests, which is what a false return means.
+ * @details Controller text updates are slow. PROS documents that updates sent
+ *          faster than every 10 ms on a wired connection, or every 50 ms over
+ *          VEXnet, will not be applied, and treats a false return as a reason
+ *          to retry.
  *
- *          Writing to row 4 does not print anything. The string is read as
- * a rumble pattern instead, built from dots for short pulses, dashes for
- *          long pulses and spaces for pauses.
+ *          Writing to row 4 does not print anything. The string is read as a
+ *          rumble pattern instead, built from dots for short pulses, dashes
+ *          for long pulses and spaces for pauses, up to 8 characters.
  */
 bool vexControllerTextSet(V5_ControllerId id, uint32_t line, uint32_t col,
                           const char *str);
@@ -420,9 +428,10 @@ void vexDeviceAdiValueSet(V5_DeviceT device, uint32_t port, int32_t value);
  * @param   device Device handle.
  * @param   port   Channel number, 0 to 7.
  * @return  The channel's current reading.
- * @details What the value means depends on the channel's configuration: 0
- * or 1 for a digital input, 0 to 4095 for an analog input, accumulated
- *          ticks for an encoder, and a distance for a sonar.
+ * @details What the value means depends on the channel's configuration: 0 or 1
+ *          for a digital input, 0 to 4095 for an analog input spanning roughly
+ *          0 V to 5 V, accumulated ticks for an encoder, and a distance for a
+ *          sonar.
  */
 int32_t vexDeviceAdiValueGet(V5_DeviceT device, uint32_t port);
 
@@ -431,12 +440,12 @@ int32_t vexDeviceAdiValueGet(V5_DeviceT device, uint32_t port);
  * @param   device  Handle to the brain's 3-Wire ports or a 3-Wire Expander.
  * @param   port    Channel number, 0 to 7, for the ports labelled A to H.
  * @param   pData   Colors to write, one 0x00RRGGBB word per LED.
- * @param   nOffset Index of the first LED to write, counting from the end of
- *                  the strip nearest the brain.
- * @param   nLength Number of LEDs to write.
+ * @param   nOffset Offset into the strip. PROS always passes 0, and VEX does
+ *                  not document which end it counts from.
+ * @param   nLength Number of LEDs to write. PROS caps this at 64.
  * @param   options Option flags. VEX does not publish their meaning; PROS
  *                  passes 0.
- * @return  The number of LEDs written.
+ * @return  Not documented by VEX. PROS passes the value through unchanged.
  * @details The channel has to be configured as #kAdiPortTypeDigitalOut first.
  *          VEX ships this as a private API, so it is absent from the published
  *          v5_api.h and the PROS kernel declares it itself in
@@ -512,11 +521,11 @@ int32_t vexDeviceGenericValueGet(V5_DeviceT device);
  * @brief   Spins a motor at a target velocity.
  * @param   device   Device handle.
  * @param   velocity Target velocity in RPM at the output shaft.
- * @details Switches the motor into #kMotorControlModeVELOCITY and hands
- * control to its internal velocity loop. The usable range depends on the
- *          cartridge: roughly 100 RPM for 36:1, 200 RPM for 18:1 and 600
- * RPM for 6:1. Setting a velocity of 0 actively holds the motor still
- *          rather than letting it coast.
+ * @details Switches the motor into #kMotorControlModeVELOCITY and hands control
+ *          to its internal velocity loop. The usable range depends on the
+ *          cartridge: roughly 100 RPM for 36:1, 200 RPM for 18:1 and 600 RPM
+ *          for 6:1. A velocity of 0 stops the motor according to its brake
+ *          mode, which is how PROS implements motor_brake().
  */
 void vexDeviceMotorVelocitySet(V5_DeviceT device, int32_t velocity);
 
@@ -560,7 +569,8 @@ double vexDeviceMotorActualVelocityGet(V5_DeviceT device);
 /**
  * @brief   Reads which way a motor is turning.
  * @param   device Device handle.
- * @return  1 when turning forwards, -1 when turning backwards.
+ * @return  1 when moving in the positive direction, -1 when moving in the
+ *          negative direction.
  */
 int32_t vexDeviceMotorDirectionGet(V5_DeviceT device);
 
@@ -601,9 +611,10 @@ int32_t vexDeviceMotorPwmGet(V5_DeviceT device);
  * @brief   Sets the current at which a motor starts backing off.
  * @param   device Device handle.
  * @param   value  Current limit in milliamps.
- * @details The default is 2500 mA per motor. Lowering it protects a
- * mechanism that can stall; raising it above the default is not useful
- * because the brain enforces its own total budget across all motors.
+ * @details The default is 2500 mA per motor. Lowering it protects a mechanism
+ *          that can stall. VEX does not document what happens above the
+ *          default, or how a per-motor limit interacts with the brain's total
+ *          current budget.
  */
 void vexDeviceMotorCurrentLimitSet(V5_DeviceT device, int32_t value);
 
@@ -618,8 +629,9 @@ int32_t vexDeviceMotorCurrentLimitGet(V5_DeviceT device);
  * @brief   Caps the voltage a motor's control loops may command.
  * @param   device Device handle.
  * @param   value  Voltage limit in millivolts.
- * @details Applies to closed loop moves. It does not clamp a voltage passed
- *          straight to vexDeviceMotorVoltageSet().
+ * @details Caps what the motor's own control loops apply. Whether it also
+ *          clamps a voltage passed straight to vexDeviceMotorVoltageSet() is
+ *          not documented.
  */
 void vexDeviceMotorVoltageLimitSet(V5_DeviceT device, int32_t value);
 
@@ -808,7 +820,7 @@ double vexDeviceMotorPositionGet(V5_DeviceT device);
  * @brief   Reads a motor's raw encoder count along with its timestamp.
  * @param   device    Device handle.
  * @param   timestamp Filled in with the time the count was captured, in
- *                    milliseconds. May not be null.
+ *                    milliseconds.
  * @return  The raw encoder count, ignoring the configured encoder units.
  * @details Reading the count and its timestamp together lets you difference
  * two samples without guessing how stale either one is.
@@ -1416,9 +1428,9 @@ double vexDeviceOpticalBrightnessGet(V5_DeviceT device);
  * @brief   Reads the Optical Sensor's proximity reading.
  * @param   device Device handle.
  * @return  The proximity, 0 through 255, larger meaning closer.
- * @details This is a measure of reflected infrared light, not a distance,
- * so a dark object reads as further away than a light one at the same
- *          range. Not updated while gesture detection is enabled.
+ * @details Reflected infrared light rather than a calibrated distance, so it
+ *          does not convert to millimetres. Not updated while gesture
+ *          detection is enabled.
  */
 int32_t vexDeviceOpticalProximityGet(V5_DeviceT device);
 
@@ -1540,9 +1552,9 @@ double vexDeviceOpticalIntegrationTimeGet(V5_DeviceT device);
  * @param   device Device handle.
  * @param   value  Power level. Positive attracts, negative repels.
  * @param   time   How long to stay energised, in milliseconds.
- * @details The magnet cannot be left on indefinitely without overheating,
- *          which is why the duration is part of the command rather than
- *          something the caller has to time.
+ * @details The duration is part of the command rather than something the
+ *          caller times. VEX does not document what the power level scale is
+ *          or what happens when the time elapses.
  */
 void vexDeviceMagnetPowerSet(V5_DeviceT device, int32_t value, int32_t time);
 
@@ -1606,8 +1618,8 @@ uint32_t vexDeviceDistanceDistanceGet(V5_DeviceT device);
  * @brief   Reads how much the sensor trusts its distance reading.
  * @param   device Device handle.
  * @return  The confidence, 0 through 63, larger being better.
- * @details Only meaningful beyond 200 mm. Closer than that the sensor
- * returns a fixed value of 10.
+ * @details PROS documents confidence as only available beyond 200 mm, with a
+ *          fixed value of 10 returned closer in.
  */
 uint32_t vexDeviceDistanceConfidenceGet(V5_DeviceT device);
 
@@ -1660,8 +1672,8 @@ double vexDeviceGpsHeadingGet(V5_DeviceT device);
 /**
  * @brief   Reads the GPS Sensor's heading.
  * @param   device Device handle.
- * @return  The heading in degrees, 0 through 360, with 0 pointing at the
- * far side of the field and increasing clockwise.
+ * @return  The heading in degrees, 0 through 360. PROS describes 0 as north on
+ *          the field, with values increasing clockwise.
  */
 double vexDeviceGpsDegreesGet(V5_DeviceT device);
 
@@ -1939,11 +1951,13 @@ uint32_t vexDeviceGenericRadioReceive(V5_DeviceT device, uint8_t *buffer,
 /** @brief      Brain display
  *
  * @details
- *  The framebuffer is #SYSTEM_DISPLAY_WIDTH by #SYSTEM_DISPLAY_HEIGHT
- * pixels, with (0, 0) at the top left and (479, 271) at the bottom right.
- * VEXos draws the program header across the top 32 rows, so drawing there
- * works but gets painted over. The area left for user code is y = 32
- * through y = 271.
+ *  The framebuffer is #SYSTEM_DISPLAY_WIDTH by #SYSTEM_DISPLAY_HEIGHT pixels,
+ *  with (0, 0) at the top left and (479, 271) at the bottom right. VEXos draws
+ *  the program header across the top 32 rows; drawing into them works but gets
+ *  painted over, leaving y = 32 through y = 271 for user code. VEX does not
+ *  state that 32 anywhere, but VEXcode presents the screen to users as 480 by
+ *  240, and the open-source jumptable bindings add 32 to every y coordinate
+ *  they forward so their callers address the user area.
  *
  *  Colors are packed as 0x00RRGGBB, the same encoding v5_color.h uses.
  * Drawing calls take their color from the current foreground, and the

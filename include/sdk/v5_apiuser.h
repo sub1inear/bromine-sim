@@ -27,13 +27,12 @@
  *  vexDeviceGetByIndex() on every call.
  *
  *  The index is zero based, so smart port 1 is index 0 and smart port 21 is
- *  index 20. Mixing this up with the one based port numbers printed on the
- *  brain is the usual source of off by one bugs here.
+ *  index 20. The ports printed on the brain are numbered from 1, which is why
+ *  PROS passes port - 1 into every one of these calls.
  *
  *  Like the underlying calls, none of these check that the port holds the kind
- *  of device being asked about. Reading a motor function on a port holding a
- *  sensor returns a meaningless value rather than an error, so check the port's
- *  type with vexDeviceGetStatus() first.
+ *  of device being asked about, and what VEXos returns for a mismatched device
+ *  is not documented. Check the port's type with vexDeviceGetStatus() first.
  *
  *  Behaviour, units and value ranges are documented once on the vexDevice
  *  functions in v5_api.h; each wrapper points at its counterpart with @see.
