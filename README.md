@@ -46,31 +46,30 @@ Requirements:
 4. Run the resulting executable inside the root directory.
 
 ## Controls
-BromineSim supports any gamepad for input, including VEX V5 controllers.
-| V5 | Nintendo | Xbox | PlayStation |
-|----|----------|------|-------------|
-| Left Stick | Left Stick | Left Stick |
-| Right Stick | Right Stick | Right Stick | Right Stick |
-| D-Pad | D-Pad | D-Pad | D-Pad |
-| L1 | L | LB | L1 |
-| L2 | ZL | LT | L2 |
-| R1 | R | RB | R1 |
-| R2 | ZR | RT | R2 |
-| A (right) | A | B | Circle |
-| B (bottom) | B | A | Cross |
-| X (top) | X | Y | Triangle |
-| Y (left) | Y | X | Square |
-| Power (⏻) | + / − | Menu / View | Options / Create |
+BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers.
+| V5 | Nintendo | Xbox | PlayStation | Keyboard (TODO) |
+|----|----------|------|-------------|----------|
+| Left Stick | Left Stick | Left Stick | WASD |
+| Right Stick | Right Stick | Right Stick | Right Stick | IJKL |
+| D-Pad | D-Pad | D-Pad | D-Pad | Arrow Keys |
+| L1 | L | LB | L1 | Q |
+| L2 | ZL | LT | L2 | E |
+| R1 | R | RB | R1 | U |
+| R2 | ZR | RT | R2 | O |
+| A (right) | A | B | Circle | Z | 
+| B (bottom) | B | A | Cross | X |
+| X (top) | X | Y | Triangle | C |
+| Y (left) | Y | X | Square | V |
+| Power (⏻) | + / − | Menu / View | Options / Create | P |
 
 Keyboard controls:
 | Key | Action |
 |-----|--------|
-| D | Toggle debug overlay |
 | Esc | Exit |
-| R (TODO) | Reset |
-| Space (TODO) | Pause/Resume |
-| M (TODO) | Start match |
-| O (TODO) | Start driver skills |
-| A (TODO) | Start auton skills |
+| ` (TODO) | Toggle debug overlay |
+| 1 (TODO) | Start freeplay (default) |
+| 2 (TODO) | Start match |
+| 3 (TODO) | Start driver skills |
+| 4 (TODO) | Start auton skills |
 
 The first controller detected will be the "master" controller, and the second controller will be the "partner" controller; any others will be ignored.
