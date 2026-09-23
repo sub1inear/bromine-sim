@@ -11,6 +11,7 @@
 #include "robot.hpp"
 #include "sim.hpp"
 #include "utils.hpp"
+#include "v5_controller_shim.h"
 #include <array>
 #include <cassert>
 #include <chrono>
@@ -171,23 +172,23 @@ uint32_t vexDeviceButtonStateGet(void) { return 0; }
 
 static int32_t gamepadAxisToVex(int gamepad, int axis)
 {
-    float value = GetGamepadAxisMovement(gamepad, axis);
+    float value = vex_controller_shim::GetGamepadAxisMovement(gamepad, axis);
     return static_cast<int32_t>(value * 127.0f);
 }
 
 static int32_t gamepadTriggerToVex(int gamepad, int button, int trigger)
 {
-    if (IsGamepadButtonDown(gamepad, button))
+    if (vex_controller_shim::IsGamepadButtonDown(gamepad, button))
     {
         return 1;
     }
-    float value = GetGamepadAxisMovement(gamepad, trigger);
+    float value = vex_controller_shim::GetGamepadAxisMovement(gamepad, trigger);
     return value > 0.5f ? 1 : 0;
 }
 
 int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
 {
-    if (!IsGamepadAvailable(id))
+    if (!vex_controller_shim::IsGamepadAvailable(id))
     {
         return 0;
     }
@@ -203,17 +204,23 @@ int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
     case AnaRightY:
         return -gamepadAxisToVex(id, GAMEPAD_AXIS_RIGHT_Y);
     case ButtonX:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_UP);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_RIGHT_FACE_UP);
     case ButtonB:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
     case ButtonY:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_LEFT);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_RIGHT_FACE_LEFT);
     case ButtonA:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
     case ButtonL1:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_TRIGGER_1);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_LEFT_TRIGGER_1);
     case ButtonR1:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_TRIGGER_1);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_RIGHT_TRIGGER_1);
     case ButtonL2:
         return gamepadTriggerToVex(id, GAMEPAD_BUTTON_LEFT_TRIGGER_2,
                                    GAMEPAD_AXIS_LEFT_TRIGGER);
@@ -221,17 +228,24 @@ int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
         return gamepadTriggerToVex(id, GAMEPAD_BUTTON_RIGHT_TRIGGER_2,
                                    GAMEPAD_AXIS_RIGHT_TRIGGER);
     case ButtonUp:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_UP);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_LEFT_FACE_UP);
     case ButtonDown:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_DOWN);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_LEFT_FACE_DOWN);
     case ButtonLeft:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
     case ButtonRight:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
+        return vex_controller_shim::IsGamepadButtonDown(
+            id, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
     case ButtonSEL:
-        return IsGamepadButtonDown(id, GAMEPAD_BUTTON_MIDDLE_LEFT) ||
-               IsGamepadButtonDown(id, GAMEPAD_BUTTON_MIDDLE) ||
-               IsGamepadButtonDown(id, GAMEPAD_BUTTON_MIDDLE_RIGHT);
+        return vex_controller_shim::IsGamepadButtonDown(
+                   id, GAMEPAD_BUTTON_MIDDLE_LEFT) ||
+               vex_controller_shim::IsGamepadButtonDown(
+                   id, GAMEPAD_BUTTON_MIDDLE) ||
+               vex_controller_shim::IsGamepadButtonDown(
+                   id, GAMEPAD_BUTTON_MIDDLE_RIGHT);
     case BatteryCapacity:
         return 100;
     case BatteryLevel:
