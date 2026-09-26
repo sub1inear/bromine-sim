@@ -19,6 +19,9 @@ At startup, input units are converted to physics units.
 When drawing, physics units are converted to screen units.
 **Object constructors take input units.**
 */
+
+// TODO: Write this with namespaces instead of prefixes.
+
 #pragma once
 #include <algorithm>
 #include <box2d/box2d.h>

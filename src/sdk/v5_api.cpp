@@ -4,14 +4,15 @@
  */
 
 // TODO: The whole file should be properly made thread-safe.
+// TODO: Specify std::atomic constraints properly.
 
 #include "v5_api.h"
 #include "device.hpp"
+#include "input.hpp"
 #include "motor.hpp"
 #include "robot.hpp"
 #include "sim.hpp"
 #include "utils.hpp"
-#include "v5_controller_shim.h"
 #include <array>
 #include <cassert>
 #include <chrono>
@@ -20,6 +21,7 @@
 
 struct _V5_Device
 {
+    // TODO: Undo making this a std::shared_ptr.
     std::shared_ptr<bromine::Device> ptr;
     V5_DeviceType type;
 };
@@ -170,82 +172,55 @@ uint32_t vexDeviceButtonStateGet(void) { return 0; }
 
 // Controller
 
-static int32_t gamepadAxisToVex(int gamepad, int axis)
+static bool checkKey(bromine::Input &input, V5_ControllerId id,
+                     bromine::Input::Keys key)
 {
-    float value = vex_controller_shim::GetGamepadAxisMovement(gamepad, axis);
-    return static_cast<int32_t>(value * 127.0f);
-}
-
-static int32_t gamepadTriggerToVex(int gamepad, int button, int trigger)
-{
-    if (vex_controller_shim::IsGamepadButtonDown(gamepad, button))
-    {
-        return 1;
-    }
-    float value = vex_controller_shim::GetGamepadAxisMovement(gamepad, trigger);
-    return value > 0.5f ? 1 : 0;
+    return (input.controllers[id].keys & key) != bromine::Input::Keys::None;
 }
 
 int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
 {
-    if (!vex_controller_shim::IsGamepadAvailable(id))
-    {
-        return 0;
-    }
-    // NOTE: Y axes must be inverted to match PROS up is positive convention.
+    bromine::Sim &sim = bromine::Sim::getInstance();
+    bromine::Input &input = sim.input;
+
+    assert(id < bromine::Input::controllers.size());
+
     switch (index)
     {
     case AnaLeftX:
-        return gamepadAxisToVex(id, GAMEPAD_AXIS_LEFT_X);
+        return input.controllers[id].leftAxisX;
     case AnaLeftY:
-        return -gamepadAxisToVex(id, GAMEPAD_AXIS_LEFT_Y);
+        return input.controllers[id].leftAxisY;
     case AnaRightX:
-        return gamepadAxisToVex(id, GAMEPAD_AXIS_RIGHT_X);
+        return input.controllers[id].rightAxisX;
     case AnaRightY:
-        return -gamepadAxisToVex(id, GAMEPAD_AXIS_RIGHT_Y);
+        return input.controllers[id].rightAxisY;
     case ButtonX:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_RIGHT_FACE_UP);
+        return checkKey(input, id, bromine::Input::Keys::X);
     case ButtonB:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_RIGHT_FACE_DOWN);
+        return checkKey(input, id, bromine::Input::Keys::B);
     case ButtonY:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_RIGHT_FACE_LEFT);
+        return checkKey(input, id, bromine::Input::Keys::Y);
     case ButtonA:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_RIGHT_FACE_RIGHT);
+        return checkKey(input, id, bromine::Input::Keys::A);
     case ButtonL1:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_LEFT_TRIGGER_1);
+        return checkKey(input, id, bromine::Input::Keys::L1);
     case ButtonR1:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_RIGHT_TRIGGER_1);
+        return checkKey(input, id, bromine::Input::Keys::R1);
     case ButtonL2:
-        return gamepadTriggerToVex(id, GAMEPAD_BUTTON_LEFT_TRIGGER_2,
-                                   GAMEPAD_AXIS_LEFT_TRIGGER);
+        return checkKey(input, id, bromine::Input::Keys::L2);
     case ButtonR2:
-        return gamepadTriggerToVex(id, GAMEPAD_BUTTON_RIGHT_TRIGGER_2,
-                                   GAMEPAD_AXIS_RIGHT_TRIGGER);
+        return checkKey(input, id, bromine::Input::Keys::R2);
     case ButtonUp:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_LEFT_FACE_UP);
+        return checkKey(input, id, bromine::Input::Keys::Up);
     case ButtonDown:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_LEFT_FACE_DOWN);
+        return checkKey(input, id, bromine::Input::Keys::Down);
     case ButtonLeft:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_LEFT_FACE_LEFT);
+        return checkKey(input, id, bromine::Input::Keys::Left);
     case ButtonRight:
-        return vex_controller_shim::IsGamepadButtonDown(
-            id, GAMEPAD_BUTTON_LEFT_FACE_RIGHT);
+        return checkKey(input, id, bromine::Input::Keys::Right);
     case ButtonSEL:
-        return vex_controller_shim::IsGamepadButtonDown(
-                   id, GAMEPAD_BUTTON_MIDDLE_LEFT) ||
-               vex_controller_shim::IsGamepadButtonDown(
-                   id, GAMEPAD_BUTTON_MIDDLE) ||
-               vex_controller_shim::IsGamepadButtonDown(
-                   id, GAMEPAD_BUTTON_MIDDLE_RIGHT);
+        return checkKey(input, id, bromine::Input::Keys::Sel);
     case BatteryCapacity:
         return 100;
     case BatteryLevel:
@@ -1149,7 +1124,7 @@ uint32_t vexSystemWatchdogGet(void) { return 0; }
 void vexSystemBoot(void)
 {
     // Convert device vector to LUT.
-    bromine::Sim &sim = bromine::getSim();
+    bromine::Sim &sim = bromine::Sim::getInstance();
 
     // First 21 ports can actually be devices, so scan the simulator's
     // device list for their ports. Could be faster but for 32 devices it

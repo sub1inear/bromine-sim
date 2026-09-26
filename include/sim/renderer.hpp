@@ -16,7 +16,6 @@ class Cup;
 class Motor;
 class Wheel;
 class Device;
-class DeviceContext;
 
 class Renderer
 {
@@ -50,6 +49,5 @@ private:
     Texture2D fieldTexture;
     Texture2D pinsTexture;
     b2WorldId worldId;
-    bool debug;
 };
 } // namespace bromine

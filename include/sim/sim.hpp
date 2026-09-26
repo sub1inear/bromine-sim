@@ -1,5 +1,6 @@
 #pragma once
 #include "field.hpp"
+#include "input.hpp"
 #include "robot.hpp"
 #include <box2d/box2d.h>
 
@@ -19,11 +20,12 @@ private:
 public:
     Field field;
     Robot robot;
+    Input input;
 
     Sim();
     ~Sim();
     void update(float dt);
+    static Sim &getInstance();
 };
 
-Sim &getSim();
 } // namespace bromine

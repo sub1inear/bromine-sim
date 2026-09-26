@@ -34,7 +34,7 @@ static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
     rlPopMatrix();
 }
 
-Renderer::Renderer(b2WorldId worldId) : worldId(worldId), debug(false)
+Renderer::Renderer(b2WorldId worldId) : worldId(worldId)
 {
     fieldTexture = LoadTexture("assets/field.png");
     pinsTexture = LoadTexture("assets/pins.png");
@@ -50,15 +50,11 @@ Renderer::~Renderer()
 
 void Renderer::draw(const Sim &sim)
 {
-    if (IsKeyPressed(KEY_D))
-    {
-        debug = !debug;
-    }
     BeginDrawing();
     {
         drawField(sim.field);
         drawRobot(sim.robot);
-        if (debug)
+        if (sim.input.debug)
         {
             drawDebug();
         }

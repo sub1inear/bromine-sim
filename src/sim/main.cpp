@@ -14,7 +14,7 @@ int main()
 
     bromine::Window window;
 
-    bromine::Sim &sim = bromine::getSim();
+    bromine::Sim &sim = bromine::Sim::getInstance();
     bromine::Renderer renderer(sim.worldId);
 
     // Boot the PROS kernel with startup_main().

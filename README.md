@@ -56,7 +56,7 @@ BromineSim supports any gamepad or keyboard for input, including VEX V5 controll
 | L2 | ZL | LT | L2 | E |
 | R1 | R | RB | R1 | U |
 | R2 | ZR | RT | R2 | O |
-| A (right) | A | B | Circle | Z | 
+| A (right) | A | B | Circle | Z |
 | B (bottom) | B | A | Cross | X |
 | X (top) | X | Y | Triangle | C |
 | Y (left) | Y | X | Square | V |
@@ -66,7 +66,7 @@ Keyboard controls:
 | Key | Action |
 |-----|--------|
 | Esc | Exit |
-| ` (TODO) | Toggle debug overlay |
+| ` or ~ | Toggle debug overlay |
 | 1 (TODO) | Start freeplay (default) |
 | 2 (TODO) | Start match |
 | 3 (TODO) | Start driver skills |

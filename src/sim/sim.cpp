@@ -52,7 +52,7 @@ void Sim::update(float dt)
     }
 }
 
-Sim &getSim()
+Sim &Sim::getInstance()
 {
     // Construct on first use to avoid Static Initialization Order Fiasco.
     static Sim sim;
