@@ -147,12 +147,12 @@ inline T remapValue(T value, T fromMin, T fromMax, T toMin, T toMax)
 
 constexpr inline PhysicsDist inputDistToPhysicsDist(InputDist dist)
 {
-    return dist * 0.0254;
+    return dist * 0.0254f;
 }
 
 constexpr PhysicsMass inputMassToPhysicsMass(InputMass mass)
 {
-    return mass * 0.453592;
+    return mass * 0.453592f;
 }
 
 PhysicsAngle inputAngleToPhysicsAngle(InputAngle angle);
