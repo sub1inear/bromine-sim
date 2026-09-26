@@ -27,8 +27,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-include(FetchContent)
-
 FetchContent_Declare(
     box2d
     GIT_REPOSITORY https://github.com/erincatto/box2d
