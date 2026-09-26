@@ -172,53 +172,64 @@ uint32_t vexDeviceButtonStateGet(void) { return 0; }
 
 // Controller
 
-static bool checkKey(bromine::Input &input, V5_ControllerId id,
+static bool checkKey(bromine::Input::Controller &controller,
                      bromine::Input::Keys key)
 {
-    return (input.controllers[id].keys & key) != bromine::Input::Keys::None;
+    return (controller.keys & key) != bromine::Input::Keys::None;
 }
 
 int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
 {
+
     bromine::Sim &sim = bromine::Sim::getInstance();
     bromine::Input &input = sim.input;
+    bromine::Input::Controller &controller = input.controllers[id];
+
+    if (!controller.connected)
+    {
+        return 0;
+    }
 
     switch (index)
     {
     case AnaLeftX:
-        return input.controllers[id].leftAxisX;
+        bromine::info("AnaLeftX: {}", controller.leftAxisX.load());
+        return controller.leftAxisX;
     case AnaLeftY:
-        return input.controllers[id].leftAxisY;
+        bromine::info("AnaLeftY: {}", controller.leftAxisY.load());
+        return controller.leftAxisY;
     case AnaRightX:
-        return input.controllers[id].rightAxisX;
+        bromine::info("AnaRightX: {}", controller.rightAxisX.load());
+        return controller.rightAxisX;
     case AnaRightY:
-        return input.controllers[id].rightAxisY;
+        bromine::info("AnaRightY: {}", controller.rightAxisY.load());
+        return controller.rightAxisY;
     case ButtonX:
-        return checkKey(input, id, bromine::Input::Keys::X);
+        return checkKey(controller, bromine::Input::Keys::X);
     case ButtonB:
-        return checkKey(input, id, bromine::Input::Keys::B);
+        return checkKey(controller, bromine::Input::Keys::B);
     case ButtonY:
-        return checkKey(input, id, bromine::Input::Keys::Y);
+        return checkKey(controller, bromine::Input::Keys::Y);
     case ButtonA:
-        return checkKey(input, id, bromine::Input::Keys::A);
+        return checkKey(controller, bromine::Input::Keys::A);
     case ButtonL1:
-        return checkKey(input, id, bromine::Input::Keys::L1);
+        return checkKey(controller, bromine::Input::Keys::L1);
     case ButtonR1:
-        return checkKey(input, id, bromine::Input::Keys::R1);
+        return checkKey(controller, bromine::Input::Keys::R1);
     case ButtonL2:
-        return checkKey(input, id, bromine::Input::Keys::L2);
+        return checkKey(controller, bromine::Input::Keys::L2);
     case ButtonR2:
-        return checkKey(input, id, bromine::Input::Keys::R2);
+        return checkKey(controller, bromine::Input::Keys::R2);
     case ButtonUp:
-        return checkKey(input, id, bromine::Input::Keys::Up);
+        return checkKey(controller, bromine::Input::Keys::Up);
     case ButtonDown:
-        return checkKey(input, id, bromine::Input::Keys::Down);
+        return checkKey(controller, bromine::Input::Keys::Down);
     case ButtonLeft:
-        return checkKey(input, id, bromine::Input::Keys::Left);
+        return checkKey(controller, bromine::Input::Keys::Left);
     case ButtonRight:
-        return checkKey(input, id, bromine::Input::Keys::Right);
+        return checkKey(controller, bromine::Input::Keys::Right);
     case ButtonSEL:
-        return checkKey(input, id, bromine::Input::Keys::Sel);
+        return checkKey(controller, bromine::Input::Keys::Sel);
     case BatteryCapacity:
         return 100;
     case BatteryLevel:

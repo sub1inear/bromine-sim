@@ -1,4 +1,5 @@
 #include "input.hpp"
+#include "utils.hpp"
 #include <raylib.h>
 
 namespace bromine
@@ -104,6 +105,11 @@ void Input::update()
 
     controllers[keyboardController].connected = true;
     Keys keys = Keys::None;
+
+    controllers[keyboardController].leftAxisY = 127;
+    controllers[keyboardController].rightAxisY = 127;
+    controllers[keyboardController].leftAxisX = 127;
+    controllers[keyboardController].rightAxisX = 127;
 
     if (IsKeyDown(KEY_W))
     {
