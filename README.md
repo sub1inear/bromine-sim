@@ -47,7 +47,7 @@ Requirements:
 
 ## Controls
 BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers.
-| V5 | Nintendo | Xbox | PlayStation | Keyboard (TODO) |
+| V5 | Nintendo | Xbox | PlayStation | Keyboard |
 |----|----------|------|-------------|----------|
 | Left Stick | Left Stick | Left Stick | WASD |
 | Right Stick | Right Stick | Right Stick | Right Stick | IJKL |
