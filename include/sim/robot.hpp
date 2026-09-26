@@ -11,7 +11,7 @@ class Robot
 {
 public:
     PhysicsIdRect rect;
-    std::vector<std::unique_ptr<Device>> devices;
+    std::vector<std::shared_ptr<Device>> devices;
 
     Robot(b2WorldId worldId);
     void update(float dt);

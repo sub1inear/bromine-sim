@@ -56,11 +56,11 @@ Robot::Robot(b2WorldId worldId)
         std::string_view type = expectJsonKey<std::string_view>(elem, "type");
         if (type == "motor")
         {
-            devices.push_back(std::make_unique<Motor>(elem, *this));
+            devices.push_back(std::make_shared<Motor>(elem, *this));
         }
         else if (type == "wheel")
         {
-            devices.push_back(std::make_unique<Wheel>(elem, *this));
+            devices.push_back(std::make_shared<Wheel>(elem, *this));
         }
         else
         {

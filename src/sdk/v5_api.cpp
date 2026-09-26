@@ -15,12 +15,12 @@
 #include <array>
 #include <cassert>
 #include <chrono>
+#include <memory>
 #include <raylib.h>
 
 struct _V5_Device
 {
-    // TODO: Make this a std::shared_ptr<Device>!
-    bromine::Device *ptr;
+    std::shared_ptr<bromine::Device> ptr;
     V5_DeviceType type;
 };
 
@@ -335,7 +335,7 @@ void vexDeviceMotorVelocityUpdate(V5_DeviceT device, int32_t velocity) {}
 
 void vexDeviceMotorVoltageSet(V5_DeviceT device, int32_t value)
 {
-    if (bromine::Motor *motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    if (auto motor = std::dynamic_pointer_cast<bromine::Motor>(device->ptr))
     {
         motor->setVoltage(value);
     }
@@ -374,7 +374,7 @@ int32_t vexDeviceMotorCurrentGet(V5_DeviceT device) { return 0; }
 
 int32_t vexDeviceMotorVoltageGet(V5_DeviceT device)
 {
-    if (bromine::Motor *motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    if (auto motor = std::dynamic_pointer_cast<bromine::Motor>(device->ptr))
     {
         return motor->getVoltage();
     }
@@ -1162,8 +1162,7 @@ void vexSystemBoot(void)
             uint8_t port;
             V5_DeviceType type;
 
-            if (bromine::Motor *motor =
-                    dynamic_cast<bromine::Motor *>(device.get()))
+            if (auto motor = std::dynamic_pointer_cast<bromine::Motor>(device))
             {
                 port = motor->port;
                 type = kDeviceTypeMotorSensor;
@@ -1185,7 +1184,7 @@ void vexSystemBoot(void)
                 }
                 else
                 {
-                    elem.ptr = device.get();
+                    elem.ptr = device;
                     elem.type = type;
                 }
             }
