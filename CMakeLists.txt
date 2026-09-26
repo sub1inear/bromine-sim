@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(BromineSim LANGUAGES C CXX)
 
-# Supress CMake warning that Raylib's CMake version is out of date.
-cmake_policy(SET CMP0000 NEW)
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -19,7 +16,9 @@ FetchContent_Declare(
 
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
+set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
 FetchContent_MakeAvailable(raylib)
+unset(CMAKE_POLICY_VERSION_MINIMUM)
 
 FetchContent_Declare(
     json
