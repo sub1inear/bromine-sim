@@ -10,20 +10,20 @@ class Input
 public:
     enum class Keys
     {
-        None = 1 << 0,
-        A = 1 << 1,
-        B = 1 << 2,
-        X = 1 << 3,
-        Y = 1 << 4,
-        L1 = 1 << 5,
-        R1 = 1 << 6,
-        R2 = 1 << 7,
-        L2 = 1 << 8,
-        Up = 1 << 9,
-        Down = 1 << 10,
-        Left = 1 << 11,
-        Right = 1 << 12,
-        Sel = 1 << 13,
+        None = 0,
+        A = 1 << 0,
+        B = 1 << 1,
+        X = 1 << 2,
+        Y = 1 << 3,
+        L1 = 1 << 4,
+        R1 = 1 << 5,
+        R2 = 1 << 6,
+        L2 = 1 << 7,
+        Up = 1 << 8,
+        Down = 1 << 9,
+        Left = 1 << 10,
+        Right = 1 << 11,
+        Sel = 1 << 12,
     };
 
     friend constexpr Keys operator|(Keys a, Keys b)
@@ -70,6 +70,10 @@ public:
 
     Input();
     void update();
+
+private:
+    void updateController();
+    void updateKeyboard();
 };
 
 } // namespace bromine

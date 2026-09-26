@@ -9,25 +9,24 @@
 
 int main()
 {
+
+    SetTraceLogLevel(LOG_NONE);
+    SetTargetFPS(bromine::fps);
+
+    bromine::Window window;
+
+    bromine::Sim &sim = bromine::Sim::getInstance();
+    bromine::Renderer renderer(sim.worldId);
+
     // Boot the PROS kernel with startup_main().
     // This will never return and Raylib requires the main thread,
     // so we run startup_main() in a detached thread.
     std::thread(startup_main).detach();
 
+    while (!window.shouldClose())
     {
-        SetTraceLogLevel(LOG_NONE);
-        SetTargetFPS(bromine::fps);
-
-        bromine::Window window;
-
-        bromine::Sim &sim = bromine::Sim::getInstance();
-        bromine::Renderer renderer(sim.worldId);
-
-        while (!window.shouldClose())
-        {
-            sim.update(GetFrameTime());
-            renderer.draw(sim);
-        }
+        sim.update(GetFrameTime());
+        renderer.draw(sim);
     }
 
     // HACK: Exit the program without destructing to avoid PROS accessing the

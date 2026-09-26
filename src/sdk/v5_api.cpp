@@ -21,8 +21,7 @@
 
 struct _V5_Device
 {
-    // TODO: Undo making this a std::shared_ptr.
-    std::shared_ptr<bromine::Device> ptr;
+    bromine::Device *ptr;
     V5_DeviceType type;
 };
 
@@ -193,16 +192,12 @@ int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
     switch (index)
     {
     case AnaLeftX:
-        bromine::info("AnaLeftX: {}", controller.leftAxisX.load());
         return controller.leftAxisX;
     case AnaLeftY:
-        bromine::info("AnaLeftY: {}", controller.leftAxisY.load());
         return controller.leftAxisY;
     case AnaRightX:
-        bromine::info("AnaRightX: {}", controller.rightAxisX.load());
         return controller.rightAxisX;
     case AnaRightY:
-        bromine::info("AnaRightY: {}", controller.rightAxisY.load());
         return controller.rightAxisY;
     case ButtonX:
         return checkKey(controller, bromine::Input::Keys::X);
@@ -319,7 +314,7 @@ void vexDeviceMotorVelocityUpdate(V5_DeviceT device, int32_t velocity) {}
 
 void vexDeviceMotorVoltageSet(V5_DeviceT device, int32_t value)
 {
-    if (auto motor = std::dynamic_pointer_cast<bromine::Motor>(device->ptr))
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
     {
         motor->voltage = value;
     }
@@ -358,7 +353,7 @@ int32_t vexDeviceMotorCurrentGet(V5_DeviceT device) { return 0; }
 
 int32_t vexDeviceMotorVoltageGet(V5_DeviceT device)
 {
-    if (auto motor = std::dynamic_pointer_cast<bromine::Motor>(device->ptr))
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
     {
         return motor->voltage;
     }
@@ -1146,7 +1141,7 @@ void vexSystemBoot(void)
             uint8_t port;
             V5_DeviceType type;
 
-            if (auto motor = std::dynamic_pointer_cast<bromine::Motor>(device))
+            if (auto motor = dynamic_cast<bromine::Motor *>(device.get()))
             {
                 port = motor->port;
                 type = kDeviceTypeMotorSensor;
@@ -1168,7 +1163,7 @@ void vexSystemBoot(void)
                 }
                 else
                 {
-                    elem.ptr = device;
+                    elem.ptr = device.get();
                     elem.type = type;
                 }
             }

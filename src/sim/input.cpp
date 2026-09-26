@@ -29,6 +29,12 @@ Input::Input() : controllers{} {}
 
 void Input::update()
 {
+    updateController();
+    updateKeyboard();
+}
+
+void Input::updateController()
+{
 
     // NOTE: Y axes must be inverted to match PROS up is positive convention.
     for (int id = 0; id < controllers.size(); ++id)
@@ -68,13 +74,11 @@ void Input::update()
             {
                 keys |= Keys::Right;
             }
-            if (triggerToVex(id, GAMEPAD_BUTTON_LEFT_TRIGGER_1,
-                             GAMEPAD_AXIS_LEFT_TRIGGER))
+            if (IsGamepadButtonDown(id, GAMEPAD_BUTTON_LEFT_TRIGGER_1))
             {
                 keys |= Keys::L1;
             }
-            if (triggerToVex(id, GAMEPAD_BUTTON_RIGHT_TRIGGER_1,
-                             GAMEPAD_AXIS_RIGHT_TRIGGER))
+            if (IsGamepadButtonDown(id, GAMEPAD_BUTTON_RIGHT_TRIGGER_1))
             {
                 keys |= Keys::R1;
             }
@@ -102,46 +106,61 @@ void Input::update()
             controllers[id].rightAxisY = -axisToVex(id, GAMEPAD_AXIS_RIGHT_Y);
         }
     }
+}
 
-    controllers[keyboardController].connected = true;
-    Keys keys = Keys::None;
+void Input::updateKeyboard()
+{
+    Controller &controller = controllers[keyboardController];
 
-    controllers[keyboardController].leftAxisY = 127;
-    controllers[keyboardController].rightAxisY = 127;
-    controllers[keyboardController].leftAxisX = 127;
-    controllers[keyboardController].rightAxisX = 127;
+    Keys keys;
+
+    if (controller.connected)
+    {
+        keys = controller.keys;
+    }
+    else
+    {
+        keys = Keys::None;
+        controller.leftAxisY = 0;
+        controller.rightAxisY = 0;
+        controller.leftAxisX = 0;
+        controller.rightAxisX = 0;
+    }
+
+    // TODO: Make controller and keyboard balance each other out (e.g. up on
+    // controller and down on keyboard is no movement)
 
     if (IsKeyDown(KEY_W))
     {
-        controllers[keyboardController].leftAxisY = axisMax;
+        controller.leftAxisY = axisMax;
     }
     if (IsKeyDown(KEY_S))
     {
-        controllers[keyboardController].leftAxisY = axisMin;
+        controller.leftAxisY = axisMin;
     }
     if (IsKeyDown(KEY_A))
     {
-        controllers[keyboardController].leftAxisX = axisMin;
+        controller.leftAxisX = axisMin;
     }
     if (IsKeyDown(KEY_D))
     {
-        controllers[keyboardController].leftAxisX = axisMax;
+        controller.leftAxisX = axisMax;
     }
     if (IsKeyDown(KEY_I))
     {
-        controllers[keyboardController].rightAxisY = axisMax;
+        controller.rightAxisY = axisMax;
     }
     if (IsKeyDown(KEY_K))
     {
-        controllers[keyboardController].rightAxisY = axisMin;
+        controller.rightAxisY = axisMin;
     }
     if (IsKeyDown(KEY_J))
     {
-        controllers[keyboardController].rightAxisX = axisMin;
+        controller.rightAxisX = axisMin;
     }
     if (IsKeyDown(KEY_L))
     {
-        controllers[keyboardController].rightAxisX = axisMax;
+        controller.rightAxisX = axisMax;
     }
     if (IsKeyDown(KEY_Q))
     {
@@ -179,8 +198,24 @@ void Input::update()
     {
         keys |= Keys::Sel;
     }
+    if (IsKeyDown(KEY_UP))
+    {
+        keys |= Keys::Up;
+    }
+    if (IsKeyDown(KEY_DOWN))
+    {
+        keys |= Keys::Down;
+    }
+    if (IsKeyDown(KEY_LEFT))
+    {
+        keys |= Keys::Left;
+    }
+    if (IsKeyDown(KEY_RIGHT))
+    {
+        keys |= Keys::Right;
+    }
 
-    controllers[keyboardController].keys = keys;
+    controller.keys = keys;
 
     if (IsKeyPressed(KEY_GRAVE))
     {

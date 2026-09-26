@@ -60,7 +60,7 @@ void Motor::update(float dt)
     {
         for (auto &device : robot.devices)
         {
-            if (auto wheel = std::dynamic_pointer_cast<Wheel>(device))
+            if (auto wheel = dynamic_cast<Wheel *>(device.get()))
             {
                 if (wheel->id == id)
                 {
