@@ -183,8 +183,6 @@ int32_t vexControllerGet(V5_ControllerId id, V5_ControllerIndex index)
     bromine::Sim &sim = bromine::Sim::getInstance();
     bromine::Input &input = sim.input;
 
-    assert(id < bromine::Input::controllers.size());
-
     switch (index)
     {
     case AnaLeftX:
