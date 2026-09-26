@@ -120,6 +120,8 @@ void Input::updateKeyboard()
     }
     else
     {
+        // Controller is now connected to keyboard.
+        controller.connected = true;
         keys = Keys::None;
         controller.leftAxisY = 0;
         controller.rightAxisY = 0;
