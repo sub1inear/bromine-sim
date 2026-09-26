@@ -6,7 +6,7 @@
 namespace bromine
 {
 Motor::Motor(const json &j, Robot &robot)
-    : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id"))
+    : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")), voltage(0)
 {
     port = expectJsonKey<uint8_t>(j, "port");
     if (port < 1 || port > 21)
@@ -54,27 +54,26 @@ Motor::Motor(const json &j, Robot &robot)
     }
 }
 
-void Motor::update(float dt) {}
-
-void Motor::setVoltage(int32_t voltage)
+void Motor::update(float dt)
 {
-    this->voltage = voltage;
-    for (auto &device : robot.devices)
+    if (voltage != 0)
     {
-        if (Wheel *wheel = dynamic_cast<Wheel *>(device.get()))
+        for (auto &device : robot.devices)
         {
-            if (wheel->id == id)
+            if (auto wheel = std::dynamic_pointer_cast<Wheel>(device))
             {
-                PhysicsRect rect = wheel->getWorldRect();
-                PhysicsPoint force =
-                    b2RotateVector(rect.pose.q, {0.0f, voltage * 0.00001f});
-                b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p, true);
+                if (wheel->id == id)
+                {
+                    PhysicsRect rect = wheel->getWorldRect();
+                    PhysicsPoint force =
+                        b2RotateVector(rect.pose.q, {0.0f, voltage * 0.00001f});
+                    b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p,
+                                      true);
+                }
             }
         }
     }
 }
-
-int32_t Motor::getVoltage() { return voltage; }
 
 void Motor::draw(Renderer &renderer) const { renderer.drawMotor(*this); }
 
