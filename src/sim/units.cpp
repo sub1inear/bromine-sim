@@ -21,6 +21,7 @@ static void setBodyMass(b2BodyId bodyId, InputMass mass)
     float scalingFactor = newMass / oldMass;
     b2MassData newMassData = {newMass, oldMassData.center,
                               oldMassData.rotationalInertia * scalingFactor};
+    b2Body_SetMassData(bodyId, newMassData);
 }
 
 PhysicsAngle inputAngleToPhysicsAngle(InputAngle angle)

@@ -65,8 +65,9 @@ void Motor::update(float dt)
                 if (wheel->id == id)
                 {
                     PhysicsRect rect = wheel->getWorldRect();
+                    // TODO: Simulate a real Smart Motor, stubbed for now.
                     PhysicsPoint force =
-                        b2RotateVector(rect.pose.q, {0.0f, voltage * 0.00001f});
+                        b2RotateVector(rect.pose.q, {0.0f, voltage * 0.0002f});
                     b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p,
                                       true);
                 }
