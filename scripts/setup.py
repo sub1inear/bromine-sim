@@ -39,6 +39,8 @@ symlink(Path('include/user/include'), path / 'include')
 
 conductor = Conductor()
 
+
+
 with open(path / 'project.pros') as f:
     project = json.load(f)
     for name, template in project['py/state']['templates'].items():
@@ -77,9 +79,9 @@ with open(path / 'project.pros') as f:
                     all_files = zip_file.namelist()
                     files_to_extract = [f for f in all_files if not f.endswith('main.cpp')]
                     zip_file.extractall(path=src, members=files_to_extract)
+                print(f'successfully installed template {name} from {source_code}')
                 break
         else:
             raise KeyError(f"error: template {name} not found in depot {depot.name} at {url}")
-
 
 print('success!')

@@ -182,12 +182,62 @@ add_dependencies(BromineSim pros_build_info)
 set_source_files_properties("${PROS_BUILD_INFO_C}" PROPERTIES GENERATED TRUE)
 target_sources(BromineSim PRIVATE "${PROS_BUILD_INFO_C}")
 
-file(GLOB USER_SOURCES CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/user/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/user/*.c"
-)
-target_sources(BromineSim PRIVATE ${USER_SOURCES})
-
-target_include_directories(BromineSim PRIVATE include/user/include)
-
 target_compile_definitions(BromineSim PRIVATE BROMINE_SIM=1)
+
+set(PROS_PUBLIC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/pros_public_include")
+
+file(GLOB PROS_PUBLIC_HEADERS CONFIGURE_DEPENDS
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include/pros"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/api.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/pros/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/pros/*.hpp"
+)
+foreach(header ${PROS_PUBLIC_HEADERS})
+    set(FORWARD_HEADER_TARGET "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/${header}")
+    configure_file(cmake/forward_header.h.in "${PROS_PUBLIC_INCLUDE_DIR}/${header}" @ONLY)
+endforeach()
+
+set(USER_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/user")
+set(USER_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/user/include")
+
+file(GLOB_RECURSE USER_SOURCE_PATHS CONFIGURE_DEPENDS FOLLOW_SYMLINKS
+    RELATIVE "${USER_SOURCE_DIR}"
+    "${USER_SOURCE_DIR}/*.cpp"
+    "${USER_SOURCE_DIR}/*.c"
+)
+
+# Sources are either src/... (the user project) or <template>/src/... (an
+# extracted template). Like PROS's common.mk, src/<dir>/foo.cpp also gets
+# -iquote include/<dir>/, and anything outside a src/ directory isn't built.
+set(USER_SOURCES "")
+foreach(path ${USER_SOURCE_PATHS})
+    if(path MATCHES "^src/(.*)$" OR path MATCHES "^[^/]+/src/(.*)$")
+        get_filename_component(dir "${CMAKE_MATCH_1}" DIRECTORY)
+    else()
+        continue()
+    endif()
+
+    set(source "${USER_SOURCE_DIR}/${path}")
+    set_source_files_properties("${source}" PROPERTIES
+        COMPILE_OPTIONS "-iquote;${USER_INCLUDE_DIR}/${dir}"
+    )
+    list(APPEND USER_SOURCES "${source}")
+endforeach()
+
+add_library(BromineSimUser OBJECT ${USER_SOURCES})
+
+target_include_directories(BromineSimUser PRIVATE
+    "${PROS_PUBLIC_INCLUDE_DIR}"
+    include/user/include
+)
+
+target_compile_definitions(BromineSimUser PRIVATE
+    BROMINE_SIM=1
+    FMT_CONSTEVAL= # fmt library portability hack
+)
+
+set(NEWLIB_COMPAT_H "${CMAKE_CURRENT_SOURCE_DIR}/include/compat/newlib_compat.h")
+target_compile_options(BromineSimUser PRIVATE -include "${NEWLIB_COMPAT_H}")
+target_link_libraries(BromineSim PRIVATE BromineSimUser)
+
+# TODO: Have scripts/setup.py generate a config.cmake for library-specific shims.
