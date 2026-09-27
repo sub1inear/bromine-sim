@@ -18,9 +18,10 @@ def symlink(dst: Path, src: Path):
         dst.unlink()
     elif dst.exists():
         raise FileExistsError(f'error: expected {dst} to be a symlink')
-    base = Path(*dst.absolute().parts[:-1])
+    Path(dst.parent).mkdir(parents=True, exist_ok=True)
     # os.path.relpath() requires a lower Python version than Path.relative_to().
-    rel = os.path.relpath(src, start=base)
+    rel = os.path.relpath(src, start=dst.parent)
+    print(f'creating symlink {rel} -> {dst}')
     dst.symlink_to(rel, target_is_directory=True)
 
 if len(sys.argv) != 2:
@@ -32,8 +33,8 @@ path = Path(sys.argv[1])
 src = Path('src/user')
 include = Path('include/user')
 
-# symlink(Path('src/user/src'), path / 'src')
-# symlink(Path('include/user/include'), path / 'include')
+symlink(Path('src/user/src'), path / 'src')
+symlink(Path('include/user/include'), path / 'include')
 
 
 conductor = Conductor()
