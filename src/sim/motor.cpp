@@ -2,16 +2,22 @@
 #include "robot.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
+#include <algorithm>
+#include <cassert>
 
 namespace bromine
 {
+
+constexpr float maxVoltage = 12000;
+constexpr float minVoltage = -maxVoltage;
+
 Motor::Motor(const json &j, Robot &robot)
     : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")), voltage(0)
 {
     port = expectJsonKey<uint8_t>(j, "port");
     if (port < 1 || port > 21)
     {
-        error("motor port must be in range [1, 21], got {}", port);
+        error("motor port must be in range [1, 21], got `{}`", port);
     }
 
     std::string_view roleStr = expectJsonKey<std::string_view>(j, "role");
@@ -40,12 +46,37 @@ Motor::Motor(const json &j, Robot &robot)
         power = Power::Full;
         rect.width = inputDistToPhysicsDist(2.26f);
         rect.height = inputDistToPhysicsDist(2.82f);
+
+        std::string_view gearStr = expectJsonKey<std::string_view>(j, "gear");
+        if (gearStr == "red")
+        {
+            gear = Gear::Red;
+        }
+        else if (gearStr == "green")
+        {
+            gear = Gear::Green;
+        }
+        else if (gearStr == "blue")
+        {
+            gear = Gear::Blue;
+        }
+        else
+        {
+            error("unknown motor gear `{}`, expected one of: `red`, `green`, "
+                  "`blue`",
+                  gearStr);
+        }
     }
     else if (powerStr == "half")
     {
         power = Power::Half;
         rect.width = inputDistToPhysicsDist(2.25f);
         rect.height = inputDistToPhysicsDist(2.5f);
+        if (j.find("gear") != j.end())
+        {
+            error("5.5W motors (half-watts) do not support gearing");
+        }
+        gear = Gear::None;
     }
     else
     {
@@ -56,16 +87,69 @@ Motor::Motor(const json &j, Robot &robot)
 
 void Motor::update()
 {
-    if (voltage != 0)
+    // Load voltage once to prevent it changing while it's applied.
+    float loadedVoltage = voltage;
+    loadedVoltage = std::clamp(loadedVoltage, minVoltage, maxVoltage);
+    // For every wheel, apply force.
+    for (Wheel *wheel : wheels)
     {
-        for (Wheel *wheel : wheels)
+        // Get the wheel's rect in world space.
+        PhysicsRect rect = wheel->getWorldRect();
+
+        // Find the rotated forward vector.
+        PhysicsPoint forward = b2RotateVector(rect.pose.q, {0.0f, 1.0f});
+
+        // Get the actual velocity of the wheel.
+        PhysicsPoint wheelVelocity =
+            b2Body_GetWorldPointVelocity(robot.rect.bodyId, rect.pose.p);
+        // Isolate the forward component of the velocity and make it a
+        // scalar.
+        float speed = b2Dot(wheelVelocity, forward);
+
+        PhysicsDist wheelRadius = rect.height / 2.0f;
+        PhysicsDist wheelCircumference = 2.0f * B2_PI * wheelRadius;
+
+        // Convert revolutions per minute to per second.
+        float revolutionsPerSecond = wheel->rpm / 60.0f;
+
+        // The max speed in m/s is the revolutions per second times the
+        // wheel circumference in meters.
+        float maxSpeed = revolutionsPerSecond * wheelCircumference;
+
+        // Calculate stall torque by scaling the published stall torque for
+        // 11W 100RPM to the actual RPM.
+        float stallTorque = 2.1f * (100.0f / wheel->rpm);
+        if (power == Power::Half)
         {
-            PhysicsRect rect = wheel->getWorldRect();
-            // TODO: Simulate a real Smart Motor, stubbed for now.
-            PhysicsPoint force =
-                b2RotateVector(rect.pose.q, {0.0f, voltage * 0.0002f});
-            b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p, true);
+            // 5.5W motors (half-watts) have around half as much stall
+            // torque.
+            stallTorque /= 2.0f;
         }
+        // Torque = force * distance, so divide by distance to get the true
+        // force.
+        float stallForce = stallTorque / wheelRadius;
+
+        // Calculate target speed as a proportion of the maximum speed.
+        float targetSpeed = (loadedVoltage / maxVoltage) * maxSpeed;
+
+        // Simulate motor-speed curve; voltage sets the speed and back-EMF
+        // reduces it.
+        float force = stallForce * (targetSpeed - speed) / maxSpeed;
+
+        // Clamp the force to prevent instantly switching directions.
+        force = std::clamp(force, -stallForce, stallForce);
+
+        // Split the motor's force across every linked wheel.
+        // NOTE: This must be done following clamping by stallForce,
+        // otherwise stallForce must be divided by the number of wheels as
+        // well.
+        force /= wheels.size();
+
+        // Make the force point in the forward direction.
+        PhysicsPoint forceVec = b2MulSV(force, forward);
+
+        // Apply the force.
+        b2Body_ApplyForce(robot.rect.bodyId, forceVec, rect.pose.p, true);
     }
 }
 
@@ -81,6 +165,10 @@ void Motor::link()
         {
             wheels.push_back(wheel);
         }
+    }
+    if (wheels.empty())
+    {
+        warning("motor on port `{}` has no connected wheels", port);
     }
 }
 

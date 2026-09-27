@@ -21,6 +21,15 @@ public:
         Full,
         Half,
     };
+    enum class Gear
+    {
+        None,
+        Red,
+        Green,
+        Blue,
+    };
+
+    Gear gear;
     Role role;
     Power power;
 

@@ -23,5 +23,10 @@ public:
     Wheel(const json &j, Robot &robot);
     void update() override;
     void draw(Renderer &renderer) const override;
+
+private:
+    float linearFriction;
+    float lateralFriction;
+    float lateralDamping;
 };
 } // namespace bromine

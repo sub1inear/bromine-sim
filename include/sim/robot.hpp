@@ -12,6 +12,7 @@ class Robot
 public:
     PhysicsIdRect rect;
     std::vector<std::unique_ptr<Device>> devices;
+    size_t wheelCount;
 
     Robot(b2WorldId worldId);
     void update();

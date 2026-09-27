@@ -4,7 +4,10 @@
 namespace bromine
 {
 
+constexpr float gravity = 9.81f;
+
 constexpr int fps = 60;
+constexpr float fixedDt = 1.0f / fps;
 
 constexpr InputDist inputFieldSize = 140.0f;
 constexpr InputDist inputHalfFieldSize = inputFieldSize / 2.0f;

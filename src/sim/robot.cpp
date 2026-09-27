@@ -10,10 +10,7 @@
 namespace bromine
 {
 
-constexpr float throttleCoeff = 1;
-constexpr float turnCoeff = 0.1;
-
-Robot::Robot(b2WorldId worldId)
+Robot::Robot(b2WorldId worldId) : wheelCount(0)
 {
     std::ifstream file("assets/robot.json");
     json j;
@@ -39,12 +36,10 @@ Robot::Robot(b2WorldId worldId)
         0.0f,
         expectJsonKey<float>(j, "width"),
         expectJsonKey<float>(j, "height"),
-        inputMassToPhysicsMass(expectJsonKey<float>(j, "mass")),
+        expectJsonKey<float>(j, "mass"),
     };
 
     b2BodyDef bodyDef = b2DefaultBodyDef();
-    bodyDef.linearDamping = 0.9f;
-    bodyDef.angularDamping = 0.9f;
     bodyDef.type = b2_dynamicBody;
     b2ShapeDef shapeDef = b2DefaultShapeDef();
     rect = inputRectToPhysicsIdRect(inputRect, worldId, bodyDef, shapeDef);
@@ -71,11 +66,16 @@ Robot::Robot(b2WorldId worldId)
     // Link motors to their corresponding wheels.
     // This action must be done following the creation of all devices,
     // so the wheels have been created.
+    // Count the wheels as well.
     for (auto &device : devices)
     {
         if (auto motor = dynamic_cast<Motor *>(device.get()))
         {
             motor->link();
+        }
+        else if (dynamic_cast<Wheel *>(device.get()))
+        {
+            ++wheelCount;
         }
     }
 }
