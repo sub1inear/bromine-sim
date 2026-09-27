@@ -51,8 +51,11 @@ cmake -S . -B build
 cmake --build build
 ```
 
+`scripts/setup.py` symlinks your source code into the PROS project and fetches the source code for any libraries.
+Redo this step if you install a new one.
+
 ## Controls
-BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers.
+BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers (TODO).
 | V5 | Nintendo | Xbox | PlayStation | Keyboard |
 |----|----------|------|-------------|----------|
 | Left Stick | Left Stick | Left Stick | WASD |
@@ -81,10 +84,19 @@ Keyboard controls:
 The first controller detected will be the "master" controller, and the second controller will be the "partner" controller; any others will be ignored.
 
 ## Compatability
-BromineSim works on Windows, macOS, and Linux (coming soon).
-Most robot code should work without modification.
-Many devices are intentionally unsupported.
-The internal PROS layer is mostly unchanged, so most PROS functions should behave as expected.
-Speed, undefined behavior, and physics will likely vary between the simulator and actual VEX hardware.
-Some functions (like `.move_voltage()`) have intentionally undocumented behavior, so it is impossible to simulate them correctly.
+BromineSim works on Windows, macOS, and Linux (TODO).
+
+## Strengths
+- The internal PROS layer is left mostly unchanged.
+- The most common devices (motors, distance sensors, IMUs, etc.) are/will be supported.
+
+### Limitations
+- FreeRTOS is run with a PC port, so threading may behave differently between the simulator and the actual VEX hardware.
+- Some devices are intentionally unsupported.
+- Unportable C/C++ code (e.g. that assumes integer sizes or has inline assembly) may not work correctly.
+- Performance may differ from actual VEX hardware.
+- Some VEX functions (like `.move_velocity()`) have intentionally undocumented behavior, so it is impossible to simulate them correctly.
+- Relying on any internal PROS headers like the hot tables may break.
+
 To write simulator- or robot-specific code, conditionally compile based on the `BROMINE_SIM` macro.
+Many of these limitations are rare in practice.
