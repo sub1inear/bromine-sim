@@ -25,7 +25,7 @@ int main()
 
     while (!window.shouldClose())
     {
-        sim.update(GetFrameTime());
+        sim.update();
         renderer.draw(sim);
     }
 

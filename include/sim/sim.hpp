@@ -24,7 +24,7 @@ public:
 
     Sim();
     ~Sim();
-    void update(float dt);
+    void update();
     static Sim &getInstance();
 };
 

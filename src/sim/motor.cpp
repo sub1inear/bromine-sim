@@ -54,7 +54,7 @@ Motor::Motor(const json &j, Robot &robot)
     }
 }
 
-void Motor::update(float dt)
+void Motor::update()
 {
     if (voltage != 0)
     {

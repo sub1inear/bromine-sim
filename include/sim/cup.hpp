@@ -13,7 +13,7 @@ public:
     bool up;
     Cup(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle, bool up,
         std::unique_ptr<Object> next = nullptr);
-    void update(float dt) override;
+    void update() override;
     void draw(Renderer &renderer) const override;
 };
 } // namespace bromine

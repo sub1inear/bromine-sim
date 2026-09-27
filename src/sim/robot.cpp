@@ -80,11 +80,11 @@ Robot::Robot(b2WorldId worldId)
     }
 }
 
-void Robot::update(float dt)
+void Robot::update()
 {
     for (auto &device : devices)
     {
-        device->update(dt);
+        device->update();
     }
 }
 

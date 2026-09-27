@@ -14,7 +14,7 @@ public:
     std::vector<std::unique_ptr<Device>> devices;
 
     Robot(b2WorldId worldId);
-    void update(float dt);
+    void update();
 };
 
 } // namespace bromine

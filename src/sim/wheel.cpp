@@ -25,7 +25,7 @@ Wheel::Wheel(const json &j, Robot &robot)
     rect.height = inchesToMeters(expectJsonKey<float>(j, "diameter"));
 }
 
-void Wheel::update(float dt) {}
+void Wheel::update() {}
 
 void Wheel::draw(Renderer &renderer) const { renderer.drawWheel(*this); }
 

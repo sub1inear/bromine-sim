@@ -78,11 +78,11 @@ Field::Field(b2WorldId worldId)
     };
 }
 
-void Field::update(float dt)
+void Field::update()
 {
     for (const std::unique_ptr<Object> &object : objects)
     {
-        object->update(dt);
+        object->update();
     }
 }
 } // namespace bromine

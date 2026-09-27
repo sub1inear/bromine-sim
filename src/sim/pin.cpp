@@ -20,7 +20,7 @@ HorizontalPin::HorizontalPin(b2WorldId worldId, InputDist x, InputDist y,
     rect = inputRectToPhysicsIdRect(inputRect, worldId, bodyDef, shapeDef);
 }
 
-void HorizontalPin::update(float dt) {}
+void HorizontalPin::update() {}
 
 void HorizontalPin::draw(Renderer &renderer) const
 {
@@ -39,7 +39,7 @@ VerticalPin::VerticalPin(b2WorldId worldId, InputDist x, InputDist y,
         inputCircleToPhysicsIdCircle(inputCircle, worldId, bodyDef, shapeDef);
 }
 
-void VerticalPin::update(float dt) {}
+void VerticalPin::update() {}
 
 void VerticalPin::draw(Renderer &renderer) const
 {

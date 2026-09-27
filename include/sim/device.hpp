@@ -17,7 +17,7 @@ public:
 
     Device(const json &j, Robot &robot);
     PhysicsRect getWorldRect() const;
-    virtual void update(float dt) = 0;
+    virtual void update() = 0;
     virtual void draw(Renderer &renderer) const = 0; // Double-dispatch.
     virtual ~Device() = default;
 };

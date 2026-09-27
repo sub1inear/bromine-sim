@@ -21,7 +21,7 @@ public:
     float size;
 
     Wheel(const json &j, Robot &robot);
-    void update(float dt) override;
+    void update() override;
     void draw(Renderer &renderer) const override;
 };
 } // namespace bromine

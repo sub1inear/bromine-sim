@@ -1,6 +1,7 @@
 #include "sim.hpp"
 #include "constants.hpp"
 #include "field.hpp"
+#include <raylib.h>
 
 namespace bromine
 {
@@ -27,10 +28,12 @@ Sim::~Sim()
     b2DestroyWorld(worldId); // Destroys inner bodies/shapes too.
 }
 
-void Sim::update(float dt)
+void Sim::update()
 {
     // See https://gafferongames.com/post/fix_your_timestep/.
     // This version doesn't bother to do a blended render.
+
+    float dt = GetFrameTime();
 
     // Clamp the delta time so large freezes (e.g. dragging the window) doesn't
     // cause slowdowns.
@@ -45,8 +48,8 @@ void Sim::update(float dt)
     while (accum >= fixedDt && steps < maxStepsPerFrame)
     {
         input.update();
-        robot.update(fixedDt);
-        field.update(fixedDt);
+        robot.update();
+        field.update();
         b2World_Step(worldId, fixedDt, 4);
         accum -= fixedDt;
         steps++;

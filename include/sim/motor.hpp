@@ -30,7 +30,7 @@ public:
     std::atomic<int32_t> voltage;
 
     Motor(const json &j, Robot &robot);
-    void update(float dt) override;
+    void update() override;
     void draw(Renderer &renderer) const override;
 
     void link();

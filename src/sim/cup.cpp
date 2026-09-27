@@ -20,7 +20,7 @@ Cup::Cup(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle, bool up,
         inputCircleToPhysicsIdCircle(inputCircle, worldId, bodyDef, shapeDef);
 }
 
-void Cup::update(float dt) {}
+void Cup::update() {}
 
 void Cup::draw(Renderer &renderer) const { renderer.drawCup(*this); }
 
