@@ -36,14 +36,20 @@ Not planned:
 ## Usage
 
 Requirements:
+- Git
 - CMake
-- Python (with `pip` or `uv`)
+- Python
+- UV
 - GCC or Clang (MSVC is not supported)
 
-1. Clone the repository.
-2. Run `scripts/setup.py path/to/pros/project` with `pip`/`pip3`/`uv` to set up the repository with your PROS project.
-3. Build it with CMake.
-4. Run the resulting executable inside the root directory.
+```bash
+git clone git@github.com:sub1inear/BromineSim.git
+cd BromineSim
+uv run scripts/setup.py path/to/pros/project
+code assets/robot.json # Edit to match your robot configuration or export it from Fusion.
+cmake -S . -B build
+cmake --build build
+```
 
 ## Controls
 BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers.
@@ -73,3 +79,12 @@ Keyboard controls:
 | 4 (TODO) | Start auton skills |
 
 The first controller detected will be the "master" controller, and the second controller will be the "partner" controller; any others will be ignored.
+
+## Compatability
+BromineSim works on Windows, macOS, and Linux (coming soon).
+Most robot code should work without modification.
+Many devices are intentionally unsupported.
+The internal PROS layer is mostly unchanged, so most PROS functions should behave as expected.
+Speed, undefined behavior, and physics will likely vary between the simulator and actual VEX hardware.
+Some functions (like `.move_voltage()`) have intentionally undocumented behavior, so it is impossible to simulate them correctly.
+To write simulator- or robot-specific code, conditionally compile based on the `BROMINE_SIM` macro.
