@@ -67,6 +67,17 @@ Robot::Robot(b2WorldId worldId)
             error("unknown device type `{}`", type);
         }
     }
+
+    // Link motors to their corresponding wheels.
+    // This action must be done following the creation of all devices,
+    // so the wheels have been created.
+    for (auto &device : devices)
+    {
+        if (auto motor = dynamic_cast<Motor *>(device.get()))
+        {
+            motor->link();
+        }
+    }
 }
 
 void Robot::update(float dt)

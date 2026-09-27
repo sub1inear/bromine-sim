@@ -58,24 +58,30 @@ void Motor::update(float dt)
 {
     if (voltage != 0)
     {
-        for (auto &device : robot.devices)
+        for (Wheel *wheel : wheels)
         {
-            if (auto wheel = dynamic_cast<Wheel *>(device.get()))
-            {
-                if (wheel->id == id)
-                {
-                    PhysicsRect rect = wheel->getWorldRect();
-                    // TODO: Simulate a real Smart Motor, stubbed for now.
-                    PhysicsPoint force =
-                        b2RotateVector(rect.pose.q, {0.0f, voltage * 0.0002f});
-                    b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p,
-                                      true);
-                }
-            }
+            PhysicsRect rect = wheel->getWorldRect();
+            // TODO: Simulate a real Smart Motor, stubbed for now.
+            PhysicsPoint force =
+                b2RotateVector(rect.pose.q, {0.0f, voltage * 0.0002f});
+            b2Body_ApplyForce(robot.rect.bodyId, force, rect.pose.p, true);
         }
     }
 }
 
 void Motor::draw(Renderer &renderer) const { renderer.drawMotor(*this); }
+
+void Motor::link()
+{
+    wheels.clear();
+    for (auto &device : robot.devices)
+    {
+        auto wheel = dynamic_cast<Wheel *>(device.get());
+        if (wheel != nullptr && wheel->id == id)
+        {
+            wheels.push_back(wheel);
+        }
+    }
+}
 
 } // namespace bromine

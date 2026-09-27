@@ -1,7 +1,9 @@
 #pragma once
 #include "device.hpp"
+#include "wheel.hpp"
 #include <atomic>
 #include <cstdint>
+#include <vector>
 
 namespace bromine
 {
@@ -30,5 +32,10 @@ public:
     Motor(const json &j, Robot &robot);
     void update(float dt) override;
     void draw(Renderer &renderer) const override;
+
+    void link();
+
+private:
+    std::vector<Wheel *> wheels;
 };
 } // namespace bromine
