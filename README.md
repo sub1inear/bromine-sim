@@ -22,16 +22,20 @@ Not planned:
 - [`src/pros`]: Modified PROS source code to run on Windows/POSIX
 - [`src/sdk`]: VEX SDK wrappers to connect PROS and the simulator
 - [`src/sim`]: Simulator code (graphics, physics, etc.)
+- [`src/user`]: User source code
 - [`include/pros`]: PROS headers
 - [`include/sdk`]: Documented VEX SDK headers
 - [`include/sim`]: Simulator headers
+- [`include/user`]: User headers
 
 [`src/pros`]: ./src/pros
 [`src/sdk`]: ./src/sdk
 [`src/sim`]: ./src/sim
+[`src/user`]: ./src/user
 [`include/pros`]: ./include/pros
 [`include/sdk`]: ./include/sdk
 [`include/sim`]: ./include/sim
+[`src/user`]: ./src/user
 
 ## Usage
 
