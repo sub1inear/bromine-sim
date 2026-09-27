@@ -189,3 +189,5 @@ file(GLOB USER_SOURCES CONFIGURE_DEPENDS
 target_sources(BromineSim PRIVATE ${USER_SOURCES})
 
 target_include_directories(BromineSim PRIVATE include/user)
+
+target_compile_definitions(BromineSim PRIVATE BROMINE_SIM=1)
