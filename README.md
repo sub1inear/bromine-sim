@@ -58,7 +58,7 @@ Redo this step if you install a new one.
 BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers (TODO).
 | V5 | Nintendo | Xbox | PlayStation | Keyboard |
 |----|----------|------|-------------|----------|
-| Left Stick | Left Stick | Left Stick | WASD |
+| Left Stick | Left Stick | Left Stick | Left Stick |WASD |
 | Right Stick | Right Stick | Right Stick | Right Stick | IJKL |
 | D-Pad | D-Pad | D-Pad | D-Pad | Arrow Keys |
 | L1 | L | LB | L1 | Q |
@@ -86,7 +86,7 @@ The first controller detected will be the "master" controller, and the second co
 ## Compatability
 BromineSim works on Windows, macOS, and Linux (TODO).
 
-## Strengths
+### Strengths
 - The internal PROS layer is left mostly unchanged.
 - The most common devices (motors, distance sensors, IMUs, etc.) are/will be supported.
 
