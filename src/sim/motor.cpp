@@ -48,6 +48,7 @@ Motor::Motor(const json &j, Robot &robot)
         rect.height = inputDistToPhysicsDist(2.82f);
 
         std::string_view gearStr = expectJsonKey<std::string_view>(j, "gear");
+        // TODO: Make gear selection affect wheel RPM.
         if (gearStr == "red")
         {
             gear = Gear::Red;
