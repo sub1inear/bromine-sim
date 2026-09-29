@@ -1,5 +1,6 @@
 #include "input.hpp"
 #include "utils.hpp"
+#include <GLFW/glfw3.h>
 #include <raylib.h>
 
 namespace bromine
