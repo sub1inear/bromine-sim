@@ -73,7 +73,7 @@ BromineSim supports any gamepad or keyboard for input, including VEX V5 controll
 | B (bottom) | B | A | Cross | X |
 | X (top) | X | Y | Triangle | C |
 | Y (left) | Y | X | Square | V |
-| Power (non-supported on V5 with simulator) | + / − | Menu / View | Options / Create | P |
+| Power (unsupported with V5 on simulator) | + / − | Menu / View | Options / Create | P |
 
 Keyboard controls:
 | Key | Action |
