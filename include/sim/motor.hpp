@@ -21,7 +21,7 @@ public:
         Full,
         Half,
     };
-    enum class Gear
+    enum class Gearset
     {
         None,
         Red,
@@ -29,7 +29,7 @@ public:
         Blue,
     };
 
-    Gear gear;
+    Gearset gearset;
     Role role;
     Power power;
 

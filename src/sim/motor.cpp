@@ -47,25 +47,27 @@ Motor::Motor(const json &j, Robot &robot)
         rect.width = inputDistToPhysicsDist(2.26f);
         rect.height = inputDistToPhysicsDist(2.82f);
 
-        std::string_view gearStr = expectJsonKey<std::string_view>(j, "gear");
+        std::string_view gearsetStr =
+            expectJsonKey<std::string_view>(j, "gearset");
         // TODO: Make gear selection affect wheel RPM.
-        if (gearStr == "red")
+        if (gearsetStr == "red")
         {
-            gear = Gear::Red;
+            gearset = Gearset::Red;
         }
-        else if (gearStr == "green")
+        else if (gearsetStr == "green")
         {
-            gear = Gear::Green;
+            gearset = Gearset::Green;
         }
-        else if (gearStr == "blue")
+        else if (gearsetStr == "blue")
         {
-            gear = Gear::Blue;
+            gearset = Gearset::Blue;
         }
         else
         {
-            error("unknown motor gear `{}`, expected one of: `red`, `green`, "
-                  "`blue`",
-                  gearStr);
+            error(
+                "unknown motor gearset `{}`, expected one of: `red`, `green`, "
+                "`blue`",
+                gearsetStr);
         }
     }
     else if (powerStr == "half")
@@ -77,7 +79,7 @@ Motor::Motor(const json &j, Robot &robot)
         {
             error("5.5W motors (half-watts) do not support gearing");
         }
-        gear = Gear::None;
+        gearset = Gearset::None;
     }
     else
     {
