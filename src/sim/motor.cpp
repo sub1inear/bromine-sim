@@ -11,8 +11,24 @@ namespace bromine
 constexpr float maxVoltage = 12000;
 constexpr float minVoltage = -maxVoltage;
 
+static float gearsetToRatio(V5MotorGearset gearset)
+{
+    switch (gearset)
+    {
+    case kMotorGearSet_06:
+        return 6.0f;
+    case kMotorGearSet_18:
+        return 18.0f;
+    case kMotorGearSet_36:
+        return 36.0f;
+    default:
+        error("unknown motor gearset `{}`", (int)gearset);
+        return 0.0f;
+    }
+}
+
 Motor::Motor(const json &j, Robot &robot)
-    : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")), voltage(0)
+    : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")), sdk{}
 {
     port = expectJsonKey<uint8_t>(j, "port");
     if (port < 1 || port > 21)
@@ -49,18 +65,18 @@ Motor::Motor(const json &j, Robot &robot)
 
         std::string_view gearsetStr =
             expectJsonKey<std::string_view>(j, "gearset");
-        // TODO: Make gear selection affect wheel RPM.
+
         if (gearsetStr == "red")
         {
-            gearset = Gearset::Red;
+            gearset = kMotorGearSet_36;
         }
         else if (gearsetStr == "green")
         {
-            gearset = Gearset::Green;
+            gearset = kMotorGearSet_18;
         }
         else if (gearsetStr == "blue")
         {
-            gearset = Gearset::Blue;
+            gearset = kMotorGearSet_06;
         }
         else
         {
@@ -79,7 +95,8 @@ Motor::Motor(const json &j, Robot &robot)
         {
             error("5.5W motors (half-watts) do not support gearing");
         }
-        gearset = Gearset::None;
+        // Internally, 5.5W motors are geared to 18:1 (200 RPM):
+        gearset = kMotorGearSet_18;
     }
     else
     {
@@ -91,7 +108,7 @@ Motor::Motor(const json &j, Robot &robot)
 void Motor::update()
 {
     // Load voltage once to prevent it changing while it's applied.
-    float loadedVoltage = voltage;
+    float loadedVoltage = sdk.voltage;
     loadedVoltage = std::clamp(loadedVoltage, minVoltage, maxVoltage);
     // For every wheel, apply force.
     for (Wheel *wheel : wheels)
@@ -112,22 +129,22 @@ void Motor::update()
         PhysicsDist wheelRadius = rect.height / 2.0f;
         PhysicsDist wheelCircumference = 2.0f * B2_PI * wheelRadius;
 
+        // The wheel RPM is the motor's base RPM (3600 RPM) divided by the
+        // motor's gear ratio and the wheel's gear ratio.
+        float wheelRpm = 3600 / gearsetToRatio(gearset) / wheel->ratio;
+
         // Convert revolutions per minute to per second.
-        float revolutionsPerSecond = wheel->rpm / 60.0f;
+        float revolutionsPerSecond = wheelRpm / 60.0f;
 
         // The max speed in m/s is the revolutions per second times the
         // wheel circumference in meters.
         float maxSpeed = revolutionsPerSecond * wheelCircumference;
 
         // Calculate stall torque by scaling the published stall torque for
-        // 11W 100RPM to the actual RPM.
-        float stallTorque = 2.1f * (100.0f / wheel->rpm);
-        if (power == Power::Half)
-        {
-            // 5.5W motors (half-watts) have around half as much stall
-            // torque.
-            stallTorque /= 2.0f;
-        }
+        // 11W/5.5W at 100RPM to the actual RPM.
+        float stallTorque = power == Power::Full ? 2.1f : 0.5f;
+        stallTorque *= 100.0f / wheelRpm;
+
         // Torque = force * distance, so divide by distance to get the true
         // force.
         float stallForce = stallTorque / wheelRadius;

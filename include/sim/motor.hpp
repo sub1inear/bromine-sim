@@ -1,5 +1,6 @@
 #pragma once
 #include "device.hpp"
+#include "v5_api.h"
 #include "wheel.hpp"
 #include <atomic>
 #include <cstdint>
@@ -21,22 +22,21 @@ public:
         Full,
         Half,
     };
-    enum class Gearset
-    {
-        None,
-        Red,
-        Green,
-        Blue,
-    };
 
-    Gearset gearset;
+    V5MotorGearset gearset;
     Role role;
     Power power;
 
     uint32_t id;
     uint8_t port;
 
-    std::atomic<int32_t> voltage;
+    struct Sdk
+    {
+        std::atomic<int32_t> voltage;
+        std::atomic<V5MotorGearset> gearset;
+    };
+
+    Sdk sdk;
 
     Motor(const json &j, Robot &robot);
     void update() override;

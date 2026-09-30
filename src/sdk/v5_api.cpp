@@ -316,7 +316,7 @@ void vexDeviceMotorVoltageSet(V5_DeviceT device, int32_t value)
 {
     if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
     {
-        motor->voltage = value;
+        motor->sdk.voltage = value;
     }
 }
 
@@ -355,7 +355,7 @@ int32_t vexDeviceMotorVoltageGet(V5_DeviceT device)
 {
     if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
     {
-        return motor->voltage;
+        return motor->sdk.voltage;
     }
     return 0;
 }
