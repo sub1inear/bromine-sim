@@ -35,7 +35,7 @@ Not planned:
 [`include/pros`]: ./include/pros
 [`include/sdk`]: ./include/sdk
 [`include/sim`]: ./include/sim
-[`src/user`]: ./src/user
+[`include/user`]: ./src/user
 
 ## Usage
 
@@ -55,14 +55,16 @@ cmake -S . -B build
 cmake --build build
 ```
 
+The executable now lives in `build/` (specific location may vary depending on your system and CMake configuration).
+
 `scripts/setup.py` symlinks your source code into the PROS project and fetches the source code for any libraries.
 Redo this step if you install a new one.
 
 ## Controls
-BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers (TODO).
+BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers.
 | V5 | Nintendo | Xbox | PlayStation | Keyboard |
 |----|----------|------|-------------|----------|
-| Left Stick | Left Stick | Left Stick | Left Stick |WASD |
+| Left Stick | Left Stick | Left Stick | Left Stick | WASD |
 | Right Stick | Right Stick | Right Stick | Right Stick | IJKL |
 | D-Pad | D-Pad | D-Pad | D-Pad | Arrow Keys |
 | L1 | L | LB | L1 | Q |
