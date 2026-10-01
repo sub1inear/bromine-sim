@@ -16,9 +16,9 @@ public:
         // Mecanum wheels are unsupported.
     };
     Subtype subtype;
-    uint32_t rpm;
     uint32_t id;
     float size;
+    float ratio;
 
     Wheel(const json &j, Robot &robot);
     void update() override;
@@ -27,6 +27,5 @@ public:
 private:
     float linearFriction;
     float lateralFriction;
-    float lateralDamping;
 };
 } // namespace bromine

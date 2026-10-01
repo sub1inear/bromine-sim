@@ -37,10 +37,10 @@ Wheel::Wheel(const json &j, Robot &robot)
     rect.width = inputDistToPhysicsDist(expectJsonKey<float>(j, "width"));
     rect.height = inputDistToPhysicsDist(expectJsonKey<float>(j, "diameter"));
 
-    rpm = expectJsonKey<uint32_t>(j, "rpm");
-    if (rpm == 0)
+    ratio = expectJsonKey<uint32_t>(j, "ratio");
+    if (ratio == 0)
     {
-        error("wheel rpm must be non-zero");
+        error("wheel ratio must be non-zero");
     }
 }
 
@@ -67,7 +67,7 @@ void Wheel::update()
     // Calculate the lateral force needed to resist lateral movement
     // with the amount that the velocity overlaps with the right vector.
     // The final force is calculated with F = m * dv / dt
-    // (from Newton's second law F = ma, with a being dv / dt).
+    // (from Newton's second law F = ma, with a = dv / dt).
     float lateralForce = std::clamp(
         -b2Dot(velocity, right) * massShare / fixedDt, -maxLateral, maxLateral);
 
