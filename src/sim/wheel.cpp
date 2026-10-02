@@ -71,14 +71,14 @@ void Wheel::update()
     float lateralForce = std::clamp(
         -b2Dot(velocity, right) * massShare / fixedDt, -maxLateral, maxLateral);
 
-    // Same except for forward force.
+    // Same except for linear force.
     float maxLinear = linearFriction * normalForce;
-    float forwardForce = std::clamp(
+    float linearForce = std::clamp(
         -b2Dot(velocity, forward) * massShare / fixedDt, -maxLinear, maxLinear);
 
     // Multiply the scalars by the unit vectors to find the final force.
     PhysicsPoint total =
-        b2Add(b2MulSV(forwardForce, forward), b2MulSV(lateralForce, right));
+        b2Add(b2MulSV(linearForce, forward), b2MulSV(lateralForce, right));
     b2Body_ApplyForce(robot.rect.bodyId, total, worldRect.pose.p, true);
 }
 
