@@ -9,6 +9,7 @@ Planned features:
 - 2D graphics/physics simulation
 - Basic sensor emulation (motors, distance sensors, inertial sensors, etc.)
 - Customizable robot configuration (can auto-generate from Fusion) 
+- Robust warning system to catch errors early
 
 Not planned:
 - 3D physics simulation
