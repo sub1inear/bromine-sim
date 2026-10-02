@@ -564,7 +564,9 @@ static void * prvWaitForStart( void * pvParams )
      * should instead call vTaskDelete( NULL ). Artificially force an assert()
      * to be triggered if configASSERT() is defined, so application writers can
      * catch the error. */
-    configASSERT( pdFALSE );
+
+    /* MODIFIED: PROS lets tasks return so we do the same. */
+    vTaskDelete( NULL );
 
     return NULL;
 }

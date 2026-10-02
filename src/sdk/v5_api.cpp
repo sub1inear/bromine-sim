@@ -419,6 +419,7 @@ void vexDeviceMotorPositionSet(V5_DeviceT device, double position)
             break;
         case kMotorEncoderRotations:
             motor->sdk.position = position;
+            break;
         case kMotorEncoderCounts:
             // TODO: Implement.
             break;
@@ -499,7 +500,6 @@ void vexDeviceMotorGearingSet(V5_DeviceT device, V5MotorGearset value)
                 "motor on port `{}` has gearset `{}` but set to `{}`",
                 motor->port, gearsetToStr(motor->gearset), gearsetToStr(value));
         }
-        bromine::info("hi `{}`", motor->port);
         motor->sdk.gearset = value;
     }
 }
