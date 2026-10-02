@@ -13,8 +13,8 @@ Wheel::Wheel(const json &j, Robot &robot)
     if (subtypeStr == "omni")
     {
         subtype = Subtype::Omni;
-        linearFriction = 0.03f;
-        lateralFriction = 0.2f;
+        linearFriction = 0.01f;
+        lateralFriction = 0.15f;
     }
     else if (subtypeStr == "traction")
     {
