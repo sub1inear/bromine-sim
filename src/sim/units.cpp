@@ -26,7 +26,7 @@ static void setBodyMass(b2BodyId bodyId, InputMass mass)
 
 PhysicsAngle inputAngleToPhysicsAngle(InputAngle angle)
 {
-    return b2MakeRot(-angle * DEG2RAD);
+    return b2MakeRot(-angle * degreesToRadians);
 }
 
 PhysicsPoint inputPointToPhysicsPoint(InputPoint point)
@@ -105,7 +105,7 @@ ScreenDist physicsDistToScreenDist(PhysicsDist dist)
 
 ScreenAngle physicsAngleToScreenAngle(PhysicsAngle angle)
 {
-    return -b2Rot_GetAngle(angle) * RAD2DEG;
+    return -b2Rot_GetAngle(angle) * radiansToDegrees;
 }
 
 ScreenPoint physicsPointToScreenPoint(PhysicsPoint point)

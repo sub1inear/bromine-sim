@@ -1,5 +1,6 @@
 #pragma once
 #include "units.hpp"
+#include <numbers>
 
 namespace bromine
 {
@@ -8,6 +9,13 @@ constexpr float gravity = 9.81f;
 
 constexpr int fps = 60;
 constexpr float fixedDt = 1.0f / fps;
+
+constexpr float degreesToRadians = std::numbers::pi_v<float> / 180.0f;
+constexpr float radiansToDegrees = 180.0f / std::numbers::pi_v<float>;
+constexpr float radiansToRotations = 1.0f / std::numbers::pi_v<float>;
+constexpr float rotationsToRadians = std::numbers::pi_v<float> / 1.0f;
+constexpr float degreesToRotations = 1.0f / 360.0f;
+constexpr float rotationsToDegrees = 360.0f / 1.0f;
 
 constexpr InputDist inputFieldSize = 140.0f;
 constexpr InputDist inputHalfFieldSize = inputFieldSize / 2.0f;

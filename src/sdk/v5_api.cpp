@@ -3,10 +3,10 @@
  * @brief   Stubs for the V5 jumptable API declared in v5_api.h.
  */
 
-// TODO: The whole file should be properly made thread-safe.
 // TODO: Specify std::atomic constraints properly.
 
 #include "v5_api.h"
+#include "constants.hpp"
 #include "device.hpp"
 #include "input.hpp"
 #include "motor.hpp"
@@ -386,10 +386,18 @@ bool vexDeviceMotorReverseFlagGet(V5_DeviceT device) { return false; }
 
 void vexDeviceMotorEncoderUnitsSet(V5_DeviceT device, V5MotorEncoderUnits units)
 {
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        motor->sdk.encoderUnits = units;
+    }
 }
 
 V5MotorEncoderUnits vexDeviceMotorEncoderUnitsGet(V5_DeviceT device)
 {
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        return motor->sdk.encoderUnits;
+    }
     return kMotorEncoderDegrees;
 }
 
@@ -400,9 +408,40 @@ V5MotorBrakeMode vexDeviceMotorBrakeModeGet(V5_DeviceT device)
     return kV5MotorBrakeModeCoast;
 }
 
-void vexDeviceMotorPositionSet(V5_DeviceT device, double position) {}
+void vexDeviceMotorPositionSet(V5_DeviceT device, double position)
+{
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        switch (motor->sdk.encoderUnits)
+        {
+        case kMotorEncoderDegrees:
+            motor->sdk.position = position * bromine::degreesToRotations;
+            break;
+        case kMotorEncoderRotations:
+            motor->sdk.position = position;
+        case kMotorEncoderCounts:
+            // TODO: Implement.
+            break;
+        }
+    }
+}
 
-double vexDeviceMotorPositionGet(V5_DeviceT device) { return 0.0; }
+double vexDeviceMotorPositionGet(V5_DeviceT device)
+{
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        switch (motor->sdk.encoderUnits)
+        {
+        case kMotorEncoderDegrees:
+            return motor->sdk.position * bromine::rotationsToDegrees;
+        case kMotorEncoderRotations:
+            return motor->sdk.position;
+        case kMotorEncoderCounts:
+            return 0.0; // TODO: Implement.
+        }
+    }
+    return 0.0f;
+}
 
 int32_t vexDeviceMotorPositionRawGet(V5_DeviceT device, uint32_t *timestamp)
 {
@@ -413,7 +452,13 @@ int32_t vexDeviceMotorPositionRawGet(V5_DeviceT device, uint32_t *timestamp)
     return 0;
 }
 
-void vexDeviceMotorPositionReset(V5_DeviceT device) {}
+void vexDeviceMotorPositionReset(V5_DeviceT device)
+{
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        motor->sdk.position = 0.0f;
+    }
+}
 
 double vexDeviceMotorTargetGet(V5_DeviceT device) { return 0.0; }
 
@@ -429,10 +474,42 @@ void vexDeviceMotorRelativeTargetSet(V5_DeviceT device, double position,
 {
 }
 
-void vexDeviceMotorGearingSet(V5_DeviceT device, V5MotorGearset value) {}
+static std::string_view gearsetToStr(V5MotorGearset gearset)
+{
+    switch (gearset)
+    {
+    case kMotorGearSet_06:
+        return "blue";
+    case kMotorGearSet_18:
+        return "green";
+    case kMotorGearSet_36:
+        return "red";
+    default:
+        bromine::error("unknown motor gearset `{}`", (int)gearset);
+    }
+}
+
+void vexDeviceMotorGearingSet(V5_DeviceT device, V5MotorGearset value)
+{
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        if (value != motor->gearset)
+        {
+            bromine::warning(
+                "motor on port `{}` has gearset `{}` but set to `{}`",
+                motor->port, gearsetToStr(motor->gearset), gearsetToStr(value));
+        }
+        bromine::info("hi `{}`", motor->port);
+        motor->sdk.gearset = value;
+    }
+}
 
 V5MotorGearset vexDeviceMotorGearingGet(V5_DeviceT device)
 {
+    if (auto motor = dynamic_cast<bromine::Motor *>(device->ptr))
+    {
+        return motor->sdk.gearset;
+    }
     return kMotorGearSet_18;
 }
 

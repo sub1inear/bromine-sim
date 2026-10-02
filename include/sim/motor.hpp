@@ -32,8 +32,12 @@ public:
 
     struct Sdk
     {
+        // TODO: Check default gearset and encoder units.
         std::atomic<int32_t> voltage;
         std::atomic<V5MotorGearset> gearset;
+        std::atomic<float>
+            position; // In rotations of the output shaft regardless of gearing.
+        std::atomic<V5MotorEncoderUnits> encoderUnits;
     };
 
     Sdk sdk;

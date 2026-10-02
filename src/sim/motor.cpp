@@ -1,9 +1,11 @@
 #include "motor.hpp"
+#include "constants.hpp"
 #include "robot.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
 #include <algorithm>
 #include <cassert>
+#include <numbers>
 
 namespace bromine
 {
@@ -23,7 +25,6 @@ static float gearsetToRatio(V5MotorGearset gearset)
         return 36.0f;
     default:
         error("unknown motor gearset `{}`", (int)gearset);
-        return 0.0f;
     }
 }
 
@@ -110,9 +111,12 @@ void Motor::update()
     // Load voltage once to prevent it changing while it's applied.
     float loadedVoltage = sdk.voltage;
     loadedVoltage = std::clamp(loadedVoltage, minVoltage, maxVoltage);
+
+    float ratio = gearsetToRatio(gearset);
     // For every wheel, apply force.
-    for (Wheel *wheel : wheels)
+    for (size_t i = 0; i < wheels.size(); i++)
     {
+        Wheel *wheel = wheels[i];
         // Get the wheel's rect in world space.
         PhysicsRect rect = wheel->getWorldRect();
 
@@ -127,11 +131,25 @@ void Motor::update()
         float speed = b2Dot(wheelVelocity, forward);
 
         PhysicsDist wheelRadius = rect.height / 2.0f;
-        PhysicsDist wheelCircumference = 2.0f * B2_PI * wheelRadius;
+        PhysicsDist wheelCircumference =
+            2.0f * std::numbers::pi_v<float> * wheelRadius;
+
+        if (i == 0)
+        {
+            // Calculate the change in position: the total amount travelled,
+            // speed * dt, divided by the wheel circumference to get wheel's
+            // rotations and multiplied by the wheel's ratio to reverse its
+            // gearing. NOTE: The motor's cartridge/ratio does not apply here.
+            // Must only do this once to avoid counting the same change multiple
+            // times.
+            float deltaPosition =
+                speed * fixedDt / wheelCircumference * wheel->ratio;
+            sdk.position += deltaPosition;
+        }
 
         // The wheel RPM is the motor's base RPM (3600 RPM) divided by the
         // motor's gear ratio and the wheel's gear ratio.
-        float wheelRpm = 3600 / gearsetToRatio(gearset) / wheel->ratio;
+        float wheelRpm = 3600 / ratio / wheel->ratio;
 
         // Convert revolutions per minute to per second.
         float revolutionsPerSecond = wheelRpm / 60.0f;

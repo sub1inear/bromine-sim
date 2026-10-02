@@ -8,7 +8,7 @@ Planned features:
 - PROS C++ emulation
 - 2D graphics/physics simulation
 - Basic sensor emulation (motors, distance sensors, inertial sensors, etc.)
-- Customizable robot configuration (can auto-generate from Fusion)
+- Customizable robot configuration (can auto-generate from Fusion) 
 
 Not planned:
 - 3D physics simulation
