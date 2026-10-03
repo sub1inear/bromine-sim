@@ -8,6 +8,7 @@
 #include "v5_api.h"
 #include "constants.hpp"
 #include "device.hpp"
+#include "imu.hpp"
 #include "input.hpp"
 #include "motor.hpp"
 #include "robot.hpp"
@@ -675,9 +676,23 @@ double vexDeviceAiVisionTemperatureGet(V5_DeviceT device) { return 0.0; }
 
 void vexDeviceImuReset(V5_DeviceT device) {}
 
-double vexDeviceImuHeadingGet(V5_DeviceT device) { return 0.0; }
+double vexDeviceImuHeadingGet(V5_DeviceT device)
+{
+    if (auto imu = dynamic_cast<bromine::Imu *>(device->ptr))
+    {
+        return imu->sdk.heading * bromine::radiansToDegrees;
+    }
+    return 0.0;
+}
 
-double vexDeviceImuDegreesGet(V5_DeviceT device) { return 0.0; }
+double vexDeviceImuDegreesGet(V5_DeviceT device)
+{
+    if (auto imu = dynamic_cast<bromine::Imu *>(device->ptr))
+    {
+        return imu->sdk.rotation * bromine::radiansToDegrees;
+    }
+    return 0.0;
+}
 
 void vexDeviceImuQuaternionGet(V5_DeviceT device, V5_DeviceImuQuaternion *data)
 {
@@ -1222,6 +1237,11 @@ void vexSystemBoot(void)
             {
                 port = motor->port;
                 type = kDeviceTypeMotorSensor;
+            }
+            else if (auto imu = dynamic_cast<bromine::Imu *>(device.get()))
+            {
+                port = imu->port;
+                type = kDeviceTypeImuSensor;
             }
             else
             {

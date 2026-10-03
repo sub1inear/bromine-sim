@@ -49,4 +49,14 @@ void infoCore(std::string_view fmt, std::format_args args)
     std::println(stderr, "{}: {}", info, msg);
 }
 
+uint8_t expectJsonPort(const json &j)
+{
+    uint8_t port = expectJsonKey<uint8_t>(j, "port");
+    if (port < 1 || port > 21)
+    {
+        error("motor port must be in range [1, 21], got `{}`", port);
+    }
+    return port;
+}
+
 } // namespace bromine

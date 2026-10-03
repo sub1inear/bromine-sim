@@ -1,5 +1,6 @@
 #include "robot.hpp"
 #include "constants.hpp"
+#include "imu.hpp"
 #include "motor.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
@@ -56,6 +57,10 @@ Robot::Robot(b2WorldId worldId) : wheelCount(0)
         else if (type == "wheel")
         {
             devices.push_back(std::make_unique<Wheel>(elem, *this));
+        }
+        else if (type == "imu")
+        {
+            devices.push_back(std::make_unique<Imu>(elem, *this));
         }
         else
         {

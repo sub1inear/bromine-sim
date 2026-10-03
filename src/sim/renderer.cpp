@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 #include "constants.hpp"
 #include "cup.hpp"
+#include "imu.hpp"
 #include "motor.hpp"
 #include "pin.hpp"
 #include "sim.hpp"
@@ -214,6 +215,18 @@ void Renderer::drawWheel(const Wheel &wheel)
     DrawRectangleLinesPro(
         {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
         origin, screenRect.angle, 1.5f, PURPLE);
+}
+
+void Renderer::drawImu(const Imu &imu)
+{
+    PhysicsRect physicsRect = imu.getWorldRect();
+    ScreenRect screenRect = physicsRectToScreenRect(physicsRect);
+
+    Vector2 origin = {screenRect.width / 2.0f, screenRect.height / 2.0f};
+
+    DrawRectangleLinesPro(
+        {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
+        origin, screenRect.angle, 1.5f, ORANGE);
 }
 
 void Renderer::drawDevice(const Device &device) { device.draw(*this); }

@@ -29,14 +29,9 @@ static float gearsetToRatio(V5MotorGearset gearset)
 }
 
 Motor::Motor(const json &j, Robot &robot)
-    : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")), sdk{}
+    : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")),
+      port(expectJsonPort(j)), sdk{}
 {
-    port = expectJsonKey<uint8_t>(j, "port");
-    if (port < 1 || port > 21)
-    {
-        error("motor port must be in range [1, 21], got `{}`", port);
-    }
-
     std::string_view roleStr = expectJsonKey<std::string_view>(j, "role");
     if (roleStr == "input")
     {

@@ -63,4 +63,6 @@ template <typename T> T expectJsonKey(const json &j, std::string_view key)
     }
 }
 
+uint8_t expectJsonPort(const json &j);
+
 } // namespace bromine

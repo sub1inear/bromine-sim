@@ -42,6 +42,7 @@ add_executable(BromineSim
     src/sim/cup.cpp
     src/sim/device.cpp
     src/sim/field.cpp
+    src/sim/imu.cpp
     src/sim/input.cpp
     src/sim/main.cpp
     src/sim/motor.cpp

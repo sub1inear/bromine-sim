@@ -15,6 +15,7 @@ class VerticalPin;
 class Cup;
 class Motor;
 class Wheel;
+class Imu;
 class Device;
 
 class Renderer
@@ -25,6 +26,7 @@ public:
     friend class Cup;
     friend class Motor;
     friend class Wheel;
+    friend class Imu;
 
     Renderer(b2WorldId worldId);
     ~Renderer();
@@ -44,6 +46,7 @@ private:
     void drawObject(const Object &object);
     void drawMotor(const Motor &motor);
     void drawWheel(const Wheel &wheel);
+    void drawImu(const Imu &imu);
     void drawDevice(const Device &device);
 
     Texture2D fieldTexture;
