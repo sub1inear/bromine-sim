@@ -39,7 +39,6 @@ void State::update()
                     data = {type, Phase::Opcontrol};
                     break;
                 case Phase::Opcontrol:
-                    timer = 0.0f;
                     data = {type, Phase::Disabled};
                     break;
                 default:
@@ -47,9 +46,8 @@ void State::update()
                     break;
                 }
             }
-            else
+            else if (type != Type::Practice)
             {
-                timer = 0.0f;
                 data = {type, Phase::Disabled};
             }
         }
