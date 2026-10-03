@@ -12,6 +12,7 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <raylib.h>
 #include <raymath.h>
 #include <rlgl.h>
 
@@ -42,6 +43,17 @@ static int SnapFontSize(float target)
     int mult = (int)(target / base + 0.5f);
     mult = std::max(mult, 1);
     return mult * base;
+}
+
+static void DrawCenteredText(const char *text, float fontSizeCoeff,
+                             float textYCoeff, Color color)
+{
+    int fontSize = SnapFontSize(GetScreenHeight() * fontSizeCoeff);
+    int textWidth = MeasureText(text, fontSize);
+
+    int textX = (GetScreenWidth() - textWidth) / 2;
+    int textY = GetScreenHeight() * textYCoeff;
+    DrawText(text, textX, textY, fontSize, color);
 }
 
 Renderer::Renderer(b2WorldId worldId) : worldId(worldId), debug(false)
@@ -112,46 +124,73 @@ void Renderer::drawDebug()
 
 void Renderer::drawState(const State &state)
 {
+    drawStateTimer(state);
+    drawStateType(state);
+    drawStatePhase(state);
+}
+
+void Renderer::drawStateTimer(const State &state)
+{
+    float ceilTimer = std::ceil(state.timer);
+    int minutes = static_cast<int>(ceilTimer) / 60;
+    int seconds = static_cast<int>(ceilTimer) % 60;
+
+    const char *text = TextFormat("%i:%02i", minutes, seconds);
+    DrawCenteredText(text, 0.08f, 0.025f, WHITE);
+}
+
+void Renderer::drawStateType(const State &state)
+{
+    const char *text;
+    Color color;
+    switch (state.type)
     {
-        float ceilTimer = std::ceil(state.timer);
-        int minutes = static_cast<int>(ceilTimer) / 60;
-        int seconds = static_cast<int>(ceilTimer) % 60;
-
-        const char *timerText = TextFormat("%i:%02i", minutes, seconds);
-        int timerFontSize = SnapFontSize(GetScreenHeight() * 0.08f);
-        int timerTextWidth = MeasureText(timerText, timerFontSize);
-
-        int timerTextX = (GetScreenWidth() - timerTextWidth) / 2;
-        int timerTextY = GetScreenHeight() * 0.025f;
-        DrawText(timerText, timerTextX, timerTextY, timerFontSize, WHITE);
+    case State::Type::Practice:
+        text = "Practice";
+        color = WHITE;
+        break;
+    case State::Type::Match:
+        text = "Match";
+        color = WHITE;
+        break;
+    case State::Type::AutonomousSkills:
+        text = "Autonomous Skills";
+        color = WHITE;
+        break;
+    case State::Type::DriverSkills:
+        text = "Driver Skills";
+        color = WHITE;
+        break;
+    default:
+        error("unknown state type `{}`", static_cast<int>(state.type));
+        break;
     }
+    DrawCenteredText(text, 0.02f, 0.1f, color);
+}
 
+void Renderer::drawStatePhase(const State &state)
+{
+    const char *text;
+    Color color;
+    switch (state.phase)
     {
-        const char *phaseText;
-        Color phaseColor;
-        switch (state.phase)
-        {
-        case State::Phase::Disabled:
-            phaseText = "Disabled";
-            phaseColor = GREEN;
-            break;
-        case State::Phase::Autonomous:
-            phaseText = "Autonomous";
-            phaseColor = RED;
-            break;
-        case State::Phase::Opcontrol:
-            phaseText = "Opcontrol";
-            phaseColor = BLUE;
-            break;
-        default:
-            error("unknown state phase `{}`", static_cast<int>(state.phase));
-        }
-        int phaseFontSize = SnapFontSize(GetScreenHeight() * 0.02f);
-        int phaseTextWidth = MeasureText(phaseText, phaseFontSize);
-        int phaseTextX = (GetScreenWidth() - phaseTextWidth) / 2;
-        int phaseTextY = GetScreenHeight() * 0.1f;
-        DrawText(phaseText, phaseTextX, phaseTextY, phaseFontSize, phaseColor);
+    case State::Phase::Disabled:
+        text = "Disabled";
+        color = GREEN;
+        break;
+    case State::Phase::Autonomous:
+        text = "Autonomous";
+        color = RED;
+        break;
+    case State::Phase::Opcontrol:
+        text = "Opcontrol";
+        color = BLUE;
+        break;
+    default:
+        error("unknown state phase `{}`", static_cast<int>(state.phase));
+        break;
     }
+    DrawCenteredText(text, 0.02f, 0.125f, color);
 }
 
 void Renderer::drawField(const Field &field)

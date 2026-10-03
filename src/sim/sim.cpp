@@ -46,11 +46,14 @@ void Sim::update()
     uint32_t steps = 0;
     while (accum >= fixedDt && steps < maxStepsPerFrame)
     {
-        input.update();
         state.update();
-        robot.update();
-        field.update();
-        b2World_Step(worldId, fixedDt, 4);
+        if (state.started)
+        {
+            input.update();
+            robot.update();
+            field.update();
+            b2World_Step(worldId, fixedDt, 4);
+        }
         accum -= fixedDt;
         steps++;
     }

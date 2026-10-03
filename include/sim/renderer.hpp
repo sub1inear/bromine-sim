@@ -42,6 +42,9 @@ private:
 
     void drawDebug();
     void drawState(const State &state);
+    void drawStateTimer(const State &state);
+    void drawStateType(const State &state);
+    void drawStatePhase(const State &state);
     void drawCup(const Cup &cup);
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);

@@ -23,6 +23,7 @@ public:
     Type type;
     Phase phase;
     float timer; // In seconds.
+    bool started;
 
     State();
     void update();
