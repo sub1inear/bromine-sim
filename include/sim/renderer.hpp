@@ -40,7 +40,7 @@ private:
     void drawHorizontalPin(const HorizontalPin &pin);
     void drawVerticalPin(const VerticalPin &pin);
 
-    void drawDebug();
+    void drawDebug(const Sim &sim);
     void drawState(const State &state);
     void drawStateTimer(const State &state);
     void drawStateType(const State &state);

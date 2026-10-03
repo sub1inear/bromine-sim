@@ -83,13 +83,13 @@ void Renderer::draw(const Sim &sim)
         drawState(sim.state);
         if (debug)
         {
-            drawDebug();
+            drawDebug(sim);
         }
     }
     EndDrawing();
 }
 
-void Renderer::drawDebug()
+void Renderer::drawDebug(const Sim &sim)
 {
     struct b2DebugDraw debugDraw = {};
     debugDraw.DrawSolidPolygonFcn =
@@ -120,6 +120,11 @@ void Renderer::drawDebug()
     };
     debugDraw.drawShapes = true;
     b2World_Draw(worldId, &debugDraw);
+
+    for (const auto &device : sim.robot.devices)
+    {
+        drawDevice(*device);
+    }
 }
 
 void Renderer::drawState(const State &state)
@@ -219,11 +224,6 @@ void Renderer::drawRobot(const Robot &robot)
     Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
     DrawRectanglePro({rect.x, rect.y, rect.width, rect.height}, origin,
                      rect.angle, WHITE);
-
-    for (const auto &device : robot.devices)
-    {
-        drawDevice(*device);
-    }
 }
 
 void Renderer::drawObject(const Object &object)
