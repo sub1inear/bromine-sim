@@ -219,11 +219,6 @@ void Input::updateKeyboard()
     }
 
     controller.keys = keys;
-
-    if (IsKeyPressed(KEY_GRAVE))
-    {
-        debug = !debug;
-    }
 }
 
 } // namespace bromine

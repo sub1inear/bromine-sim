@@ -7,7 +7,7 @@ namespace bromine
 {
 Window::Window()
 {
-    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_MSAA_4X_HINT);
+    SetConfigFlags(FLAG_WINDOW_HIDDEN);
     InitWindow(0, 0, "");
 
     int monitor = GetCurrentMonitor();
@@ -19,7 +19,9 @@ Window::Window()
     int monitorSize = std::min(monitorWidth, monitorHeight);
     int windowSize = (int)((float)monitorSize * 0.8f);
 
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_MSAA_4X_HINT);
     InitWindow(windowSize, windowSize, "BromineSim");
+    ClearWindowState(FLAG_WINDOW_HIDDEN);
 }
 
 Window::~Window() { CloseWindow(); }

@@ -2,6 +2,7 @@
 #include "field.hpp"
 #include "input.hpp"
 #include "robot.hpp"
+#include "state.hpp"
 #include <box2d/box2d.h>
 
 namespace bromine
@@ -21,6 +22,7 @@ public:
     Field field;
     Robot robot;
     Input input;
+    State state;
 
     Sim();
     ~Sim();

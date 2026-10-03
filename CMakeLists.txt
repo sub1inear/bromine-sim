@@ -50,6 +50,7 @@ add_executable(BromineSim
     src/sim/renderer.cpp
     src/sim/robot.cpp
     src/sim/sim.cpp
+    src/sim/state.cpp
     src/sim/units.cpp
     src/sim/utils.cpp
     src/sim/wheel.cpp

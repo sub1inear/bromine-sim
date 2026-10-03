@@ -8,7 +8,7 @@ Planned features:
 - PROS C++ emulation
 - 2D graphics/physics simulation
 - Basic sensor emulation (motors, distance sensors, inertial sensors, etc.)
-- Customizable robot configuration (can auto-generate from Fusion) 
+- Customizable robot configuration (can auto-generate from Fusion)
 - Robust warning system to catch errors early
 
 Not planned:
@@ -83,7 +83,7 @@ Keyboard controls:
 |-----|--------|
 | Esc | Exit |
 | ` or ~ | Toggle debug overlay |
-| 1 (TODO) | Start freeplay (default) |
+| 1 (TODO) | Start practice (default) |
 | 2 (TODO) | Start match |
 | 3 (TODO) | Start driver skills |
 | 4 (TODO) | Start auton skills |

@@ -47,6 +47,7 @@ void Sim::update()
     while (accum >= fixedDt && steps < maxStepsPerFrame)
     {
         input.update();
+        state.update();
         robot.update();
         field.update();
         b2World_Step(worldId, fixedDt, 4);

@@ -66,8 +66,6 @@ public:
 
     std::array<Controller, 2> controllers;
 
-    bool debug;
-
     Input();
     void update();
 

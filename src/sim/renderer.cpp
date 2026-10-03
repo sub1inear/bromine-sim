@@ -5,6 +5,7 @@
 #include "motor.hpp"
 #include "pin.hpp"
 #include "sim.hpp"
+#include "state.hpp"
 #include "units.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
@@ -35,7 +36,15 @@ static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
     rlPopMatrix();
 }
 
-Renderer::Renderer(b2WorldId worldId) : worldId(worldId)
+static int SnapFontSize(float target)
+{
+    int base = GetFontDefault().baseSize;
+    int mult = (int)(target / base + 0.5f);
+    mult = std::max(mult, 1);
+    return mult * base;
+}
+
+Renderer::Renderer(b2WorldId worldId) : worldId(worldId), debug(false)
 {
     fieldTexture = LoadTexture("assets/field.png");
     pinsTexture = LoadTexture("assets/pins.png");
@@ -51,11 +60,16 @@ Renderer::~Renderer()
 
 void Renderer::draw(const Sim &sim)
 {
+    if (IsKeyPressed(KEY_GRAVE))
+    {
+        debug = !debug;
+    }
     BeginDrawing();
     {
         drawField(sim.field);
         drawRobot(sim.robot);
-        if (sim.input.debug)
+        drawState(sim.state);
+        if (debug)
         {
             drawDebug();
         }
@@ -94,6 +108,50 @@ void Renderer::drawDebug()
     };
     debugDraw.drawShapes = true;
     b2World_Draw(worldId, &debugDraw);
+}
+
+void Renderer::drawState(const State &state)
+{
+    {
+        float ceilTimer = std::ceil(state.timer);
+        int minutes = static_cast<int>(ceilTimer) / 60;
+        int seconds = static_cast<int>(ceilTimer) % 60;
+
+        const char *timerText = TextFormat("%i:%02i", minutes, seconds);
+        int timerFontSize = SnapFontSize(GetScreenHeight() * 0.08f);
+        int timerTextWidth = MeasureText(timerText, timerFontSize);
+
+        int timerTextX = (GetScreenWidth() - timerTextWidth) / 2;
+        int timerTextY = GetScreenHeight() * 0.025f;
+        DrawText(timerText, timerTextX, timerTextY, timerFontSize, WHITE);
+    }
+
+    {
+        const char *phaseText;
+        Color phaseColor;
+        switch (state.phase)
+        {
+        case State::Phase::Disabled:
+            phaseText = "Disabled";
+            phaseColor = GREEN;
+            break;
+        case State::Phase::Autonomous:
+            phaseText = "Autonomous";
+            phaseColor = RED;
+            break;
+        case State::Phase::Opcontrol:
+            phaseText = "Opcontrol";
+            phaseColor = BLUE;
+            break;
+        default:
+            error("unknown state phase `{}`", static_cast<int>(state.phase));
+        }
+        int phaseFontSize = SnapFontSize(GetScreenHeight() * 0.02f);
+        int phaseTextWidth = MeasureText(phaseText, phaseFontSize);
+        int phaseTextX = (GetScreenWidth() - phaseTextWidth) / 2;
+        int phaseTextY = GetScreenHeight() * 0.1f;
+        DrawText(phaseText, phaseTextX, phaseTextY, phaseFontSize, phaseColor);
+    }
 }
 
 void Renderer::drawField(const Field &field)

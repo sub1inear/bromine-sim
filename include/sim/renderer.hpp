@@ -17,6 +17,7 @@ class Motor;
 class Wheel;
 class Imu;
 class Device;
+class State;
 
 class Renderer
 {
@@ -40,6 +41,7 @@ private:
     void drawVerticalPin(const VerticalPin &pin);
 
     void drawDebug();
+    void drawState(const State &state);
     void drawCup(const Cup &cup);
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
@@ -52,5 +54,6 @@ private:
     Texture2D fieldTexture;
     Texture2D pinsTexture;
     b2WorldId worldId;
+    bool debug;
 };
 } // namespace bromine
