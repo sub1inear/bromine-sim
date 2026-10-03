@@ -7,12 +7,15 @@
 namespace bromine
 {
 State::State()
-    : type(Type::Practice), phase(Phase::Opcontrol), timer(0.0f), started(false)
+    : data({Type::Practice, Phase::Disabled}), timer(0.0f), started(false)
 {
 }
 
 void State::update()
 {
+    Type type = data.load().type;
+    Phase phase = data.load().phase;
+
     if (started)
     {
         if (timer > 0.0f)
@@ -29,15 +32,25 @@ void State::update()
                 {
                 case Phase::Autonomous:
                     timer = 5.0f;
-                    phase = Phase::Disabled;
+                    data = {type, Phase::Disabled};
                     break;
                 case Phase::Disabled:
                     timer = 105.0f;
-                    phase = Phase::Opcontrol;
+                    data = {type, Phase::Opcontrol};
+                    break;
+                case Phase::Opcontrol:
+                    timer = 0.0f;
+                    data = {type, Phase::Disabled};
                     break;
                 default:
+                    error("unexpected phase `{}`", static_cast<int>(phase));
                     break;
                 }
+            }
+            else
+            {
+                timer = 0.0f;
+                data = {type, Phase::Disabled};
             }
         }
     }
@@ -45,32 +58,46 @@ void State::update()
     {
         if (IsKeyPressed(KEY_ONE))
         {
-            type = Type::Practice;
+            data = {Type::Practice, Phase::Disabled};
             timer = 0.0f;
-            phase = Phase::Opcontrol;
         }
         if (IsKeyPressed(KEY_TWO))
         {
-            type = Type::Match;
+            data = {Type::Match, Phase::Disabled};
             timer = 15.0f;
-            phase = Phase::Autonomous;
         }
 
         if (IsKeyPressed(KEY_THREE))
         {
-            type = Type::DriverSkills;
+            data = {Type::DriverSkills, Phase::Disabled};
             timer = 60.0f;
-            phase = Phase::Opcontrol;
         }
         if (IsKeyPressed(KEY_FOUR))
         {
-            type = Type::AutonomousSkills;
+            data = {Type::AutonomousSkills, Phase::Disabled};
             timer = 60.0f;
-            phase = Phase::Autonomous;
         }
         if (IsKeyPressed(KEY_SPACE))
         {
             started = true;
+            switch (type)
+            {
+            case Type::Practice:
+                data = {type, Phase::Opcontrol};
+                break;
+            case Type::Match:
+                data = {type, Phase::Autonomous};
+                break;
+            case Type::AutonomousSkills:
+                data = {type, Phase::Autonomous};
+                break;
+            case Type::DriverSkills:
+                data = {type, Phase::Opcontrol};
+                break;
+            default:
+                error("unknown state type `{}`", static_cast<int>(type));
+                break;
+            }
         }
     }
 }

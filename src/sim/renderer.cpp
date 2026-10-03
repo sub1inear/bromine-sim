@@ -148,7 +148,8 @@ void Renderer::drawStateType(const State &state)
 {
     const char *text;
     Color color;
-    switch (state.type)
+    State::Type type = state.data.load().type;
+    switch (type)
     {
     case State::Type::Practice:
         text = "Practice";
@@ -167,7 +168,7 @@ void Renderer::drawStateType(const State &state)
         color = WHITE;
         break;
     default:
-        error("unknown state type `{}`", static_cast<int>(state.type));
+        error("unknown state type `{}`", static_cast<int>(type));
         break;
     }
     DrawCenteredText(text, 0.02f, 0.1f, color);
@@ -177,7 +178,8 @@ void Renderer::drawStatePhase(const State &state)
 {
     const char *text;
     Color color;
-    switch (state.phase)
+    State::Phase phase = state.data.load().phase;
+    switch (phase)
     {
     case State::Phase::Disabled:
         text = "Disabled";
@@ -192,7 +194,7 @@ void Renderer::drawStatePhase(const State &state)
         color = BLUE;
         break;
     default:
-        error("unknown state phase `{}`", static_cast<int>(state.phase));
+        error("unknown state phase `{}`", static_cast<int>(phase));
         break;
     }
     DrawCenteredText(text, 0.02f, 0.125f, color);

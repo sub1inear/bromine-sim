@@ -13,6 +13,7 @@
 #include "motor.hpp"
 #include "robot.hpp"
 #include "sim.hpp"
+#include "state.hpp"
 #include "utils.hpp"
 #include <array>
 #include <cassert>
@@ -1323,7 +1324,23 @@ bool vexStdlibVersionVerify(void) { return false; }
 
 uint32_t vexCompetitionStatus(void)
 {
-    return V5_COMP_BIT_GAME | V5_COMP_BIT_COMP;
+    bromine::Sim &sim = bromine::Sim::getInstance();
+    bromine::State &state = sim.state;
+    bromine::State::Data data = state.data;
+
+    constexpr uint32_t opcontrolStatus = V5_COMP_BIT_GAME | V5_COMP_BIT_COMP;
+    constexpr uint32_t disabledStatus = V5_COMP_BIT_GAME | V5_COMP_BIT_EBL;
+    constexpr uint32_t autonomousStatus = V5_COMP_BIT_GAME | V5_COMP_BIT_MODE;
+
+    switch (data.phase)
+    {
+    case bromine::State::Phase::Disabled:
+        return disabledStatus;
+    case bromine::State::Phase::Autonomous:
+        return autonomousStatus;
+    case bromine::State::Phase::Opcontrol:
+        return opcontrolStatus;
+    }
 }
 
 void vexCompetitionControl(uint32_t data) {}

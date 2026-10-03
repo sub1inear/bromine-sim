@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 
 namespace bromine
 {
@@ -20,8 +21,14 @@ public:
         DriverSkills,
     };
 
-    Type type;
-    Phase phase;
+    struct Data
+    {
+        Type type;
+        Phase phase;
+    };
+
+    std::atomic<Data> data;
+
     float timer; // In seconds.
     bool started;
 

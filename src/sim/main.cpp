@@ -10,7 +10,7 @@
 int main()
 {
 
-    SetTraceLogLevel(LOG_NONE);
+    // SetTraceLogLevel(LOG_NONE);
     SetTargetFPS(bromine::fps);
 
     bromine::Window window;
