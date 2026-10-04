@@ -27,10 +27,10 @@
  *      bits 15-8   green
  *      bits 7-0    blue
  *
- *  The constants can be passed directly to vexDisplayForegroundColor(),
- *  vexDisplayBackgroundColor() and vexDeviceLedRgbSet(), and they match the
- *  per pixel format used by the buffers given to vexDisplayCopyRect(),
- *  vexImageBmpRead() and vexImagePngRead().
+ *  The constants can be passed directly to vexDisplayForegroundColor() and
+ *  vexDisplayBackgroundColor(), and they match the per pixel format used by
+ *  the buffers given to vexDisplayCopyRect(), vexImageBmpRead() and
+ *  vexImagePngRead(). The values are identical to VEX's own v5_color.h.
  *//*---------------------------------------------------------------------------*/
 
 //*****************************************************************************
@@ -46,10 +46,8 @@
  *          support, encoded as 0x00RRGGBB.
  *
  * @details
- *  Names follow the CSS/X11 spelling, so ClrAqua and ClrCyan are the same
- *  value, as are ClrFuchsia and ClrMagenta. ClrGray, ClrSlateGray and the
- *  other "Gray" names use the American spelling except for ClrLightGrey,
- *  which keeps the X11 spelling it was defined with.
+ *  ClrAqua and ClrCyan are the same value, as are ClrFuchsia and ClrMagenta.
+ *  Every grey uses the "Gray" spelling except ClrLightGrey.
  * @{
  */
 #define ClrAliceBlue 0x00F0F8FF

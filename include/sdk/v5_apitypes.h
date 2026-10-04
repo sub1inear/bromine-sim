@@ -22,12 +22,13 @@
  *
  * @details
  *  Enums, structures and constants shared by the jumptable API in v5_api.h and
- *  the port indexed wrappers in v5_apiuser.h. Nothing here allocates storage or
- *  calls into VEXos, so the file is safe to include on its own.
+ *  the port indexed wrappers in v5_apiuser.h. The file only declares types and
+ *  macros.
  *
- *  Structures that VEXos reads or writes directly are declared packed so that
- *  their layout matches the wire format used between the user processor and the
- *  devices. Do not reorder their fields.
+ *  Structures passed to VEXos are declared packed, as in VEX's own header, so
+ *  their layout has to match what VEXos expects. Do not reorder their fields.
+ *
+ *  See docs/dev/sdk-doc-evidence.md for the sources behind these comments.
  *//*---------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
@@ -61,8 +62,7 @@ extern "C"
  */
 typedef struct __attribute__((__packed__)) _vcodesig
 {
-    uint32_t magic;   ///< Magic number, must be set to #V5_SIG_MAGIC or VEXos
-                      ///< will refuse to run the program.
+    uint32_t magic;   ///< Magic number. Must be #V5_SIG_MAGIC.
     uint32_t type;    ///< Program type. Only #V5_SIG_TYPE_USER is defined.
     uint32_t owner;   ///< Program originator, one of the V5_SIG_OWNER_* values.
     uint32_t options; ///< Bitwise OR of the V5_SIG_OPTIONS_* flags.
@@ -79,11 +79,11 @@ typedef struct __attribute__((__packed__)) _vcodesig
 /** Ordinary user program. This is the only program type currently defined. */
 #define V5_SIG_TYPE_USER 0
 
-/** Program belongs to the V5 system itself. */
+/** Owner: the V5 system. */
 #define V5_SIG_OWNER_SYS 0
-/** Program was produced by VEX. */
+/** Owner: VEX. */
 #define V5_SIG_OWNER_VEX 1
-/** Program was produced by a VEX partner. */
+/** Owner: a VEX partner. */
 #define V5_SIG_OWNER_PARTNER 2
 
 /** No startup options requested. */
@@ -111,7 +111,7 @@ typedef struct __attribute__((__packed__)) _vcodesig
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief   Wall clock time read from the brain's real time clock.
+ * @brief   Time of day, as filled in by vexGettime().
  * @see     vexGettime
  */
 struct time
@@ -123,7 +123,7 @@ struct time
 };
 
 /**
- * @brief   Calendar date read from the brain's real time clock.
+ * @brief   Calendar date, as filled in by vexGetdate().
  * @see     vexGetdate
  */
 struct date
@@ -143,71 +143,59 @@ struct date
 
 /**
  * @brief   Identifies the kind of device attached to a port.
- * @details Returned by vexDeviceGetStatus() for every port index, and
- * accepted by vexDevicesGetNumberByType(). Several values cover hardware
- * that was never sold and only appeared on development systems.
+ * @details Filled in by vexDeviceGetStatus(), one entry per port index, and
+ *          accepted by vexDevicesGetNumberByType(). VEX's 2024 header also
+ *          defines 26 (AI camera), 27 (light tower), 28 (arm), 30 (pneumatic)
+ *          and 31 (MC55 motor), which are missing here.
  */
 typedef enum
 {
-    kDeviceTypeNoSensor = 0,     ///< Nothing plugged into the port.
-    kDeviceTypeMotorSensor = 2,  ///< V5 Smart Motor.
-    kDeviceTypeLedSensor = 3,    ///< LED module, development hardware only.
-    kDeviceTypeAbsEncSensor = 4, ///< V5 Rotation Sensor.
-    kDeviceTypeCrMotorSensor =
-        5, ///< Continuous rotation motor, development hardware only.
-    kDeviceTypeImuSensor = 6,      ///< V5 Inertial Sensor.
-    kDeviceTypeRangeSensor = 7,    // obsolete
-    kDeviceTypeDistanceSensor = 7, ///< V5 Distance Sensor. Shares its value
-                                   ///< with the obsolete range sensor.
-    kDeviceTypeRadioSensor = 8,    ///< VEXnet radio.
-    kDeviceTypeTetherSensor =
-        9, ///< Controller tethered over the wired smart port.
-    kDeviceTypeBrainSensor =
-        10, ///< The brain itself, reported for internal ports.
-    kDeviceTypeVisionSensor = 11, ///< V5 Vision Sensor.
-    kDeviceTypeAdiSensor =
-        12, ///< 3-Wire Expander, or the brain's built in 3-Wire ports.
-    kDeviceTypeRes1Sensor =
-        13, ///< Reserved. Reported for the partner controller.
-    kDeviceTypeRes2Sensor = 14,     ///< Reserved. Reported for the battery.
-    kDeviceTypeRes3Sensor = 15,     ///< Reserved.
-    kDeviceTypeOpticalSensor = 16,  ///< V5 Optical Sensor.
-    kDeviceTypeMagnetSensor = 17,   ///< Workcell electromagnet.
-    kDeviceTypeGpsSensor = 20,      ///< V5 GPS Sensor.
-    kDeviceTypeAiVisionSensor = 29, ///< VEX AI Vision Sensor.
-    kDeviceTypeBumperSensor =
-        0x40, ///< Bumper switch, development hardware only.
-    kDeviceTypeGyroSensor =
-        0x46, ///< Dedicated gyro, development hardware only.
-    kDeviceTypeSonarSensor =
-        0x47, ///< Dedicated sonar, development hardware only.
-    kDeviceTypeGenericSensor =
-        128, ///< Generic sensor read with vexDeviceGenericValueGet().
-    kDeviceTypeGenericSerial = 129, ///< Port switched to generic serial mode.
-    kDeviceTypeUndefinedSensor =
-        255 ///< Device present but not recognised by VEXos.
+    kDeviceTypeNoSensor = 0,         ///< Nothing plugged into the port.
+    kDeviceTypeMotorSensor = 2,      ///< V5 Smart Motor.
+    kDeviceTypeLedSensor = 3,        ///< LED module.
+    kDeviceTypeAbsEncSensor = 4,     ///< V5 Rotation Sensor.
+    kDeviceTypeCrMotorSensor = 5,    ///< Continuous rotation motor.
+    kDeviceTypeImuSensor = 6,        ///< V5 Inertial Sensor.
+    kDeviceTypeRangeSensor = 7,      // obsolete
+    kDeviceTypeDistanceSensor = 7,   ///< V5 Distance Sensor. Shares its value
+                                     ///< with the obsolete range sensor.
+    kDeviceTypeRadioSensor = 8,      ///< VEXnet radio.
+    kDeviceTypeTetherSensor = 9,     ///< Tether. VEX does not document it.
+    kDeviceTypeBrainSensor = 10,     ///< Brain. VEX does not document it.
+    kDeviceTypeVisionSensor = 11,    ///< V5 Vision Sensor.
+    kDeviceTypeAdiSensor = 12,       ///< 3-Wire (ADI) expander, or the brain's
+                                     ///< own 3-Wire ports (PROS port 22).
+    kDeviceTypeRes1Sensor = 13,      ///< Reserved.
+    kDeviceTypeRes2Sensor = 14,      ///< Reserved.
+    kDeviceTypeRes3Sensor = 15,      ///< Reserved.
+    kDeviceTypeOpticalSensor = 16,   ///< V5 Optical Sensor.
+    kDeviceTypeMagnetSensor = 17,    ///< Workcell electromagnet.
+    kDeviceTypeGpsSensor = 20,       ///< V5 GPS Sensor.
+    kDeviceTypeAiVisionSensor = 29,  ///< VEX AI Vision Sensor.
+    kDeviceTypeBumperSensor = 0x40,  ///< Bumper switch.
+    kDeviceTypeGyroSensor = 0x46,    ///< Dedicated gyro (obsolete).
+    kDeviceTypeSonarSensor = 0x47,   ///< Dedicated sonar (obsolete).
+    kDeviceTypeGenericSensor = 128,  ///< Generic sensor.
+    kDeviceTypeGenericSerial = 129,  ///< Port in generic serial mode.
+    kDeviceTypeUndefinedSensor = 255 ///< Undefined device type.
 } V5_DeviceType;
 
 /**
  * @brief   Opaque handle to a device.
- * @details Obtained from vexDeviceGetByIndex() or vexDevicesGet(). The
- * pointed to structure is owned by VEXos and must not be dereferenced or
- *          freed by user code. A handle stays valid for the life of the
- *          program, but the device it refers to may be unplugged at any
- * time.
+ * @details Obtained from vexDeviceGetByIndex(). The structure it points to
+ *          belongs to VEXos, and PROS and vexide only ever pass the pointer
+ *          back to VEXos.
  */
 typedef struct _V5_Device *V5_DeviceT;
 
 /**
- * @brief   Upper bound on the number of device port indexes VEXos can report.
- * @details Larger than the number of physical smart ports, and larger than the
- *          count vexDevicesGetNumber() reports. PROS addresses the battery at
- *          index 24 and the two controllers at 25 and 26. Use this as the
- *          length of any buffer passed to vexDeviceGetStatus().
+ * @brief   Size of the port type buffer used with vexDeviceGetStatus().
+ * @details PROS sizes its registry with this, while it only scans the first
+ *          22 indexes (21 smart ports plus the built-in 3-Wire ports).
  */
 #define V5_MAX_DEVICE_PORTS 32
 
-/** Buffer large enough to hold the type of every port VEXos can report. */
+/** Buffer large enough to hold one #V5_DeviceType per port index. */
 typedef V5_DeviceType V5_DeviceTypeBuffer[V5_MAX_DEVICE_PORTS];
 
 /*----------------------------------------------------------------------------*/
@@ -220,14 +208,12 @@ typedef V5_DeviceType V5_DeviceTypeBuffer[V5_MAX_DEVICE_PORTS];
 
 /**
  * @brief   Selects which controller value vexControllerGet() returns.
- * @details The first block of names describes the hardware channels. The
- *          aliases at the end of the enum are the labels printed on the
- *          production controller, so ButtonA and Button8R are the same
- * channel.
+ * @details The first block of names is the original channel list. The
+ *          aliases at the end are the labels on the V5 controller, so ButtonA
+ *          and Button8R are the same channel.
  *
- *          Analog channels return -127 to 127, button channels return 0 or
- * 1, and the battery channels return a percentage. A disconnected
- *          controller reads as 0 on every channel.
+ *          Analog channels return -127 to 127, and 0 when the controller is
+ *          not connected. Button channels are non-zero while pressed.
  */
 typedef enum _V5_ControllerIndex
 {
@@ -235,55 +221,51 @@ typedef enum _V5_ControllerIndex
     AnaLeftY,     ///< Left stick, vertical axis.
     AnaRightX,    ///< Right stick, horizontal axis.
     AnaRightY,    ///< Right stick, vertical axis.
-    AnaSpare1,    ///< Unused analog channel.
-    AnaSpare2,    ///< Unused analog channel.
+    AnaSpare1,    ///< Spare analog channel.
+    AnaSpare2,    ///< Spare analog channel.
 
-    Button5U, ///< Upper button in the left shoulder pair.
-    Button5D, ///< Lower button in the left shoulder pair.
-    Button6U, ///< Upper button in the right shoulder pair.
-    Button6D, ///< Lower button in the right shoulder pair.
-    Button7U, ///< Up on the left button cluster.
-    Button7D, ///< Down on the left button cluster.
-    Button7L, ///< Left on the left button cluster.
-    Button7R, ///< Right on the left button cluster.
-    Button8U, ///< Up on the right button cluster.
-    Button8D, ///< Down on the right button cluster.
-    Button8L, ///< Left on the right button cluster.
-    Button8R, ///< Right on the right button cluster.
+    Button5U, ///< L1, the first trigger on the left.
+    Button5D, ///< L2, the second trigger on the left.
+    Button6U, ///< R1, the first trigger on the right.
+    Button6D, ///< R2, the second trigger on the right.
+    Button7U, ///< Up arrow on the left pad.
+    Button7D, ///< Down arrow on the left pad.
+    Button7L, ///< Left arrow on the left pad.
+    Button7R, ///< Right arrow on the left pad.
+    Button8U, ///< X on the right pad.
+    Button8D, ///< B on the right pad.
+    Button8L, ///< Y on the right pad.
+    Button8R, ///< A on the right pad.
 
-    ButtonSEL, ///< Centre button. PROS exposes it as
+    ButtonSEL, ///< Power button. PROS exposes it as
                ///< E_CONTROLLER_DIGITAL_POWER.
 
-    BatteryLevel, ///< Controller battery level as a percentage.
+    BatteryLevel, ///< Controller battery level. The unit is not documented.
 
-    ButtonAll,       ///< All button states packed into a single word.
-    Flags,           ///< Controller status flags.
+    ButtonAll,       ///< All buttons. The encoding is not documented.
+    Flags,           ///< Controller flags. Not documented.
     BatteryCapacity, ///< Controller battery capacity as a percentage.
 
     // Final V5 names
-    Axis1 = AnaRightX, ///< Production label for the right stick, horizontal.
-    Axis2 = AnaRightY, ///< Production label for the right stick, vertical.
-    Axis3 = AnaLeftY,  ///< Production label for the left stick, vertical.
-    Axis4 = AnaLeftX,  ///< Production label for the left stick, horizontal.
+    Axis1 = AnaRightX, ///< Controller label for the right stick, horizontal.
+    Axis2 = AnaRightY, ///< Controller label for the right stick, vertical.
+    Axis3 = AnaLeftY,  ///< Controller label for the left stick, vertical.
+    Axis4 = AnaLeftX,  ///< Controller label for the left stick, horizontal.
 
-    ButtonL1 =
-        Button5U, ///< Production label for the upper left shoulder button.
-    ButtonL2 =
-        Button5D, ///< Production label for the lower left shoulder button.
-    ButtonR1 =
-        Button6U, ///< Production label for the upper right shoulder button.
-    ButtonR2 =
-        Button6D, ///< Production label for the lower right shoulder button.
+    ButtonL1 = Button5U, ///< Controller label L1.
+    ButtonL2 = Button5D, ///< Controller label L2.
+    ButtonR1 = Button6U, ///< Controller label R1.
+    ButtonR2 = Button6D, ///< Controller label R2.
 
-    ButtonUp = Button7U,    ///< Production label for up on the left cluster.
-    ButtonDown = Button7D,  ///< Production label for down on the left cluster.
-    ButtonLeft = Button7L,  ///< Production label for left on the left cluster.
-    ButtonRight = Button7R, ///< Production label for right on the left cluster.
+    ButtonUp = Button7U,    ///< Controller label Up.
+    ButtonDown = Button7D,  ///< Controller label Down.
+    ButtonLeft = Button7L,  ///< Controller label Left.
+    ButtonRight = Button7R, ///< Controller label Right.
 
-    ButtonX = Button8U, ///< Production label for up on the right cluster.
-    ButtonB = Button8D, ///< Production label for down on the right cluster.
-    ButtonY = Button8L, ///< Production label for left on the right cluster.
-    ButtonA = Button8R  ///< Production label for right on the right cluster.
+    ButtonX = Button8U, ///< Controller label X.
+    ButtonB = Button8D, ///< Controller label B.
+    ButtonY = Button8L, ///< Controller label Y.
+    ButtonA = Button8R  ///< Controller label A.
 } V5_ControllerIndex;
 
 /**
@@ -293,11 +275,11 @@ typedef enum _V5_ControllerIndex
 typedef enum _V5_ControllerStatus
 {
     kV5ControllerOffline = 0, ///< No controller is connected.
-    kV5ControllerTethered,    ///< Connected over a wired tether.
+    kV5ControllerTethered,    ///< Connected through a wired smart port cable.
     kV5ControllerVexnet       ///< Connected wirelessly over VEXnet.
 } V5_ControllerStatus;
 
-/** Selects one of the two controllers the brain can pair with. */
+/** Selects one of the two controllers. */
 typedef enum _V5_ControllerId
 {
     kControllerMaster = 0, ///< Primary controller.
@@ -312,9 +294,8 @@ typedef enum _V5_ControllerId
 
 /**
  * @brief   Preset colors for the LED module.
- * @details The values are ordinary 0x00RRGGBB colors, so vexDeviceLedSet()
- * and vexDeviceLedRgbSet() accept the same encoding. This device was never
- *          sold and only exists on development systems.
+ * @details The values are written as 0xRRGGBB. VEX's header calls the LED an
+ *          obsolete sensor that is still available on development systems.
  */
 typedef enum _V5_DeviceLedColor
 {
@@ -334,48 +315,49 @@ typedef enum _V5_DeviceLedColor
 
 /**
  * @brief   Selects what a single 3-Wire (ADI) channel is wired to.
- * @details Set with vexDeviceAdiPortConfigSet(). The configuration decides
- * how vexDeviceAdiValueGet() and vexDeviceAdiValueSet() interpret the
- *          channel, so it must be set before the channel is used.
+ * @details Set with vexDeviceAdiPortConfigSet(). PROS and vexide configure a
+ *          channel before using it.
  *
- *          Configuring a channel as a quadrature encoder or sonar claims
- * the adjacent channel as well, since both need two wires. Those pairs
- *          always start on an even numbered channel.
+ *          Quadrature encoders and ultrasonics use two adjacent channels,
+ *          starting on an even numbered channel (A, C, E or G). PROS and
+ *          vexide only configure the first of the two.
  */
 typedef enum _V5_AdiPortConfiguration
 {
     kAdiPortTypeAnalogIn = 0, ///< 12 bit analog input, reads 0 to 4095.
-    kAdiPortTypeAnalogOut,    ///< Analog output.
-    kAdiPortTypeDigitalIn,    ///< Digital input, reads 0 or 1.
-    kAdiPortTypeDigitalOut,   ///< Digital output, driven with 0 or 1.
+    kAdiPortTypeAnalogOut,    ///< 8 bit PWM output (vexide's PwmOut).
+    kAdiPortTypeDigitalIn,    ///< Digital input.
+    kAdiPortTypeDigitalOut,   ///< Digital output.
 
-    kAdiPortTypeSmartButton, ///< Smart button input.
-    kAdiPortTypeSmartPot,    ///< Smart potentiometer input.
+    kAdiPortTypeSmartButton, ///< V2 bumper switch.
+    kAdiPortTypeSmartPot,    ///< V2 potentiometer.
 
-    kAdiPortTypeLegacyButton,        ///< Cortex era bumper or limit switch.
+    kAdiPortTypeLegacyButton,        ///< Limit or bumper switch.
     kAdiPortTypeLegacyPotentiometer, ///< Cortex era potentiometer.
     kAdiPortTypeLegacyLineSensor,    ///< Cortex era line tracker.
     kAdiPortTypeLegacyLightSensor,   ///< Cortex era light sensor.
-    kAdiPortTypeLegacyGyro, ///< Cortex era yaw rate gyro. Calibrates for
-                            ///< about one second after configuration.
+    kAdiPortTypeLegacyGyro, ///< Cortex era yaw rate gyro. Configuring it
+                            ///< starts a calibration; PROS waits 1300 ms.
     kAdiPortTypeLegacyAccelerometer, ///< Cortex era accelerometer.
 
     kAdiPortTypeLegacyServo, ///< Cortex era servo output.
-    kAdiPortTypeLegacyPwm,   ///< Cortex era motor controller output.
+    kAdiPortTypeLegacyPwm,   ///< Motor controller (MC29) output.
 
-    kAdiPortTypeQuadEncoder, ///< Quadrature encoder. Uses this channel and
+    kAdiPortTypeQuadEncoder, ///< Quadrature encoder, on this channel and
                              ///< the next one.
-    kAdiPortTypeSonar, ///< Ultrasonic rangefinder. This channel is the ping
-                       ///< output, the next is the echo input.
+    kAdiPortTypeSonar,       ///< Ultrasonic rangefinder. This channel is the
+                       ///< OUTPUT (ping) cable, the next the INPUT (echo).
 
-    kAdiPortTypeLegacyPwmSlew, ///< Cortex era motor controller output with
-                               ///< slew rate limiting.
+    kAdiPortTypeLegacyPwmSlew, ///< Motor controller output with slew rate
+                               ///< limiting.
 
-    kAdiPortTypeUndefined = 255 ///< Channel not configured.
+    kAdiPortTypeUndefined = 255 ///< Undefined. vexide notes that
+                                ///< unconfigured channels report AnalogIn,
+                                ///< not this.
 } V5_AdiPortConfiguration;
 
-/** Number of 3-Wire channels on a brain or a 3-Wire Expander. Channels are
- * numbered 0 to 7. */
+/** Number of 3-Wire channels on a brain or a 3-Wire Expander, numbered 0 to
+ * 7 for A to H. */
 #define V5_ADI_PORT_NUM 8
 
 /*----------------------------------------------------------------------------*/
@@ -384,9 +366,10 @@ typedef enum _V5_AdiPortConfiguration
 
 /**
  * @brief   State of a smart port bumper switch.
- * @note    The two trailing comments below are swapped in the original
- * header. kBumperReleased means the switch is released and kBumperPressed
- *          means it is pressed.
+ * @note    The two trailing comments below are copied from VEX's header and
+ *          contradict the names: kBumperReleased (0) is commented "Switch
+ *          pressed". No runtime uses this type, so the sources do not settle
+ *          which is right.
  */
 typedef enum _V5_DeviceBumperState
 {
@@ -400,11 +383,10 @@ typedef enum _V5_DeviceBumperState
 // Most of this is still TBD and is currently based on the IQ implementation
 
 /**
- * @brief   Closed loop control mode a Smart Motor is running in.
- * @details Set implicitly by the various target functions, so most code
- * reads this with vexDeviceMotorModeGet() rather than setting it directly.
- *          Calling vexDeviceMotorVoltageSet() or vexDeviceMotorPwmSet()
- * leaves the motor in open loop and does not use these modes.
+ * @brief   Control mode a Smart Motor is running in.
+ * @details The trailing comments are VEX's. Neither PROS nor vexide reads or
+ *          sets these modes.
+ * @see     vexDeviceMotorModeSet
  */
 typedef enum
 {
@@ -420,7 +402,7 @@ typedef enum
 } V5MotorControlMode;
 
 /**
- * @brief   What a Smart Motor does once it stops being commanded.
+ * @brief   What a Smart Motor does when it is stopped.
  * @see     vexDeviceMotorBrakeModeSet
  */
 typedef enum _V5_MotorBrakeMode
@@ -432,10 +414,7 @@ typedef enum _V5_MotorBrakeMode
 
 /**
  * @brief   Units used for motor position values.
- * @details Applies to vexDeviceMotorPositionGet(),
- * vexDeviceMotorPositionSet() and the position targets. Raw counts are
- * unaffected by the gearset, degrees and rotations are scaled to the output
- * shaft.
+ * @details Applies to the motor position and target functions.
  * @see     vexDeviceMotorEncoderUnitsSet
  */
 typedef enum
@@ -447,9 +426,8 @@ typedef enum
 
 /**
  * @brief   Gear cartridge fitted to a Smart Motor.
- * @details VEXos needs this to convert between raw encoder counts and
- * degrees, and to work out the motor's free speed. The cartridge colors are
- *          red for 36:1, green for 18:1 and blue for 6:1.
+ * @details PROS lists red as 36:1 (100 RPM), green as 18:1 (200 RPM) and
+ *          blue as 6:1 (600 RPM).
  * @see     vexDeviceMotorGearingSet
  */
 typedef enum _V5MotorGearset
@@ -461,10 +439,8 @@ typedef enum _V5MotorGearset
 
 /**
  * @brief   Raw encoder counts per output revolution for the 36:1 cartridge.
- * @details The 18:1 cartridge produces 900 counts per revolution and the 6:1
- *          cartridge produces 300. All three work out to 50 counts per turn of
- *          the motor's own shaft, which is consistent with the encoder sitting
- *          before the gearbox.
+ * @details vexide gives 1800 for the 36:1 cartridge, 900 for 18:1 and 300 for
+ *          6:1.
  */
 #define V5_MOTOR_COUNTS_PER_ROT 1800.0
 
@@ -475,25 +451,23 @@ typedef enum _V5MotorGearset
 /**
  * @brief   Gain set for a motor's internal position or velocity controller.
  * @details Passed to vexDeviceMotorPositionPidSet() and
- *          vexDeviceMotorVelocityPidSet(). VEX has never published the
- * scaling of the individual terms or the motor's default values, so
- * changing them is a trial and error exercise. The padding fields exist
- * only to match the packet layout sent to the motor and should be left at
- * zero.
+ *          vexDeviceMotorVelocityPidSet(). PROS documents the gains as 4.4
+ *          fixed point. VEX has not published the motor's default values.
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceMotorPid
 {
-    uint8_t kf;        ///< Feedforward gain.
-    uint8_t kp;        ///< Proportional gain.
-    uint8_t ki;        ///< Integral gain.
-    uint8_t kd;        ///< Derivative gain.
-    uint8_t filter;    ///< Error filtering strength.
-    uint8_t pad1;      ///< Padding, set to zero.
-    uint16_t limit;    ///< Integral windup limit.
-    uint8_t threshold; ///< Error threshold below which the loop treats the
-                       ///< target as reached.
-    uint8_t loopspeed; ///< Control loop interval.
-    uint8_t pad2[2];   ///< Padding, set to zero.
+    uint8_t kf;        ///< Feedforward constant.
+    uint8_t kp;        ///< Proportional constant.
+    uint8_t ki;        ///< Integral constant.
+    uint8_t kd;        ///< Derivative constant.
+    uint8_t filter;    ///< Constant used for filtering the profile
+                       ///< acceleration.
+    uint8_t pad1;      ///< Padding.
+    uint16_t limit;    ///< Integral limit.
+    uint8_t threshold; ///< Threshold for deciding a position move has
+                       ///< reached its goal. No effect on velocity control.
+    uint8_t loopspeed; ///< Rate the PID computation runs at, in ms.
+    uint8_t pad2[2];   ///< Padding.
 } V5_DeviceMotorPid;
 
 /*----------------------------------------------------------------------------*/
@@ -508,10 +482,10 @@ typedef struct __attribute__((__packed__)) _V5_DeviceMotorPid
  */
 typedef enum
 {
-    kVisionModeNormal = 0, ///< Detect color signatures and color codes only.
-    kVisionModeMixed = 1,  ///< Detect color signatures, color codes and lines.
-    kVisionModeLineDetect = 2, ///< Detect lines only.
-    kVisionTypeTest = 3        ///< Factory test mode.
+    kVisionModeNormal = 0,     ///< Color signatures and codes.
+    kVisionModeMixed = 1,      ///< Color signatures and lines.
+    kVisionModeLineDetect = 2, ///< Lines only.
+    kVisionTypeTest = 3        ///< Test mode, of unknown use.
 } V5VisionMode;
 
 /**
@@ -520,10 +494,9 @@ typedef enum
  */
 typedef enum
 {
-    kVisionTypeNormal = 0, ///< Matched a single color signature.
-    kVisionTypeColorCode =
-        1, ///< Matched a color code built from several signatures.
-    kVisionTypeLineDetect = 2 ///< Produced by line detection.
+    kVisionTypeNormal = 0,    ///< A plain color signature.
+    kVisionTypeColorCode = 1, ///< A color code built from several signatures.
+    kVisionTypeLineDetect = 2 ///< Line detection.
 } V5VisionBlockType;
 
 // White balance
@@ -534,8 +507,8 @@ typedef enum
  */
 typedef enum
 {
-    kVisionWBNormal = 0, ///< Continuous automatic white balance.
-    kVisionWBStart = 1,  ///< Balance once at startup, then hold.
+    kVisionWBNormal = 0, ///< Automatic, using the brightest part of the image.
+    kVisionWBStart = 1,  ///< Automatic, but only once at power on.
     kVisionWBManual =
         2 ///< Use the color set by vexDeviceVisionWhiteBalanceSet().
 } V5VisionWBMode;
@@ -548,7 +521,7 @@ typedef enum
  */
 typedef enum
 {
-    kVisionLedModeAuto = 0, ///< The sensor drives the LED itself.
+    kVisionLedModeAuto = 0, ///< Shows the most prominent object's color.
     kVisionLedModeManual =
         1 ///< Use the color set by vexDeviceVisionLedColorSet().
 } V5VisionLedMode;
@@ -556,56 +529,54 @@ typedef enum
 // Wifi mode
 
 /**
- * @brief   Vision Sensor onboard access point state.
- * @details Turning the access point on lets a browser view the camera feed,
- * but the sensor stops reporting detected objects while it is enabled.
+ * @brief   Vision Sensor Wi-Fi hotspot state.
+ * @details vexide documents that the hotspot streams the camera feed at
+ *          192.168.1.1 and disables all object detection while it is on.
  * @see     vexDeviceVisionWifiModeSet
  */
 typedef enum
 {
-    kVisionWifiModeOff = 0, ///< Access point disabled, detection running.
-    kVisionWifiModeOn = 1   ///< Access point enabled, detection suspended.
+    kVisionWifiModeOff = 0, ///< Hotspot off.
+    kVisionWifiModeOn = 1   ///< Hotspot on, object detection disabled.
 } V5VisionWifiMode;
 
 // signature should be 40 bytes and is the same data
 // as sent to the vision sensor
 
 /**
- * @brief   Set in V5_DeviceVisionSignature::flags once the sensor has filled in
- *          a signature read back with vexDeviceVisionSignatureGet().
+ * @brief   Status flag in V5_DeviceVisionSignature::flags.
+ * @details PROS treats a zero flags byte after vexDeviceVisionSignatureGet()
+ *          as the signature not being valid.
  */
 #define VISION_SIG_FLAG_STATUS (1 << 0)
 
 /**
  * @brief   One color signature stored on the Vision Sensor.
- * @details The sensor holds seven signatures in volatile memory, so they
- * have to be written again after every power cycle. Thresholds are given in
- *          the U and V chroma planes of the Y'UV color space; the tuning
- *          utility in VEXcode produces them from a sample image.
+ * @details vexide documents the sensor's memory as volatile, so signatures
+ *          are lost when it loses power. Thresholds are on the U and V
+ *          chroma components of the Y'UV color space.
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceVisionSignature
 {
     uint8_t id;     ///< Signature slot, 1 to 7.
-    uint8_t flags;  ///< Status bits, see #VISION_SIG_FLAG_STATUS.
-    uint8_t pad[2]; ///< Padding, set to zero.
-    float range;    ///< Match leniency, roughly 0 to 11. Larger values accept
-                    ///< lighter and darker shades.
-    int32_t uMin;   ///< Lower bound of the U chroma threshold.
-    int32_t uMax;   ///< Upper bound of the U chroma threshold.
-    int32_t uMean;  ///< Centre of the U chroma threshold.
-    int32_t vMin;   ///< Lower bound of the V chroma threshold.
-    int32_t vMax;   ///< Upper bound of the V chroma threshold.
-    int32_t vMean;  ///< Centre of the V chroma threshold.
-    uint32_t mRgb;  ///< Representative color of the signature, as 0x00RRGGBB.
-    uint32_t mType; ///< Distinguishes a plain signature from a color code
-                    ///< member.
+    uint8_t flags;  ///< Status flags, see #VISION_SIG_FLAG_STATUS.
+    uint8_t pad[2]; ///< Padding.
+    float range;    ///< How lenient matching is; 0 to 11 in Vision Utility.
+                    ///< Larger values accept lighter and darker shades.
+    int32_t uMin;   ///< Minimum of the U threshold.
+    int32_t uMax;   ///< Maximum of the U threshold.
+    int32_t uMean;  ///< Mean of the U threshold.
+    int32_t vMin;   ///< Minimum of the V threshold.
+    int32_t vMax;   ///< Maximum of the V threshold.
+    int32_t vMean;  ///< Mean of the V threshold.
+    uint32_t mRgb;  ///< Signature color.
+    uint32_t mType; ///< #kVisionTypeNormal, or #kVisionTypeColorCode for a
+                    ///< signature used in a color code.
 } V5_DeviceVisionSignature;
 
 /**
  * @brief   One object reported by the Vision Sensor.
- * @details Coordinates are in the sensor's 316 by 212 pixel frame with the
- *          origin at the top left. The centre of an object is
- *          (xoffset + width / 2, yoffset + height / 2).
+ * @details Coordinates are in the sensor's 316 by 212 pixel field of view.
  * @see     vexDeviceVisionObjectGet
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceVisionObject
@@ -623,8 +594,7 @@ typedef struct __attribute__((__packed__)) _V5_DeviceVisionObject
 
 /**
  * @brief   An 8 bit per channel color used by the Vision Sensor.
- * @details Used both for the manual white balance reference and for the
- *          illumination LED color.
+ * @details Used for the manual white balance color and for the LED color.
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceVisionRgb
 {
@@ -640,33 +610,36 @@ typedef struct __attribute__((__packed__)) _V5_DeviceVisionRgb
 
 /**
  * @brief   One color descriptor stored on the AI Vision Sensor.
- * @details The sensor holds seven descriptors, addressed by id. A pixel
- *          matches when its hue is within hangle of the descriptor's color and
- *          its saturation is within hdsat, so the two ranges are what decides
- *          how forgiving the match is.
+ * @details hangle and hdsat set how far a detected color's hue and saturation
+ *          may vary from the reference color.
  * @see     vexDeviceAiVisionColorSet
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionColor
 {
     uint8_t id;   ///< Descriptor slot, 1 to 7.
-    uint8_t red;  ///< Red channel of the reference color, 0 to 255.
-    uint8_t grn;  ///< Green channel of the reference color, 0 to 255.
-    uint8_t blu;  ///< Blue channel of the reference color, 0 to 255.
-    float hangle; ///< Accepted hue deviation in degrees, roughly 1 to 40.
-    float hdsat;  ///< Accepted saturation deviation, roughly 0.1 to 1.
+    uint8_t red;  ///< Red channel of the reference color.
+    uint8_t grn;  ///< Green channel of the reference color.
+    uint8_t blu;  ///< Blue channel of the reference color.
+    float hangle; ///< Hue range. PROS documents 1 to 40; vexide says VEXcode
+                  ///< limits it to 0 to 20.
+    float hdsat;  ///< Saturation range. PROS documents 0.1 to 1.
 } V5_DeviceAiVisionColor;
 
 /**
  * @brief   One code descriptor stored on the AI Vision Sensor.
- * @details A code merges neighbouring objects matching two to five of the
- *          color descriptors into a single detection. Only the first len
- *          entries of c1 through c5 are used; the rest are ignored.
+ * @details A code merges nearby objects matching its color descriptors into
+ *          one object. vexide fills the ids in order and sets len to the
+ *          number of non-zero ids.
+ * @warning VEX's 2024 header and vex-sdk declare this structure with seven
+ *          ids, c1 to c7. This copy has only five, so it is 4 bytes shorter
+ *          than what VEXos reads and writes.
  * @see     vexDeviceAiVisionCodeSet
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionCode
 {
-    uint8_t id;  ///< Descriptor slot, 1 to 5.
-    uint8_t len; ///< How many of c1 through c5 make up the code, 2 to 5.
+    uint8_t id;  ///< Descriptor slot. PROS documents 1 to 5, vexide accepts
+                 ///< 1 to 8.
+    uint8_t len; ///< Number of color descriptor ids in use.
     int16_t c1;  ///< Id of the first color descriptor.
     int16_t c2;  ///< Id of the second color descriptor.
     int16_t c3;  ///< Id of the third color descriptor.
@@ -676,58 +649,54 @@ typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionCode
 
 /**
  * @brief   One object reported by the AI Vision Sensor.
- * @details Which member of the union holds the object's geometry is decided by
- *          type, and what id means changes with it: a color or code
- *          descriptor's id for a color detection, the AprilTag's id for a tag,
- *          and the AI model's element id for a model detection.
- *
- *          The sensor's frame is 320 by 240 pixels with the origin at the top
- *          left, so the coordinates are not interchangeable with the 316 by 212
- *          frame the older Vision Sensor reports through
- *          V5_DeviceVisionObject.
+ * @details type decides which member of the union holds the object: color
+ *          for color and code objects, model for AI model objects and tag
+ *          for AprilTags. vexide documents the sensor's resolution as 320 by
+ *          240.
  * @see     vexDeviceAiVisionObjectGet
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionObject
 {
-    uint8_t id;   ///< Descriptor, tag or element id, depending on type.
-    uint8_t type; ///< Which kind of detection this is, and so which union
-                  ///< member is filled in.
+    uint8_t id;   ///< Color or code descriptor id, model class id, or
+                  ///< AprilTag id, depending on type.
+    uint8_t type; ///< Kind of object, which selects the union member.
 
     union
     {
-        /** @brief  A color or code detection, as an upright bounding box. */
+        /** @brief  A color or code object, as a bounding box. */
         struct __attribute__((__packed__))
         {
-            uint16_t xoffset; ///< Left edge of the box.
-            uint16_t yoffset; ///< Top edge of the box.
+            uint16_t xoffset; ///< X of the box's position.
+            uint16_t yoffset; ///< Y of the box's position.
             uint16_t width;   ///< Width of the box.
             uint16_t height;  ///< Height of the box.
-            uint16_t angle;   ///< Orientation in 0.1 degree units.
+            uint16_t angle;   ///< Angle in 0.1 degree units. vexide only reads
+                              ///< it for codes.
         } color;
 
-        /** @brief  An AprilTag detection, as its four corners. */
+        /** @brief  An AprilTag, as its four corners. */
         struct __attribute__((__packed__))
         {
-            int16_t x0; ///< X of the first corner.
-            int16_t y0; ///< Y of the first corner.
-            int16_t x1; ///< X of the second corner.
-            int16_t y1; ///< Y of the second corner.
-            int16_t x2; ///< X of the third corner.
-            int16_t y2; ///< Y of the third corner.
-            int16_t x3; ///< X of the fourth corner.
-            int16_t y3; ///< Y of the fourth corner.
+            int16_t x0; ///< X of the top left corner.
+            int16_t y0; ///< Y of the top left corner.
+            int16_t x1; ///< X of the top right corner.
+            int16_t y1; ///< Y of the top right corner.
+            int16_t x2; ///< X of the bottom right corner.
+            int16_t y2; ///< Y of the bottom right corner.
+            int16_t x3; ///< X of the bottom left corner.
+            int16_t y3; ///< Y of the bottom left corner.
         } tag;
 
-        /** @brief  An AI model detection, as a bounding box and a score. */
+        /** @brief  An AI model object, as a bounding box and a score. */
         struct __attribute__((__packed__))
         {
-            uint16_t xoffset; ///< Left edge of the box.
-            uint16_t yoffset; ///< Top edge of the box.
+            uint16_t xoffset; ///< X of the box's position.
+            uint16_t yoffset; ///< Y of the box's position.
             uint16_t width;   ///< Width of the box.
             uint16_t height;  ///< Height of the box.
-            uint16_t score;   ///< Confidence in the classification.
+            uint16_t score;   ///< Confidence reported by the model.
         } model;
-    } object; ///< The detection itself, selected by type.
+    } object; ///< The object itself, selected by type.
 } V5_DeviceAiVisionObject;
 
 /*----------------------------------------------------------------------------*/
@@ -737,17 +706,17 @@ typedef struct __attribute__((__packed__)) _V5_DeviceAiVisionObject
 // Quaternion data from IMU
 
 /**
- * @brief   Unit quaternion describing the Inertial Sensor's orientation.
- * @details The members are named a, b, c and d rather than the more usual
- *          w, x, y and z.
+ * @brief   Quaternion describing the Inertial Sensor's orientation.
+ * @details vexide reads a, b and c as the vector part (x, y, z) and d as the
+ *          scalar part.
  * @see     vexDeviceImuQuaternionGet
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceImuQuaternion
 {
-    double a; ///< First quaternion component.
-    double b; ///< Second quaternion component.
-    double c; ///< Third quaternion component.
-    double d; ///< Fourth quaternion component.
+    double a; ///< x component.
+    double b; ///< y component.
+    double c; ///< z component.
+    double d; ///< Scalar (w) component.
 } V5_DeviceImuQuaternion;
 
 // Attitude data from IMU
@@ -769,40 +738,40 @@ typedef struct __attribute__((__packed__)) _V5_DeviceImuAttitude
 /**
  * @brief   Raw three axis reading from the Inertial Sensor.
  * @details Gyroscope readings are in degrees per second, accelerometer
- *          readings are in g. Only x, y and z are filled in; w is left
- *          untouched by both vexDeviceImuRawGyroGet() and
- *          vexDeviceImuRawAccelGet().
+ *          readings are in g. PROS documents that w is never filled in.
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceImuRaw
 {
     double x; ///< Reading about or along the x axis.
     double y; ///< Reading about or along the y axis.
     double z; ///< Reading about or along the z axis.
-    double w; ///< Not written by the raw gyro or accelerometer calls.
+    double w; ///< Not filled in.
 } V5_DeviceImuRaw;
 
 // native is same direction as 3wire gyro
 // clockwise is positive
 
 /**
- * @brief   Sign convention used for the Inertial Sensor's heading.
- * @details Part of the mode word passed to vexDeviceImuModeSet(). The name
- *          carries a typo that is kept for source compatibility.
+ * @brief   Heading direction setting for the Inertial Sensor.
+ * @details Used in the mode word of vexDeviceImuModeSet(). The misspelt
+ *          name is the one in VEX's header.
  */
 typedef enum _V5ImuHeadingnMode
 {
     kImuHeadingNative =
-        0x00, ///< Same direction as the 3-Wire gyro, clockwise positive.
-    kImuHeadingIQ = 0x01 ///< IQ compatible direction.
+        0x00, ///< Native. VEX's header says this is the same direction as
+              ///< the 3-Wire gyro, clockwise positive.
+    kImuHeadingIQ = 0x01 ///< IQ. VEX does not document it further.
 } _V5ImuHeadingnMode;
 
 // Orientation mode
 
 /**
  * @brief   Which way the Inertial Sensor is mounted.
- * @details Part of the mode word passed to vexDeviceImuModeSet(). The same
- *          three bits are reported back in bits 1 to 3 of
- *          vexDeviceImuStatusGet().
+ * @details Used in the mode word of vexDeviceImuModeSet(). vexide decodes
+ *          the orientation found at calibration from bits 1 to 3 of
+ *          vexDeviceImuStatusGet(), as 0 to 5 in the same order as these
+ *          values.
  */
 typedef enum _V5ImuOrientationMode
 {
@@ -812,21 +781,21 @@ typedef enum _V5ImuOrientationMode
     kImuOrientationXDown = 0x30, ///< X axis down.
     kImuOrientationYUp = 0x40,   ///< Y axis up.
     kImuOrientationYDown = 0x50, ///< Y axis down.
-    kImuOrientationAuto = 0x80   ///< Let the sensor work out its orientation
-                                 ///< during calibration.
+    kImuOrientationAuto = 0x80   ///< Automatic. VEX does not document it
+                                 ///< further.
 } V5ImuOrientationMode;
 
 // Quaternion mode
 
 /**
- * @brief   Whether the Inertial Sensor reports fused or raw quaternions.
- * @details Part of the mode word passed to vexDeviceImuModeSet().
+ * @brief   Quaternion mode setting for the Inertial Sensor.
+ * @details Used in the mode word of vexDeviceImuModeSet(). VEX does not
+ *          document the difference between the two.
  */
 typedef enum _V5ImuQuaternionMode
 {
-    kImuQuaternionProcessed =
-        0x000,                ///< Quaternion from the sensor fusion filter.
-    kImuQuaternionRaw = 0x100 ///< Unfiltered quaternion.
+    kImuQuaternionProcessed = 0x000, ///< Processed.
+    kImuQuaternionRaw = 0x100        ///< Raw.
 } V5ImuQuaternionMode;
 
 /*----------------------------------------------------------------------------*/
@@ -835,18 +804,15 @@ typedef enum _V5ImuQuaternionMode
 // for raw crgb data
 
 /**
- * @brief   Unprocessed channel counts from the Optical Sensor's color front
- * end.
- * @details Absolute magnitudes depend on the integration time and on how
- * much light reaches the sensor, so these are mainly useful as ratios.
+ * @brief   Raw clear, red, green and blue readings from the Optical Sensor.
  * @see     vexDeviceOpticalRawGet
  */
 typedef struct _V5_DeviceOpticalRaw
 {
-    uint16_t clear; ///< Unfiltered channel count.
-    uint16_t red;   ///< Red channel count.
-    uint16_t green; ///< Green channel count.
-    uint16_t blue;  ///< Blue channel count.
+    uint16_t clear; ///< Clear reading.
+    uint16_t red;   ///< Red reading.
+    uint16_t green; ///< Green reading.
+    uint16_t blue;  ///< Blue reading.
 } V5_DeviceOpticalRaw;
 
 /**
@@ -858,28 +824,28 @@ typedef struct _V5_DeviceOpticalRgb
     double red;        ///< Red component.
     double green;      ///< Green component.
     double blue;       ///< Blue component.
-    double brightness; ///< Overall brightness, 0 to 1.
+    double brightness; ///< Brightness.
 } V5_DeviceOpticalRgb;
 
 // gesture data
 
 /**
  * @brief   Raw gesture data from the Optical Sensor.
- * @details Only filled in while gesture detection is enabled. A recognised
- *          gesture is cleared about 500 ms after it is detected.
+ * @details PROS documents that gestures are cleared after 500 ms.
  * @see     vexDeviceOpticalGestureGet
  */
 typedef struct _V5_DeviceOpticalGesture
 {
-    uint8_t udata;  ///< Up photodiode reading.
-    uint8_t ddata;  ///< Down photodiode reading.
-    uint8_t ldata;  ///< Left photodiode reading.
-    uint8_t rdata;  ///< Right photodiode reading.
-    uint8_t type;   ///< Recognised direction: 0 none, 1 up, 2 down, 3 right,
-                    ///< 4 left.
+    uint8_t udata;  ///< Up data.
+    uint8_t ddata;  ///< Down data.
+    uint8_t ldata;  ///< Left data.
+    uint8_t rdata;  ///< Right data.
+    uint8_t type;   ///< Gesture: 0 none, 1 up, 2 down. PROS reads 3 as right
+                    ///< and 4 as left; vexide reads them the other way round.
     uint8_t pad;    ///< Padding.
-    uint16_t count; ///< Number of gestures recognised so far.
-    uint32_t time;  ///< Time since the gesture was recognised, in milliseconds.
+    uint16_t count; ///< Number of gestures.
+    uint32_t time;  ///< Time since the gesture was recognised. vexide treats
+                    ///< it as milliseconds.
 } V5_DeviceOpticalGesture;
 
 /*----------------------------------------------------------------------------*/
@@ -887,16 +853,16 @@ typedef struct _V5_DeviceOpticalGesture
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief   How long the Workcell electromagnet energises for.
+ * @brief   Duration presets for the Workcell electromagnet.
  * @details Used by vexDeviceMagnetPickup() and vexDeviceMagnetDrop(). VEX
- * does not publish the duration each value maps to.
+ *          does not publish the duration each value maps to.
  */
 typedef enum _V5_DeviceMagnetDuration
 {
-    kMagnetDurationShort,     ///< Shortest pulse.
-    kMagnetDurationMedium,    ///< Medium pulse.
-    kMagnetDurationLong,      ///< Long pulse.
-    kMagnetDurationExtraLong, ///< Longest pulse.
+    kMagnetDurationShort,     ///< Short.
+    kMagnetDurationMedium,    ///< Medium.
+    kMagnetDurationLong,      ///< Long.
+    kMagnetDurationExtraLong, ///< Extra long.
 } V5_DeviceMagnetDuration;
 
 /*----------------------------------------------------------------------------*/
@@ -905,24 +871,26 @@ typedef enum _V5_DeviceMagnetDuration
 // Quaternion data from GPS
 
 /**
- * @brief   Unit quaternion describing the GPS Sensor's orientation.
+ * @brief   Quaternion describing the GPS Sensor's orientation.
+ * @details vex-sdk names the members x, y, z and w, and vexide reads them as
+ *          the vector part and the scalar part in that order.
  * @see     vexDeviceGpsQuaternionGet
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceGpsQuaternion
 {
-    double a; ///< First quaternion component.
-    double b; ///< Second quaternion component.
-    double c; ///< Third quaternion component.
-    double d; ///< Fourth quaternion component.
+    double a; ///< x component.
+    double b; ///< y component.
+    double c; ///< z component.
+    double d; ///< Scalar (w) component.
 } V5_DeviceGpsQuaternion;
 
 // Attitude data from GPS, collect all useful info into this structure now
 
 /**
  * @brief   Combined position and orientation reported by the GPS Sensor.
- * @details Positions are in meters relative to the centre of the field, and
- *          are corrected for the mounting offset set with
- *          vexDeviceGpsOriginSet(). Angles are in degrees.
+ * @details Positions are in metres with (0, 0) at the centre of the field,
+ *          for the reference point set with vexDeviceGpsOriginSet(). Angles
+ *          are in degrees.
  * @see     vexDeviceGpsAttitudeGet
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceGpsAttitude
@@ -932,29 +900,28 @@ typedef struct __attribute__((__packed__)) _V5_DeviceGpsAttitude
     double yaw;   // z
 
     // spacial position on the field
-    double position_x; ///< X position on the field, in meters.
-    double position_y; ///< Y position on the field, in meters.
-    double position_z; ///< Z position on the field, in meters.
+    double position_x; ///< X position on the field, in metres.
+    double position_y; ///< Y position on the field, in metres.
+    double position_z; ///< Z position. No runtime reads it.
 
     // alternative roll, pitch and yaw
-    double az;  ///< Azimuth, an alternative expression of the orientation.
-    double el;  ///< Elevation, an alternative expression of the orientation.
-    double rot; ///< Rotation, an alternative expression of the orientation.
+    double az;  ///< Not documented beyond the comment above.
+    double el;  ///< Not documented beyond the comment above.
+    double rot; ///< Not documented beyond the comment above.
 } V5_DeviceGpsAttitude;
 
 // Raw data from IMU
 
 /**
- * @brief   Raw three axis reading from the GPS Sensor's onboard IMU.
- * @details Gyroscope readings are in degrees per second, accelerometer
- *          readings are in g. Only x, y and z are filled in.
+ * @brief   Raw three axis reading from the GPS Sensor's inertial sensor.
+ * @details VEX does not document the units, or whether w is written.
  */
 typedef struct __attribute__((__packed__)) _V5_DeviceGpsRaw
 {
-    double x; ///< Reading about or along the x axis.
-    double y; ///< Reading about or along the y axis.
-    double z; ///< Reading about or along the z axis.
-    double w; ///< Not written by the raw gyro or accelerometer calls.
+    double x; ///< x axis reading.
+    double y; ///< y axis reading.
+    double z; ///< z axis reading.
+    double w; ///< Not read by PROS or vexide.
 } V5_DeviceGpsRaw;
 
 /*----------------------------------------------------------------------------*/
@@ -964,8 +931,8 @@ typedef struct __attribute__((__packed__)) _V5_DeviceGpsRaw
 /**
  * @brief   Opaque file handle.
  * @details Returned as a FIL* by vexFileOpen() and the other open calls. The
- *          structure belongs to VEXos and must not be dereferenced or freed.
- *          Only a limited number can be open at once; PROS records the limit
+ *          Rust standard library describes it as a pointer to a FatFs file
+ *          object managed by VEXos. A PROS comment gives the open file limit
  *          as 8 as of VEXos 0.7.4b55.
  */
 typedef void FIL;
@@ -982,14 +949,16 @@ typedef void FIL;
 
 // new 1.0.13, file status
 
-/** Set in the vexFileStatus() result when the named path exists. */
+/** Set in the vexFileStatus() result when the path exists. */
 #define FS_FILE_EXIST 1
-/** Set in the vexFileStatus() result when the named path is a directory. */
+/** Set, along with #FS_FILE_EXIST, when the path is a directory. */
 #define FS_FILE_DIR 2
 
 /**
  * @brief   Result code returned by the file system calls.
- * @details These are the FatFs result codes, passed through unchanged.
+ * @details The Rust standard library describes VEX's file system as a
+ *          derivative of FatFs (Xilinx's xilffs), and these are FatFs's
+ *          result codes.
  */
 typedef enum
 {
@@ -1030,17 +999,13 @@ typedef enum
  */
 typedef enum _touchEvent
 {
-    kTouchEventRelease,  ///< The screen was released.
-    kTouchEventPress,    ///< The screen was pressed.
-    kTouchEventPressAuto ///< Auto repeat while the screen is held down.
+    kTouchEventRelease,  ///< Released.
+    kTouchEventPress,    ///< Pressed.
+    kTouchEventPressAuto ///< Held down (PROS's E_TOUCH_HELD).
 } V5_TouchEvent;
 
 /**
- * @brief   Snapshot of the touchscreen state.
- * @details The position is in display pixels, and reflects where the last
- *          event happened rather than where a finger currently is. The two
- *          counters let code detect a new press or release without polling
- *          fast enough to catch the event itself.
+ * @brief   Touchscreen state.
  * @see     vexTouchDataGet
  */
 typedef struct _V5_TouchStatus
@@ -1048,8 +1013,8 @@ typedef struct _V5_TouchStatus
     V5_TouchEvent lastEvent; ///< Kind of the most recent event.
     int16_t lastXpos;        ///< X coordinate of the most recent event.
     int16_t lastYpos;        ///< Y coordinate of the most recent event.
-    int32_t pressCount;      ///< Running total of presses.
-    int32_t releaseCount;    ///< Running total of releases.
+    int32_t pressCount;      ///< Number of presses.
+    int32_t releaseCount;    ///< Number of releases.
 } V5_TouchStatus;
 
 /*----------------------------------------------------------------------------*/
@@ -1058,20 +1023,21 @@ typedef struct _V5_TouchStatus
 
 /**
  * @name    Competition status bits
- * @brief   Bits returned by vexCompetitionStatus() and accepted by
- *          vexCompetitionControl().
+ * @brief   Bits returned by vexCompetitionStatus().
  *
  * @details
- *  PROS reads these as follows: V5_COMP_BIT_COMP set means something is
- *  attached to the competition port, and V5_COMP_BIT_GAME then distinguishes
- *  real field control from a plain competition switch. Note that
- *  V5_COMP_BIT_EBL is set when the robot is disabled, not enabled.
+ *  V5_COMP_BIT_COMP is set when a competition switch or field control is
+ *  connected, and V5_COMP_BIT_GAME then means field control rather than a
+ *  switch; PROS and vexide read them that way. V5_COMP_BIT_EBL is set when
+ *  the robot is disabled, not enabled. VEX's 2024 header also defines
+ *  V5_COMP_BIT_OPT1 (16) and V5_COMP_BIT_OPT2 (32), "option" bits for
+ *  VEXos 1.1.3 and later, which are missing here.
  * @{
  */
 #define V5_COMP_BIT_EBL 1  // if set then robot disabled
 #define V5_COMP_BIT_MODE 2 // if set then robot in autonomous
 #define V5_COMP_BIT_COMP                                                       \
-    4 // if set then field control else comp switch connected
+    4 // if set then either comp switch or field control connected
 #define V5_COMP_BIT_GAME 8 // if set then field control connected
 
 /** @} */
@@ -1084,25 +1050,21 @@ typedef struct _V5_TouchStatus
 /**
  * @brief   Describes a decoded image.
  * @details Before calling vexImageBmpRead() or vexImagePngRead(), set data
- * to a buffer of at least maxw * maxh 32 bit pixels. The decoder fills in
- *          width, height and the pixels themselves. Pixels use the same
- *          0x00RRGGBB layout as the rest of the display API, so the buffer
- * can be handed straight to vexDisplayCopyRect().
+ *          to a buffer of at least maxw * maxh 32 bit pixels. Pixels are
+ *          RGB8, the same encoding as the display colors.
  */
 typedef struct __attribute__((__packed__)) _v5_image
 {
-    uint16_t width; ///< Decoded image width in pixels, written by the decoder.
-    uint16_t
-        height;     ///< Decoded image height in pixels, written by the decoder.
-    uint32_t *data; ///< Caller supplied pixel buffer. Must be set before
-                    ///< decoding.
-    uint32_t *p;    ///< Points at the first pixel of the second row after a
-                    ///< BMP read.
+    uint16_t width;  ///< Image width in pixels.
+    uint16_t height; ///< Image height in pixels.
+    uint32_t *data;  ///< Caller supplied pixel buffer.
+    uint32_t *p;     ///< Not documented.
 } v5_image;
 
 /** Width of the brain's display in pixels. */
 #define SYSTEM_DISPLAY_WIDTH 480
-/** Full height of the brain's display in pixels, including the VEXos header. */
+/** Height of the brain's display in pixels, including the 32 row program
+ * header. */
 #define SYSTEM_DISPLAY_HEIGHT 272
 
 #ifdef __cplusplus
