@@ -29,6 +29,8 @@ Sim::~Sim()
 
 void Sim::update()
 {
+    screen.update();
+
     // See https://gafferongames.com/post/fix_your_timestep/.
     // This version doesn't bother to do a blended render.
 
@@ -47,9 +49,9 @@ void Sim::update()
     while (accum >= fixedDt && steps < maxStepsPerFrame)
     {
         state.update();
+        input.update(*screen.window);
         if (state.started)
         {
-            input.update();
             robot.update();
             field.update();
             b2World_Step(worldId, fixedDt, 4);
@@ -57,8 +59,6 @@ void Sim::update()
         accum -= fixedDt;
         steps++;
     }
-
-    screen.update();
 }
 
 Sim &Sim::getInstance()

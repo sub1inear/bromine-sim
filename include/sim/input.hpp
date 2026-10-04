@@ -1,7 +1,11 @@
 #pragma once
+#include "v5_apitypes.h"
 #include <array>
 #include <atomic>
+#include <cstdint>
 #include <type_traits>
+
+struct GLFWwindow;
 
 namespace bromine
 {
@@ -64,14 +68,32 @@ public:
         std::atomic<bool> connected;
     };
 
+    // NOTE: This needs to be <= 8 bytes to be atomic,
+    // so we use uint8_t for the coordinates and force pressCount/releaseCount
+    // to be an uint16_t. Technically this is invalid (should be uint32_t) but
+    // nothing really can be done about it.
+    struct Touch
+    {
+        uint8_t event;
+        uint16_t x;
+        uint8_t y;
+        uint16_t pressCount;
+        uint16_t releaseCount;
+    };
+
     std::array<Controller, 2> controllers;
 
+    std::atomic<Touch> touch;
+
     Input();
-    void update();
+    void update(GLFWwindow &touchWindow);
 
 private:
     void updateController();
     void updateKeyboard();
+    void updateTouch(GLFWwindow &touchWindow);
+
+    int lastTouchState;
 };
 
 } // namespace bromine

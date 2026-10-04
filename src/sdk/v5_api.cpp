@@ -15,6 +15,7 @@
 #include "sim.hpp"
 #include "state.hpp"
 #include "utils.hpp"
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <chrono>
@@ -1002,6 +1003,25 @@ void vexDisplayScrollRect(int32_t x1, int32_t y1, int32_t x2, int32_t y2,
 void vexDisplayCopyRect(int32_t x1, int32_t y1, int32_t x2, int32_t y2,
                         uint32_t *pSrc, int32_t srcStride)
 {
+    bromine::Sim &sim = bromine::Sim::getInstance();
+    bromine::Screen &screen = sim.screen;
+
+    x1 = std::max(x1, 0);
+    y1 = std::max(y1, 0);
+    x2 = std::min(x2, 479);
+    y2 = std::min(y2, 239);
+
+    for (int32_t y = y1; y <= y2; ++y)
+    {
+        for (int32_t x = x1; x <= x2; ++x)
+        {
+            screen.buffer[y * 480 + x].store(
+                pSrc[(y - y1) * srcStride + (x - x1)],
+                std::memory_order_relaxed);
+        }
+    }
+
+    screen.dirty = true;
 }
 
 void vexDisplayPixelSet(uint32_t x, uint32_t y) {}
@@ -1297,11 +1317,18 @@ void vexTouchUserCallbackSet(void (*callback)(V5_TouchEvent, int32_t, int32_t))
 
 bool vexTouchDataGet(V5_TouchStatus *status)
 {
-    if (status != nullptr)
-    {
-        *status = {};
-    }
-    return false;
+    bromine::Sim &sim = bromine::Sim::getInstance();
+    bromine::Input &input = sim.input;
+
+    bromine::Input::Touch touch = input.touch;
+
+    *status = {.lastEvent = static_cast<V5_TouchEvent>(touch.event),
+               .lastXpos = static_cast<int16_t>(touch.x),
+               .lastYpos = static_cast<int16_t>(touch.y),
+               .pressCount = static_cast<int32_t>(touch.pressCount),
+               .releaseCount = static_cast<int32_t>(touch.releaseCount)};
+
+    return true;
 }
 
 // system utility

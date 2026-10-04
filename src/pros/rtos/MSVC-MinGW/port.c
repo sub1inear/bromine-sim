@@ -70,6 +70,12 @@ static DWORD WINAPI prvSimulatedPeripheralTimer( LPVOID lpParameter );
 static void prvProcessSimulatedInterrupts( void );
 
 /*
+ * MODIFIED: Thread entry point for every task. Calls the task's function and
+ * deletes the task if it returns.
+ */
+static DWORD WINAPI prvTaskEntry( LPVOID lpParameter );
+
+/*
  * Interrupt handlers used by the kernel itself.  These are executed from the
  * simulated interrupt handler thread.
  */
@@ -107,6 +113,10 @@ typedef struct
      * between the call to SuspendThread() to suspend the thread and the
      * asynchronous SuspendThread() operation actually being performed. */
     void * pvYieldEvent;
+
+    /* MODIFIED: The task's entry point, called by prvTaskEntry(). */
+    TaskFunction_t pxCode;
+    void * pvParameters;
 } ThreadState_t;
 
 /* Simulated interrupts waiting to be processed.  This is a bit mask where each
@@ -249,17 +259,13 @@ StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
                                                NULL ); /* No name. */
 
 
-#ifdef __GNUC__
-    /* GCC reports the warning for the cast operation from TaskFunction_t to LPTHREAD_START_ROUTINE. */
-    /* Disable this warning here by the #pragma option. */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-function-type"
-#endif
+    /* MODIFIED: Start the thread in prvTaskEntry() rather than pxCode directly
+     * so a task that returns is deleted, matching PROS. */
+    pxThreadState->pxCode = pxCode;
+    pxThreadState->pvParameters = pvParameters;
+
     /* Create the thread itself. */
-    pxThreadState->pvThread = CreateThread( NULL, xStackSize, ( LPTHREAD_START_ROUTINE ) pxCode, pvParameters, CREATE_SUSPENDED | STACK_SIZE_PARAM_IS_A_RESERVATION, NULL );
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
+    pxThreadState->pvThread = CreateThread( NULL, xStackSize, prvTaskEntry, pxThreadState, CREATE_SUSPENDED | STACK_SIZE_PARAM_IS_A_RESERVATION, NULL );
 
     configASSERT( pxThreadState->pvThread ); /* See comment where TerminateThread() is called. */
     SetThreadAffinityMask( pxThreadState->pvThread, 0x01 );
@@ -267,6 +273,25 @@ StackType_t * pxPortInitialiseStack( StackType_t * pxTopOfStack,
     SetThreadPriority( pxThreadState->pvThread, portTASK_THREAD_PRIORITY );
 
     return ( StackType_t * ) pxThreadState;
+}
+/*-----------------------------------------------------------*/
+
+static DWORD WINAPI prvTaskEntry( LPVOID lpParameter )
+{
+    ThreadState_t * pxThreadState = ( ThreadState_t * ) lpParameter;
+
+    /* Call the task's entry point. */
+    pxThreadState->pxCode( pxThreadState->pvParameters );
+
+    /* A function that implements a task must not exit or attempt to return to
+     * its caller as there is nothing to return to. Upstream, returning here
+     * would silently end the thread while FreeRTOS still schedules the task,
+     * starving every lower priority task. */
+
+    /* MODIFIED: PROS lets tasks return so we do the same. */
+    vTaskDelete( NULL );
+
+    return 0;
 }
 /*-----------------------------------------------------------*/
 

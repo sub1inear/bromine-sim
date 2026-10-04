@@ -26,17 +26,17 @@ static bool triggerToVex(int id, int button, int trigger)
     return value > triggerThreshold;
 }
 
-Input::Input() : controllers{} {}
+Input::Input() : controllers{}, touch{}, lastTouchState(GLFW_RELEASE) {}
 
-void Input::update()
+void Input::update(GLFWwindow &touchWindow)
 {
     updateController();
     updateKeyboard();
+    updateTouch(touchWindow);
 }
 
 void Input::updateController()
 {
-
     // NOTE: Y axes must be inverted to match PROS up is positive convention.
     for (int id = 0; id < controllers.size(); ++id)
     {
@@ -219,6 +219,40 @@ void Input::updateKeyboard()
     }
 
     controller.keys = keys;
+}
+
+void Input::updateTouch(GLFWwindow &touchWindow)
+{
+    int touchState = glfwGetMouseButton(&touchWindow, GLFW_MOUSE_BUTTON_LEFT);
+    if ((lastTouchState == GLFW_RELEASE && touchState == GLFW_PRESS) ||
+        (lastTouchState == GLFW_PRESS && touchState == GLFW_RELEASE))
+    {
+        double xpos;
+        double ypos;
+        glfwGetCursorPos(&touchWindow, &xpos, &ypos);
+
+        if (xpos < 0 || xpos >= 480 || ypos < 0 || ypos >= 240)
+        {
+            return;
+        }
+        printf("Touch position: (%f, %f), State: %d\n", xpos, ypos, touchState);
+
+        Touch newTouch = touch;
+        newTouch.x = static_cast<uint16_t>(xpos);
+        newTouch.y = static_cast<uint8_t>(ypos);
+        if (touchState == GLFW_PRESS)
+        {
+            newTouch.pressCount++;
+            newTouch.event = kTouchEventPress;
+        }
+        else if (touchState == GLFW_RELEASE)
+        {
+            newTouch.releaseCount++;
+            newTouch.event = kTouchEventRelease;
+        }
+        touch = newTouch;
+    }
+    lastTouchState = touchState;
 }
 
 } // namespace bromine
