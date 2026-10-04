@@ -45,7 +45,7 @@ namespace c {
  * \return True if the operation was successful, or false otherwise, setting
  * errno values as specified above.
  */
-static inline bool lcd_print(__attribute__((unused)) int16_t line, __attribute__((unused)) const char* fmt, ...)  {
+bool __attribute__((weak)) lcd_print(__attribute__((unused)) int16_t line, __attribute__((unused)) const char* fmt, ...)  {
     return false;
 }
 

@@ -235,7 +235,6 @@ void Input::updateTouch(GLFWwindow &touchWindow)
         {
             return;
         }
-        printf("Touch position: (%f, %f), State: %d\n", xpos, ypos, touchState);
 
         Touch newTouch = touch;
         newTouch.x = static_cast<uint16_t>(xpos);

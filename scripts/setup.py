@@ -12,13 +12,25 @@ import requests
 from io import BytesIO
 import zipfile
 from furl import furl
+import shutil
 
 def symlink(dst: Path, src: Path):
+    dir_path = Path(dst.parent).resolve()
+    # Sanity-check we're not deleting anything outside of BromineSim.
+    root = Path(__file__).resolve().parent.parent
+    if not dir_path.is_relative_to(root):
+        raise ValueError(f'error: {dir_path} is not relative to {root}')
+    if src.resolve().is_relative_to(dir_path):
+        raise ValueError(f'error: {src} is inside {dir_path}')
+
     if dst.is_symlink():
         dst.unlink()
     elif dst.exists():
         raise FileExistsError(f'error: expected {dst} to be a symlink')
-    Path(dst.parent).mkdir(parents=True, exist_ok=True)
+
+    if dir_path.exists():
+        shutil.rmtree(dir_path)
+    dir_path.mkdir(parents=True)
     # os.path.relpath() requires a lower Python version than Path.relative_to().
     rel = os.path.relpath(src, start=dst.parent)
     print(f'creating symlink {rel} -> {dst}')
@@ -36,10 +48,7 @@ include = Path('include/user')
 symlink(Path('src/user/src'), path / 'src')
 symlink(Path('include/user/include'), path / 'include')
 
-
 conductor = Conductor()
-
-
 
 with open(path / 'project.pros') as f:
     project = json.load(f)

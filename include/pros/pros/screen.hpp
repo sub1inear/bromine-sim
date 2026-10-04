@@ -712,6 +712,6 @@ const char* convert_args(const std::string& arg) {
 
 } // namespace pros
 
-static inline void lvgl_init() {}
+extern __attribute__((weak)) void lvgl_init() {}
 ///@}
 #endif //header guard

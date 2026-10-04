@@ -165,6 +165,13 @@ if(WIN32)
     target_link_libraries(BromineSim PRIVATE winmm)
 endif()
 
+if(WIN32 AND NOT MINGW AND CMAKE_CXX_COMPILER_LINKER_ID STREQUAL "LLD")
+    target_link_options(BromineSim PRIVATE "LINKER:-lldmingw")
+    foreach(dir $ENV{LIB})
+        target_link_options(BromineSim PRIVATE "LINKER:/libpath:${dir}")
+    endforeach()
+endif()
+
 set(PROS_BUILD_INFO_C "${CMAKE_CURRENT_BINARY_DIR}/pros_build_info.c")
 
 set(PROS_BUILD_INFO_ARGS
