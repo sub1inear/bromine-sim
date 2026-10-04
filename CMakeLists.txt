@@ -210,9 +210,6 @@ file(GLOB_RECURSE USER_SOURCE_PATHS CONFIGURE_DEPENDS FOLLOW_SYMLINKS
     "${USER_SOURCE_DIR}/*.c"
 )
 
-# Sources are either src/... (the user project) or <template>/src/... (an
-# extracted template). Like PROS's common.mk, src/<dir>/foo.cpp also gets
-# -iquote include/<dir>/, and anything outside a src/ directory isn't built.
 set(USER_SOURCES "")
 foreach(path ${USER_SOURCE_PATHS})
     if(path MATCHES "^src/(.*)$" OR path MATCHES "^[^/]+/src/(.*)$")
@@ -243,5 +240,48 @@ target_compile_definitions(BromineSimUser PRIVATE
 set(NEWLIB_COMPAT_H "${CMAKE_CURRENT_SOURCE_DIR}/include/compat/newlib_compat.h")
 target_compile_options(BromineSimUser PRIVATE -include "${NEWLIB_COMPAT_H}")
 target_link_libraries(BromineSim PRIVATE BromineSimUser)
+
+if(EXISTS "${USER_INCLUDE_DIR}/liblvgl/llemu.hpp")
+    FetchContent_Declare(
+        liblvgl
+        GIT_REPOSITORY https://github.com/purduesigbots/liblvgl.git
+        GIT_TAG        4b6f16e8baf592511ad7618547ade755858fc79b # update/9.2.0, no release tag
+    )
+    FetchContent_MakeAvailable(liblvgl)
+
+    file(GLOB_RECURSE LIBLVGL_SOURCES CONFIGURE_DEPENDS
+        "${liblvgl_SOURCE_DIR}/src/liblvgl/*.c"
+        "${liblvgl_SOURCE_DIR}/src/liblvgl/*.cpp"
+    )
+
+    foreach(source ${LIBLVGL_SOURCES})
+        file(RELATIVE_PATH path "${liblvgl_SOURCE_DIR}/src" "${source}")
+        get_filename_component(dir "${path}" DIRECTORY)
+        set_source_files_properties("${source}" PROPERTIES
+            COMPILE_OPTIONS "-iquote;${liblvgl_SOURCE_DIR}/include/${dir}"
+        )
+    endforeach()
+
+    if(WIN32)
+        set_property(SOURCE "${liblvgl_SOURCE_DIR}/src/liblvgl/libs/fsdrv/lv_fs_stdio.c"
+            APPEND PROPERTY COMPILE_DEFINITIONS WIN32)
+    endif()
+
+    add_library(BromineSimLvgl OBJECT ${LIBLVGL_SOURCES})
+
+    target_include_directories(BromineSimLvgl PRIVATE
+        "${PROS_PUBLIC_INCLUDE_DIR}"
+        "${liblvgl_SOURCE_DIR}/include"
+        "${liblvgl_SOURCE_DIR}/include/liblvgl"
+    )
+
+    target_compile_definitions(BromineSimLvgl PRIVATE BROMINE_SIM=1)
+    target_link_libraries(BromineSim PRIVATE BromineSimLvgl)
+
+    target_compile_definitions(BromineSimUser PRIVATE
+        _PROS_INCLUDE_LIBLVGL_LLEMU_H
+        _PROS_INCLUDE_LIBLVGL_LLEMU_HPP
+    )
+endif()
 
 # TODO: Have scripts/setup.py generate a config.cmake for library-specific shims.
