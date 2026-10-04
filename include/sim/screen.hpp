@@ -16,7 +16,6 @@ public:
 private:
     GLFWwindow *window;
     GLFWwindow *raylibWindow;
-    bool windowCreated;
     void createWindow();
 };
 } // namespace bromine

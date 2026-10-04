@@ -1,12 +1,11 @@
 #include "screen.hpp"
+#include "utils.hpp"
 #include <GLFW/glfw3.h>
 #include <external/glad.h>
 
 namespace bromine
 {
-Screen::Screen() : window(nullptr), raylibWindow(nullptr), windowCreated(false)
-{
-}
+Screen::Screen() : window(nullptr), raylibWindow(nullptr) {}
 
 Screen::~Screen()
 {
@@ -18,23 +17,15 @@ Screen::~Screen()
 
 void Screen::createWindow()
 {
-    windowCreated = true;
     raylibWindow = glfwGetCurrentContext();
 
     glfwDefaultWindowHints();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-#endif
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-    window = glfwCreateWindow(480 * 2, 240 * 2, "V5 Brain", nullptr, nullptr);
-    glfwDefaultWindowHints();
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    window = glfwCreateWindow(480, 240, "V5 Brain", nullptr, nullptr);
 
     if (window == nullptr)
     {
-        return;
+        error("failed to create GLFW window");
     }
 
     glfwMakeContextCurrent(window);
@@ -44,14 +35,9 @@ void Screen::createWindow()
 
 void Screen::update()
 {
-    if (!windowCreated)
-    {
-        createWindow();
-    }
-
     if (window == nullptr)
     {
-        return;
+        createWindow();
     }
 
     if (glfwWindowShouldClose(window))
@@ -65,7 +51,7 @@ void Screen::update()
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glfwSwapBuffers(window);
 

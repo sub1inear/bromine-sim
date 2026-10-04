@@ -149,7 +149,6 @@ target_include_directories(BromineSim PRIVATE include/pros/rtos)
 target_include_directories(BromineSim PRIVATE include/pros/rtos/${PROS_PORT_NAME})
 
 target_include_directories(BromineSim PRIVATE ${raylib_SOURCE_DIR}/src/external/glfw/include)
-target_include_directories(BromineSim PRIVATE ${raylib_SOURCE_DIR}/src)
 target_compile_definitions(BromineSim PRIVATE GLFW_INCLUDE_NONE)
 
 target_link_libraries(BromineSim PRIVATE raylib)
