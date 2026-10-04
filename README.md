@@ -19,27 +19,8 @@ Not planned:
 - VEXCode support
 - Auto-generation of robot configuration from other CAD softwares
 
-## Architecture
-- [`src/pros`]: Modified PROS source code to run on Windows/POSIX
-- [`src/sdk`]: VEX SDK wrappers to connect PROS and the simulator
-- [`src/sim`]: Simulator code (graphics, physics, etc.)
-- [`src/user`]: User source code
-- [`include/pros`]: PROS headers
-- [`include/sdk`]: Documented VEX SDK headers
-- [`include/sim`]: Simulator headers
-- [`include/user`]: User headers
-
-[`src/pros`]: ./src/pros
-[`src/sdk`]: ./src/sdk
-[`src/sim`]: ./src/sim
-[`src/user`]: ./src/user
-[`include/pros`]: ./include/pros
-[`include/sdk`]: ./include/sdk
-[`include/sim`]: ./include/sim
-[`include/user`]: ./src/user
 
 ## Usage
-
 Requirements:
 - Git
 - CMake
@@ -112,3 +93,22 @@ BromineSim works on Windows, macOS, and Linux (TODO).
 
 To write simulator- or robot-specific code, conditionally compile based on the `BROMINE_SIM` macro.
 Many of these limitations are rare in practice.
+
+## Architecture
+- [`src/pros`]: Modified PROS source code to run on Windows/POSIX
+- [`src/sdk`]: VEX SDK wrappers to connect PROS and the simulator
+- [`src/sim`]: Simulator code (graphics, physics, etc.)
+- [`src/user`]: User source code
+- [`include/pros`]: PROS headers
+- [`include/sdk`]: Documented VEX SDK headers
+- [`include/sim`]: Simulator headers
+- [`include/user`]: User headers
+
+[`src/pros`]: ./src/pros
+[`src/sdk`]: ./src/sdk
+[`src/sim`]: ./src/sim
+[`src/user`]: ./src/user
+[`include/pros`]: ./include/pros
+[`include/sdk`]: ./include/sdk
+[`include/sim`]: ./include/sim
+[`include/user`]: ./include/user
