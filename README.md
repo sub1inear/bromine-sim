@@ -76,19 +76,24 @@ BromineSim supports any gamepad or keyboard for input, including VEX V5 controll
 | B (bottom) | B | A | Cross | X |
 | X (top) | X | Y | Triangle | C |
 | Y (left) | Y | X | Square | V |
-| Power (unsupported with V5 on simulator) | + / − | Menu / View | Options / Create | P |
+| Power  | + / − | Menu / View | Options / Create | P |
 
 Keyboard controls:
 | Key | Action |
 |-----|--------|
 | Esc | Exit |
 | ` or ~ | Toggle debug overlay |
-| 1 (TODO) | Start practice (default) |
-| 2 (TODO) | Start match |
-| 3 (TODO) | Start driver skills |
-| 4 (TODO) | Start auton skills |
+| 1 | Practice (default) |
+| 2 | Match |
+| 3 | Driver skills |
+| 4 | Auton skills |
+| Space | Start |
 
 The first controller detected will be the "master" controller, and the second controller will be the "partner" controller; any others will be ignored.
+
+Because user code cannot be restarted, BromineSim has no restart key. Instead, exit and relaunch the simulator.
+
+The power key on the actual V5 is not available in the simulator; press `P` instead.
 
 ## Compatability
 BromineSim works on Windows, macOS, and Linux (TODO).
