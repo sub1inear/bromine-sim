@@ -2,6 +2,7 @@
 #include "field.hpp"
 #include "input.hpp"
 #include "robot.hpp"
+#include "screen.hpp"
 #include "state.hpp"
 #include <box2d/box2d.h>
 
@@ -23,6 +24,7 @@ public:
     Robot robot;
     Input input;
     State state;
+    Screen screen;
 
     Sim();
     ~Sim();

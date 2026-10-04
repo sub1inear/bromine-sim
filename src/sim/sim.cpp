@@ -57,6 +57,8 @@ void Sim::update()
         accum -= fixedDt;
         steps++;
     }
+
+    screen.update();
 }
 
 Sim &Sim::getInstance()

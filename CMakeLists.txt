@@ -49,6 +49,7 @@ add_executable(BromineSim
     src/sim/pin.cpp
     src/sim/renderer.cpp
     src/sim/robot.cpp
+    src/sim/screen.cpp
     src/sim/sim.cpp
     src/sim/state.cpp
     src/sim/units.cpp
@@ -144,10 +145,12 @@ target_include_directories(BromineSim PRIVATE include)
 target_include_directories(BromineSim PRIVATE include/sim)
 target_include_directories(BromineSim PRIVATE include/pros)
 target_include_directories(BromineSim PRIVATE include/sdk)
-
-
 target_include_directories(BromineSim PRIVATE include/pros/rtos)
 target_include_directories(BromineSim PRIVATE include/pros/rtos/${PROS_PORT_NAME})
+
+target_include_directories(BromineSim PRIVATE ${raylib_SOURCE_DIR}/src/external/glfw/include)
+target_include_directories(BromineSim PRIVATE ${raylib_SOURCE_DIR}/src)
+target_compile_definitions(BromineSim PRIVATE GLFW_INCLUDE_NONE)
 
 target_link_libraries(BromineSim PRIVATE raylib)
 target_link_libraries(BromineSim PRIVATE nlohmann_json::nlohmann_json)
