@@ -11,8 +11,6 @@ public:
 
     struct Sdk
     {
-        // NOTE: The naming for these are confusing but done to match the VEX
-        // SDK conventions.
         // In radians, CW, not wrapped.
         std::atomic<float> heading;
         // In radians, CW, wrapped.
