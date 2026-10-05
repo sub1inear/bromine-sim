@@ -6,7 +6,7 @@
     "devices": [
         {
             "type": "motor",
-            "port": 1,
+            "port": 6,
             "id": 0,
             "gearset": "blue",
             "role": "drive",
@@ -18,7 +18,7 @@
         },
         {
             "type": "motor",
-            "port": 2,
+            "port": 5,
             "id": 0,
             "role": "drive",
             "power": "half",
@@ -29,31 +29,31 @@
         },
         {
             "type": "motor",
-            "port": 3,
+            "port": 4,
             "id": 0,
             "gearset": "blue",
             "role": "drive",
             "power": "full",
-            "reversed": false,
+            "reversed": true,
             "x": -3.0911424372104084,
             "y": -5.2500028350000045,
             "angle": 0.0
         },
         {
             "type": "motor",
-            "port": 4,
+            "port": 3,
             "id": 1,
             "gearset": "blue",
             "role": "drive",
             "power": "full",
-            "reversed": false,
+            "reversed": true,
             "x": 3.0911424372104075,
             "y": 0.2500001349999977,
             "angle": 0.0
         },
         {
             "type": "motor",
-            "port": 5,
+            "port": 2,
             "id": 1,
             "role": "drive",
             "power": "half",
@@ -64,7 +64,7 @@
         },
         {
             "type": "motor",
-            "port": 6,
+            "port": 1,
             "id": 1,
             "gearset": "blue",
             "role": "drive",
