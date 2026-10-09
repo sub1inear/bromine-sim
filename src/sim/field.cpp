@@ -1,4 +1,5 @@
 #include "field.hpp"
+#include "categories.hpp"
 #include "constants.hpp"
 #include "cup.hpp"
 #include "pin.hpp"
@@ -23,6 +24,7 @@ static PhysicsIdRect makeWall(b2WorldId worldId, InputDist x, InputDist y,
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_staticBody;
     b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.filter.categoryBits = std::to_underlying(Categories::Wall);
 
     return inputRectToPhysicsIdRect(rect, worldId, bodyDef, shapeDef);
 }

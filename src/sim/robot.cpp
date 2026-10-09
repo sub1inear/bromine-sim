@@ -1,5 +1,7 @@
 #include "robot.hpp"
+#include "categories.hpp"
 #include "constants.hpp"
+#include "distance.hpp"
 #include "imu.hpp"
 #include "motor.hpp"
 #include "utils.hpp"
@@ -43,6 +45,7 @@ Robot::Robot(b2WorldId worldId) : wheelCount(0)
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
     b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.filter.categoryBits = std::to_underlying(Categories::Player);
     rect = inputRectToPhysicsIdRect(inputRect, worldId, bodyDef, shapeDef);
 
     std::vector<json> vec = expectJsonKey<std::vector<json>>(j, "devices");
@@ -61,6 +64,10 @@ Robot::Robot(b2WorldId worldId) : wheelCount(0)
         else if (type == "imu")
         {
             devices.push_back(std::make_unique<Imu>(elem, *this));
+        }
+        else if (type == "distance")
+        {
+            devices.push_back(std::make_unique<Distance>(elem, *this));
         }
         else
         {

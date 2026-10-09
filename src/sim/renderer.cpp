@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 #include "constants.hpp"
 #include "cup.hpp"
+#include "distance.hpp"
 #include "imu.hpp"
 #include "motor.hpp"
 #include "pin.hpp"
@@ -326,6 +327,23 @@ void Renderer::drawImu(const Imu &imu)
     DrawRectangleLinesPro(
         {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
         origin, screenRect.angle, 1.5f, ORANGE);
+}
+
+void Renderer::drawDistance(const Distance &distance)
+{
+    PhysicsRect physicsRect = distance.getWorldRect();
+    ScreenRect screenRect = physicsRectToScreenRect(physicsRect);
+
+    Vector2 origin = {screenRect.width / 2.0f, screenRect.height / 2.0f};
+
+    DrawRectangleLinesPro(
+        {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
+        origin, screenRect.angle, 1.5f, BLUE);
+
+    ScreenPoint lineStart = physicsPointToScreenPoint(distance.lineStart);
+    ScreenPoint lineEnd = physicsPointToScreenPoint(distance.lineEnd);
+
+    DrawLineV(lineStart, lineEnd, BLUE);
 }
 
 void Renderer::drawDevice(const Device &device) { device.draw(*this); }

@@ -41,6 +41,7 @@ FetchContent_MakeAvailable(box2d)
 add_executable(BromineSim
     src/sim/cup.cpp
     src/sim/device.cpp
+    src/sim/distance.cpp
     src/sim/field.cpp
     src/sim/imu.cpp
     src/sim/input.cpp

@@ -8,6 +8,7 @@
 #include "v5_api.h"
 #include "constants.hpp"
 #include "device.hpp"
+#include "distance.hpp"
 #include "imu.hpp"
 #include "input.hpp"
 #include "motor.hpp"
@@ -839,7 +840,14 @@ uint32_t vexDeviceMagnetStatusGet(V5_DeviceT device) { return 0; }
 
 // Distance
 
-uint32_t vexDeviceDistanceDistanceGet(V5_DeviceT device) { return 0; }
+uint32_t vexDeviceDistanceDistanceGet(V5_DeviceT device)
+{
+    if (auto distance = dynamic_cast<bromine::Distance *>(device->ptr))
+    {
+        return distance->sdk.distance;
+    }
+    return 0;
+}
 
 uint32_t vexDeviceDistanceConfidenceGet(V5_DeviceT device) { return 0; }
 
@@ -1254,15 +1262,22 @@ void vexSystemBoot(void)
             uint8_t port;
             V5_DeviceType type;
 
-            if (auto motor = dynamic_cast<bromine::Motor *>(device.get()))
+            bromine::Device *ptr = device.get();
+
+            if (auto motor = dynamic_cast<bromine::Motor *>(ptr))
             {
                 port = motor->port;
                 type = kDeviceTypeMotorSensor;
             }
-            else if (auto imu = dynamic_cast<bromine::Imu *>(device.get()))
+            else if (auto imu = dynamic_cast<bromine::Imu *>(ptr))
             {
                 port = imu->port;
                 type = kDeviceTypeImuSensor;
+            }
+            else if (auto distance = dynamic_cast<bromine::Distance *>(ptr))
+            {
+                port = distance->port;
+                type = kDeviceTypeDistanceSensor;
             }
             else
             {

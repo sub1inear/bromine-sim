@@ -11,6 +11,7 @@ public:
 
     struct Sdk
     {
+        // TODO: Convert to degrees here rather than in the SDK getter.
         // In radians, CW, not wrapped.
         std::atomic<float> heading;
         // In radians, CW, wrapped.

@@ -6,7 +6,7 @@
     "devices": [
         {
             "type": "motor",
-            "port": 1,
+            "port": 6,
             "id": 0,
             "gearset": "blue",
             "role": "drive",
@@ -17,7 +17,7 @@
         },
         {
             "type": "motor",
-            "port": 2,
+            "port": 5,
             "id": 0,
             "role": "drive",
             "power": "half",
@@ -27,7 +27,7 @@
         },
         {
             "type": "motor",
-            "port": 3,
+            "port": 4,
             "id": 0,
             "gearset": "blue",
             "role": "drive",
@@ -38,7 +38,7 @@
         },
         {
             "type": "motor",
-            "port": 4,
+            "port": 3,
             "id": 1,
             "gearset": "blue",
             "role": "drive",
@@ -49,7 +49,7 @@
         },
         {
             "type": "motor",
-            "port": 5,
+            "port": 2,
             "id": 1,
             "role": "drive",
             "power": "half",
@@ -59,7 +59,7 @@
         },
         {
             "type": "motor",
-            "port": 6,
+            "port": 1,
             "id": 1,
             "gearset": "blue",
             "role": "drive",
@@ -72,8 +72,8 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 0,
-            "ratio": 1.67,
-            "x": -5.0,
+            "ratio": 1.3333333333333333,
+            "x": -5.625,
             "y": 5.0,
             "angle": 0.0,
             "width": 1.225,
@@ -83,8 +83,8 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 0,
-            "ratio": 1.67,
-            "x": -5.0,
+            "ratio": 1.3333333333333333,
+            "x": -5.625,
             "y": -5.0,
             "angle": 0.0,
             "width": 1.225,
@@ -94,8 +94,8 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 1,
-            "ratio": 1.67,
-            "x": 5.0,
+            "ratio": 1.3333333333333333,
+            "x": 5.625,
             "y": 5.0,
             "angle": 0.0,
             "width": 1.225,
@@ -105,8 +105,8 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 1,
-            "ratio": 1.67,
-            "x": 5.0,
+            "ratio": 1.3333333333333333,
+            "x": 5.625,
             "y": -5.0,
             "angle": 0.0,
             "width": 1.225,
@@ -114,8 +114,15 @@
         },
         {
             "type": "imu",
-            "port": 7,
+            "port": 11,
             "x": 0.0,
+            "y": 0.0,
+            "angle": 0.0
+        },
+        {
+            "type": "distance",
+            "port": 10,
+            "x": 5.0,
             "y": 0.0,
             "angle": 0.0
         }

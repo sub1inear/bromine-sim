@@ -1,4 +1,5 @@
 #include "pin.hpp"
+#include "categories.hpp"
 #include "constants.hpp"
 #include "renderer.hpp"
 #include "utils.hpp"
@@ -16,6 +17,7 @@ HorizontalPin::HorizontalPin(b2WorldId worldId, InputDist x, InputDist y,
     bodyDef.angularDamping = 0.9f;
     bodyDef.type = b2_dynamicBody;
     b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.filter.categoryBits = std::to_underlying(Categories::Object);
 
     rect = inputRectToPhysicsIdRect(inputRect, worldId, bodyDef, shapeDef);
 }
