@@ -20,7 +20,7 @@ Window::Window()
     int windowSize = (int)((float)monitorSize * 0.8f);
 
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_MSAA_4X_HINT);
-    InitWindow(windowSize, windowSize, "BromineSim");
+    InitWindow(windowSize, windowSize, BROMINE_SIM_PROJECT_NAME);
     ClearWindowState(FLAG_WINDOW_HIDDEN);
 }
 

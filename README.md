@@ -57,7 +57,7 @@ Requirements:
 
     Linux/macOS: `build/bromine-sim`
 ## Controls
-BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers.
+bromine-sim supports any gamepad or keyboard for input, including VEX V5 controllers.
 | V5 | Nintendo | Xbox | PlayStation | Keyboard |
 |----|----------|------|-------------|----------|
 | Left Stick | Left Stick | Left Stick | Left Stick | WASD |
@@ -86,12 +86,12 @@ Keyboard controls:
 
 The first controller detected will be the "master" controller, and the second controller will be the "partner" controller; any others will be ignored.
 
-Because user code cannot be restarted, BromineSim has no restart key. Instead, exit and relaunch the simulator.
+Because user code cannot be restarted, bromine-sim has no restart key. Instead, exit and relaunch the simulator.
 
 The power key on the actual V5 is not available in the simulator; press `P` instead.
 
 ## Compatability
-BromineSim works on Windows, macOS, and Linux (TODO).
+bromine-sim works on Windows, macOS, and Linux (TODO).
 
 ### Strengths
 - The internal PROS layer is left mostly unchanged.

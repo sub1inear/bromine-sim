@@ -16,7 +16,7 @@ import shutil
 
 def symlink(dst: Path, src: Path):
     dir_path = Path(dst.parent).resolve()
-    # Sanity-check we're not deleting anything outside of BromineSim.
+    # Sanity-check we're not deleting anything outside of bromine-sim.
     root = Path(__file__).resolve().parent.parent
     if not dir_path.is_relative_to(root):
         raise ValueError(f'error: {dir_path} is not relative to {root}')

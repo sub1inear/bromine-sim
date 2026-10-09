@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(BromineSim LANGUAGES C CXX)
+project(bromine-sim LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -38,7 +38,7 @@ set(BOX2D_BUILD_SAMPLES OFF CACHE INTERNAL "")
 
 FetchContent_MakeAvailable(box2d)
 
-add_executable(BromineSim
+add_executable(${PROJECT_NAME}
     src/sim/cup.cpp
     src/sim/device.cpp
     src/sim/distance.cpp
@@ -129,10 +129,10 @@ add_executable(BromineSim
 
 if(WIN32)
     set(PROS_PORT_NAME "MSVC-MinGW")
-    target_sources(BromineSim PRIVATE src/pros/rtos/MSVC-MinGW/port.c)
+    target_sources(${PROJECT_NAME} PRIVATE src/pros/rtos/MSVC-MinGW/port.c)
 elseif(UNIX)
     set(PROS_PORT_NAME "Posix")
-    target_sources(BromineSim PRIVATE
+    target_sources(${PROJECT_NAME} PRIVATE
         src/pros/rtos/Posix/port.c
         src/pros/rtos/Posix/utils/wait_for_event.c
     )
@@ -140,36 +140,36 @@ else()
     message(FATAL_ERROR "No FreeRTOS port available for this platform")
 endif()
 
-message(STATUS "BromineSim: using the ${PROS_PORT_NAME} FreeRTOS port")
+message(STATUS "${PROJECT_NAME}: using the ${PROS_PORT_NAME} FreeRTOS port")
 
-target_include_directories(BromineSim PRIVATE include)
-target_include_directories(BromineSim PRIVATE include/sim)
-target_include_directories(BromineSim PRIVATE include/pros)
-target_include_directories(BromineSim PRIVATE include/sdk)
-target_include_directories(BromineSim PRIVATE include/pros/rtos)
-target_include_directories(BromineSim PRIVATE include/pros/rtos/${PROS_PORT_NAME})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE include/sim)
+target_include_directories(${PROJECT_NAME} PRIVATE include/pros)
+target_include_directories(${PROJECT_NAME} PRIVATE include/sdk)
+target_include_directories(${PROJECT_NAME} PRIVATE include/pros/rtos)
+target_include_directories(${PROJECT_NAME} PRIVATE include/pros/rtos/${PROS_PORT_NAME})
 
-target_include_directories(BromineSim PRIVATE ${raylib_SOURCE_DIR}/src/external/glfw/include)
-target_compile_definitions(BromineSim PRIVATE GLFW_INCLUDE_NONE)
+target_include_directories(${PROJECT_NAME} PRIVATE ${raylib_SOURCE_DIR}/src/external/glfw/include)
+target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 
-target_link_libraries(BromineSim PRIVATE raylib)
-target_link_libraries(BromineSim PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(BromineSim PRIVATE box2d::box2d)
+target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} PRIVATE box2d::box2d)
 
 if(APPLE)
-    target_link_libraries(BromineSim PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
 elseif(UNIX AND NOT APPLE)
-    target_link_libraries(BromineSim PRIVATE m pthread dl X11)
+    target_link_libraries(${PROJECT_NAME} PRIVATE m pthread dl X11)
 endif()
 
 if(WIN32)
-    target_link_libraries(BromineSim PRIVATE winmm)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winmm)
 endif()
 
 if(WIN32 AND NOT MINGW AND CMAKE_CXX_COMPILER_LINKER_ID STREQUAL "LLD")
-    target_link_options(BromineSim PRIVATE "LINKER:-lldmingw")
+    target_link_options(${PROJECT_NAME} PRIVATE "LINKER:-lldmingw")
     foreach(dir $ENV{LIB})
-        target_link_options(BromineSim PRIVATE "LINKER:/libpath:${dir}")
+        target_link_options(${PROJECT_NAME} PRIVATE "LINKER:/libpath:${dir}")
     endforeach()
 endif()
 
@@ -190,11 +190,14 @@ add_custom_target(pros_build_info
     COMMENT "Stamping PROS build info"
     VERBATIM
 )
-add_dependencies(BromineSim pros_build_info)
+add_dependencies(${PROJECT_NAME} pros_build_info)
 set_source_files_properties("${PROS_BUILD_INFO_C}" PROPERTIES GENERATED TRUE)
-target_sources(BromineSim PRIVATE "${PROS_BUILD_INFO_C}")
+target_sources(${PROJECT_NAME} PRIVATE "${PROS_BUILD_INFO_C}")
 
-target_compile_definitions(BromineSim PRIVATE BROMINE_SIM=1)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    BROMINE_SIM=1
+    BROMINE_SIM_PROJECT_NAME="${PROJECT_NAME}"
+)
 
 set(PROS_PUBLIC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/pros_public_include")
 
@@ -233,21 +236,21 @@ foreach(path ${USER_SOURCE_PATHS})
     list(APPEND USER_SOURCES "${source}")
 endforeach()
 
-add_library(BromineSimUser OBJECT ${USER_SOURCES})
+add_library(${PROJECT_NAME}-user OBJECT ${USER_SOURCES})
 
-target_include_directories(BromineSimUser PRIVATE
+target_include_directories(${PROJECT_NAME}-user PRIVATE
     "${PROS_PUBLIC_INCLUDE_DIR}"
     include/user/include
 )
 
-target_compile_definitions(BromineSimUser PRIVATE
+target_compile_definitions(${PROJECT_NAME}-user PRIVATE
     BROMINE_SIM=1
     FMT_CONSTEVAL= # fmt library portability hack
 )
 
 set(NEWLIB_COMPAT_H "${CMAKE_CURRENT_SOURCE_DIR}/include/compat/newlib_compat.h")
-target_compile_options(BromineSimUser PRIVATE -include "${NEWLIB_COMPAT_H}")
-target_link_libraries(BromineSim PRIVATE BromineSimUser)
+target_compile_options(${PROJECT_NAME}-user PRIVATE -include "${NEWLIB_COMPAT_H}")
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-user)
 
 if(EXISTS "${USER_INCLUDE_DIR}/liblvgl/llemu.hpp")
     FetchContent_Declare(
@@ -275,18 +278,18 @@ if(EXISTS "${USER_INCLUDE_DIR}/liblvgl/llemu.hpp")
             APPEND PROPERTY COMPILE_DEFINITIONS WIN32)
     endif()
 
-    add_library(BromineSimLvgl OBJECT ${LIBLVGL_SOURCES})
+    add_library(${PROJECT_NAME}-lvgl OBJECT ${LIBLVGL_SOURCES})
 
-    target_include_directories(BromineSimLvgl PRIVATE
+    target_include_directories(${PROJECT_NAME}-lvgl PRIVATE
         "${PROS_PUBLIC_INCLUDE_DIR}"
         "${liblvgl_SOURCE_DIR}/include"
         "${liblvgl_SOURCE_DIR}/include/liblvgl"
     )
 
-    target_compile_definitions(BromineSimLvgl PRIVATE BROMINE_SIM=1)
-    target_link_libraries(BromineSim PRIVATE BromineSimLvgl)
+    target_compile_definitions(${PROJECT_NAME}-lvgl PRIVATE BROMINE_SIM=1)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-lvgl)
 
-    target_compile_definitions(BromineSimUser PRIVATE
+    target_compile_definitions(${PROJECT_NAME}-user PRIVATE
         _PROS_INCLUDE_LIBLVGL_LLEMU_H
         _PROS_INCLUDE_LIBLVGL_LLEMU_HPP
     )
