@@ -1,6 +1,5 @@
-# BromineSim
-
-BromineSim is a Vex V5 Robot Simulator.
+# bromine-sim
+**bromine-sim** is a Vex V5 Robot Simulator.
 
 ## Features
 Planned features:
@@ -21,27 +20,43 @@ Not planned:
 
 
 ## Usage
+
 Requirements:
-- Git
-- CMake
-- Python
-- UV
-- GCC or Clang (MSVC is not supported)
 
-```bash
-git clone git@github.com:sub1inear/BromineSim.git
-cd BromineSim
-uv run scripts/setup.py path/to/pros/project
-code assets/robot.json # Edit to match your robot configuration or export it from Fusion.
-cmake -S . -B build
-cmake --build build
-```
+- [Git](https://git-scm.com/)
+- [CMake](https://cmake.org/)
+- [Python](https://www.python.org/)
+- [uv](https://docs.astral.sh/uv/)
+- [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) (MSVC is not supported)
+- [PROS](https://pros.cs.purdue.edu/)
+- A PROS project
 
-The executable now lives in `build/` (specific location may vary depending on your system and CMake configuration).
+1. Create a PROS project if you don't already have one.
 
-`scripts/setup.py` symlinks your source code into the PROS project and fetches the source code for any libraries.
-Redo this step if you install a new one.
+    VSCode: Install the PROS extension and go `Conductor > Create Project`.
 
+    CLI: Run `pros c new-project path/to/pros/project`.
+1. Clone the repository and enter it.
+    ```bash
+    git clone git@github.com:sub1inear/bromine-sim.git
+    cd bromine-sim
+    ```
+2. Link your PROS project and its libraries (redo if any added).
+    ```bash
+    sudo uv run scripts/setup.py path/to/pros/project
+    ```
+3. Edit `assets/robot.json` to match your robot, or export it from Fusion (TODO).
+    ```bash
+    code assets/robot.json
+    ```
+4. Build the project with CMake and run the simulator.
+    ```bash
+    cmake -S . -B build
+    cmake --build build
+    ```
+    Windows: `build\bromine-sim.exe`
+
+    Linux/macOS: `build/bromine-sim`
 ## Controls
 BromineSim supports any gamepad or keyboard for input, including VEX V5 controllers.
 | V5 | Nintendo | Xbox | PlayStation | Keyboard |
