@@ -35,7 +35,7 @@ void Distance::update()
 
     // Box2D combines the angle and the max distance into one vector.
     PhysicsPoint translation =
-        b2MulSV(MAX_DISTANCE, b2Rot_GetYAxis(worldRect.pose.q));
+        b2MulSV(maxDistance, b2Rot_GetYAxis(worldRect.pose.q));
 
     b2RayResult result =
         b2World_CastRayClosest(worldId, lineStart, translation, filter);
