@@ -1,5 +1,5 @@
 # bromine-sim
-**bromine-sim** is a Vex V5 Robot Simulator.
+`bromine-sim` is a Vex V5 Robot Simulator.
 
 ## Features
 Planned features:
@@ -57,7 +57,7 @@ Requirements:
 
     Linux/macOS: `build/bromine-sim`
 ## Controls
-bromine-sim supports any gamepad or keyboard for input, including VEX V5 controllers.
+`bromine-sim` supports any gamepad or keyboard for input, including VEX V5 controllers.
 | V5 | Nintendo | Xbox | PlayStation | Keyboard |
 |----|----------|------|-------------|----------|
 | Left Stick | Left Stick | Left Stick | Left Stick | WASD |
@@ -91,7 +91,7 @@ Because user code cannot be restarted, bromine-sim has no restart key. Instead, 
 The power key on the actual V5 is not available in the simulator; press `P` instead.
 
 ## Compatability
-bromine-sim works on Windows, macOS, and Linux (TODO).
+`bromine-sim` works on Windows, macOS, and Linux (TODO).
 
 ### Strengths
 - The internal PROS layer is left mostly unchanged.
