@@ -30,6 +30,7 @@ Requirements:
 - [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) (MSVC is not supported)
 - [PROS](https://pros.cs.purdue.edu/)
 
+Instructions:
 1. Create a PROS project if you don't already have one.
 
     VSCode: Install the PROS extension and go `Conductor > Create Project`.
