@@ -11,6 +11,7 @@
             "gearset": "blue",
             "role": "drive",
             "power": "full",
+            "reversed": false,
             "x": -3.0911424372104084,
             "y": 0.2500001349999961,
             "angle": 0.0
@@ -21,6 +22,7 @@
             "id": 0,
             "role": "drive",
             "power": "half",
+            "reversed": false,
             "x": -3.759083866058613,
             "y": -2.12500115313194,
             "angle": 0.0
@@ -32,6 +34,7 @@
             "gearset": "blue",
             "role": "drive",
             "power": "full",
+            "reversed": true,
             "x": -3.0911424372104084,
             "y": -5.2500028350000045,
             "angle": 0.0
@@ -43,6 +46,7 @@
             "gearset": "blue",
             "role": "drive",
             "power": "full",
+            "reversed": true,
             "x": 3.0911424372104075,
             "y": 0.2500001349999977,
             "angle": 0.0
@@ -53,6 +57,7 @@
             "id": 1,
             "role": "drive",
             "power": "half",
+            "reversed": false,
             "x": 3.7590838660586137,
             "y": -2.1250011531319384,
             "angle": 0.0
@@ -64,6 +69,7 @@
             "gearset": "blue",
             "role": "drive",
             "power": "full",
+            "reversed": false,
             "x": 3.0911424372104106,
             "y": -5.250002835000004,
             "angle": 0.0
@@ -72,7 +78,7 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 0,
-            "ratio": 1.3333333333333333,
+            "ratio": 1.67,
             "x": -5.625,
             "y": 5.0,
             "angle": 0.0,
@@ -83,7 +89,7 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 0,
-            "ratio": 1.3333333333333333,
+            "ratio": 1.67,
             "x": -5.625,
             "y": -5.0,
             "angle": 0.0,
@@ -94,7 +100,7 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 1,
-            "ratio": 1.3333333333333333,
+            "ratio": 1.67,
             "x": 5.625,
             "y": 5.0,
             "angle": 0.0,
@@ -105,7 +111,7 @@
             "type": "wheel",
             "subtype": "omni",
             "id": 1,
-            "ratio": 1.3333333333333333,
+            "ratio": 1.67,
             "x": 5.625,
             "y": -5.0,
             "angle": 0.0,

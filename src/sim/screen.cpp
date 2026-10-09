@@ -22,6 +22,7 @@ void Screen::createWindow()
 
     glfwDefaultWindowHints();
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
     window = glfwCreateWindow(480, 240, "V5 Brain", nullptr, nullptr);
 
     if (window == nullptr)
@@ -76,6 +77,7 @@ void Screen::update()
         {
             copyBuffer[i] = buffer[i].load(std::memory_order_relaxed);
         }
+
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 480, 240, GL_BGRA,
                         GL_UNSIGNED_BYTE, copyBuffer.data());
 

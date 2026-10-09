@@ -30,7 +30,8 @@ static float gearsetToRatio(V5MotorGearset gearset)
 
 Motor::Motor(const json &j, Robot &robot)
     : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")),
-      port(expectJsonPort(j)), sdk{}
+      reversed(expectJsonKey<bool>(j, "reversed")), port(expectJsonPort(j)),
+      sdk{}
 {
     std::string_view roleStr = expectJsonKey<std::string_view>(j, "role");
     if (roleStr == "input")
@@ -106,6 +107,11 @@ void Motor::update()
     // Load voltage once to prevent it changing while it's applied.
     float loadedVoltage = sdk.voltage;
     loadedVoltage = std::clamp(loadedVoltage, minVoltage, maxVoltage);
+
+    if (reversed)
+    {
+        loadedVoltage = -loadedVoltage;
+    }
 
     float ratio = gearsetToRatio(gearset);
     // For every wheel, apply force.

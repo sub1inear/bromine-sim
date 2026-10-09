@@ -30,6 +30,8 @@ public:
     uint32_t id;
     uint8_t port;
 
+    bool reversed;
+
     struct Sdk
     {
         // TODO: Check default gearset and encoder units.

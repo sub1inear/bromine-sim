@@ -677,7 +677,14 @@ double vexDeviceAiVisionTemperatureGet(V5_DeviceT device) { return 0.0; }
 
 // IMU
 
-void vexDeviceImuReset(V5_DeviceT device) {}
+void vexDeviceImuReset(V5_DeviceT device)
+{
+    if (auto imu = dynamic_cast<bromine::Imu *>(device->ptr))
+    {
+        imu->sdk.heading = 0.0f;
+        imu->sdk.rotation = 0.0f;
+    }
+}
 
 double vexDeviceImuHeadingGet(V5_DeviceT device)
 {
