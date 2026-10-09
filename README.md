@@ -92,7 +92,7 @@ Because user code cannot be restarted, bromine-sim has no restart key. Instead, 
 The power key on the actual V5 is not available in the simulator; press `P` instead.
 
 ## Compatability
-`bromine-sim` works on Windows, macOS, and Linux (TODO).
+`bromine-sim` works on Windows, macOS, and Linux.
 
 ### Strengths
 - The internal PROS layer is left mostly unchanged.
