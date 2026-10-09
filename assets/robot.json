@@ -1,4 +1,5 @@
 {
+    "$schema": "./robot.schema.json",
     "version": 1,
     "width": 14.746681270825269,
     "height": 15.71342099319122,
