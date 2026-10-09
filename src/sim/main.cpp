@@ -40,10 +40,10 @@ int main()
     bromine::Sim &sim = bromine::Sim::getInstance();
     bromine::Renderer renderer(sim.worldId);
 
-    // Boot the PROS kernel with startup_main().
+    // Boot the PROS kernel with pros_startup().
     // This will never return and Raylib requires the main thread,
-    // so we run startup_main() in a detached thread.
-    std::thread(startup_main).detach();
+    // so we run pros_startup() in a detached thread.
+    std::thread(pros_startup).detach();
 
     while (!window.shouldClose())
     {

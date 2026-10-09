@@ -60,7 +60,7 @@ __attribute__((constructor(102))) static void pros_init(void) {
 	// user's functions directly.
 }
 
-int startup_main() {
+int pros_startup() {
 	rtos_sched_start();
 
 	vexDisplayPrintf(10, 60, 1, "failed to start scheduler\n");

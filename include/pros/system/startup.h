@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-void startup_main();
+void pros_startup();
 
 #ifdef __cplusplus
 }
