@@ -27,6 +27,8 @@ public:
     Role role;
     Power power;
 
+    float ratio;
+
     uint32_t id;
     uint8_t port;
 

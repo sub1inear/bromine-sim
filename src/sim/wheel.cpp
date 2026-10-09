@@ -36,12 +36,6 @@ Wheel::Wheel(const json &j, Robot &robot)
     }
     rect.width = inputDistToPhysicsDist(expectJsonKey<float>(j, "width"));
     rect.height = inputDistToPhysicsDist(expectJsonKey<float>(j, "diameter"));
-
-    ratio = expectJsonKey<float>(j, "ratio");
-    if (ratio == 0)
-    {
-        error("wheel ratio must be non-zero");
-    }
 }
 
 void Wheel::preUpdate()

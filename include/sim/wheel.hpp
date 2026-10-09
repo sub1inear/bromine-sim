@@ -18,7 +18,6 @@ public:
     Subtype subtype;
     uint32_t id;
     float size;
-    float ratio;
 
     Wheel(const json &j, Robot &robot);
     void preUpdate() override;

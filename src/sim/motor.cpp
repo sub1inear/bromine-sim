@@ -100,6 +100,12 @@ Motor::Motor(const json &j, Robot &robot)
         error("unknown motor power `{}`, expected one of: `full`, `half`",
               powerStr);
     }
+
+    ratio = expectJsonKey<float>(j, "ratio");
+    if (ratio == 0)
+    {
+        error("motor ratio must be non-zero");
+    }
 }
 
 void Motor::preUpdate()
@@ -113,7 +119,7 @@ void Motor::preUpdate()
         loadedVoltage = -loadedVoltage;
     }
 
-    float ratio = gearsetToRatio(gearset);
+    float gearsetRatio = gearsetToRatio(gearset);
     // For every wheel, apply force.
     for (size_t i = 0; i < wheels.size(); i++)
     {
@@ -139,18 +145,17 @@ void Motor::preUpdate()
         {
             // Calculate the change in position: the total amount travelled,
             // speed * dt, divided by the wheel circumference to get wheel's
-            // rotations and multiplied by the wheel's ratio to reverse its
-            // gearing. NOTE: The motor's cartridge/ratio does not apply here.
-            // Must only do this once to avoid counting the same change multiple
-            // times.
-            float deltaPosition =
-                speed * fixedDt / wheelCircumference * wheel->ratio;
+            // rotations and multiplied by the motor's external gear ratio to
+            // reverse its gearing. NOTE: The motor's cartridge does not apply
+            // here. Must only do this once to avoid counting the same change
+            // multiple times.
+            float deltaPosition = speed * fixedDt / wheelCircumference * ratio;
             sdk.position += deltaPosition;
         }
 
         // The wheel RPM is the motor's base RPM (3600 RPM) divided by the
-        // motor's gear ratio and the wheel's gear ratio.
-        float wheelRpm = 3600 / ratio / wheel->ratio;
+        // motor's gearset ratio and the motor's external gear ratio.
+        float wheelRpm = 3600 / gearsetRatio / ratio;
 
         // Convert revolutions per minute to per second.
         float revolutionsPerSecond = wheelRpm / 60.0f;
