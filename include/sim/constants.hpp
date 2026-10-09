@@ -5,10 +5,9 @@
 namespace bromine
 {
 
-constexpr float gravity = 9.81f;
+constexpr float fixedDt = 1.0f / 240.0f;
 
-constexpr int fps = 60;
-constexpr float fixedDt = 1.0f / fps;
+constexpr float gravity = 9.81f;
 
 constexpr float degreesToRadians = std::numbers::pi_v<float> / 180.0f;
 constexpr float radiansToDegrees = 180.0f / std::numbers::pi_v<float>;

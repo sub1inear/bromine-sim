@@ -6,7 +6,7 @@
 namespace bromine
 {
 constexpr float maxDt = 0.25;
-constexpr uint32_t maxStepsPerFrame = 5;
+constexpr uint32_t maxStepsPerFrame = 9;
 
 static b2WorldId createWorld()
 {

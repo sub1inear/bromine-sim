@@ -1,4 +1,3 @@
-#include "constants.hpp"
 #include "pros/system/startup.h"
 #include "renderer.hpp"
 #include "sim.hpp"
@@ -11,7 +10,6 @@ int main()
 {
 
     SetTraceLogLevel(LOG_NONE);
-    SetTargetFPS(bromine::fps);
 
     bromine::Window window;
 
