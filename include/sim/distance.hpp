@@ -24,5 +24,6 @@ public:
     Distance(const json &j, Robot &robot);
     void update() override;
     void draw(Renderer &renderer) const override;
+    bool isOutOfRange() const;
 };
 } // namespace bromine

@@ -10,7 +10,7 @@ namespace bromine
 {
 // See https://www.vexrobotics.com/276-4852.html.
 constexpr PhysicsDist maxDistance = 2.0f; // meters
-constexpr int32_t errorDistance = 9999;
+constexpr int32_t outOfRangeDistance = 9999;
 
 Distance::Distance(const json &j, Robot &robot)
     : Device(j, robot), port(expectJsonPort(j))
@@ -52,9 +52,14 @@ void Distance::update()
     else
     {
         lineEnd = b2Add(lineStart, translation);
-        sdk.distance = errorDistance;
+        sdk.distance = outOfRangeDistance;
     }
 }
 
 void Distance::draw(Renderer &renderer) const { renderer.drawDistance(*this); }
+
+bool Distance::isOutOfRange() const
+{
+    return sdk.distance == outOfRangeDistance;
+}
 } // namespace bromine

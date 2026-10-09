@@ -339,11 +339,13 @@ void Renderer::drawDistance(const Distance &distance)
     DrawRectangleLinesPro(
         {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
         origin, screenRect.angle, 1.5f, BLUE);
+    if (!distance.isOutOfRange())
+    {
+        ScreenPoint lineStart = physicsPointToScreenPoint(distance.lineStart);
+        ScreenPoint lineEnd = physicsPointToScreenPoint(distance.lineEnd);
 
-    ScreenPoint lineStart = physicsPointToScreenPoint(distance.lineStart);
-    ScreenPoint lineEnd = physicsPointToScreenPoint(distance.lineEnd);
-
-    DrawLineV(lineStart, lineEnd, BLUE);
+        DrawLineV(lineStart, lineEnd, BLUE);
+    }
 }
 
 void Renderer::drawDevice(const Device &device) { device.draw(*this); }
