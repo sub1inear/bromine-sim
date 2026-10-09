@@ -253,10 +253,18 @@ target_compile_options(${PROJECT_NAME}-user PRIVATE -include "${NEWLIB_COMPAT_H}
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-user)
 
 if(EXISTS "${USER_INCLUDE_DIR}/liblvgl/llemu.hpp")
+    set(LIBLVGL_PATCH_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_liblvgl.cmake")
+    file(SHA256 "${LIBLVGL_PATCH_SCRIPT}" LIBLVGL_PATCH_HASH)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${LIBLVGL_PATCH_SCRIPT}")
+
     FetchContent_Declare(
         liblvgl
         GIT_REPOSITORY https://github.com/purduesigbots/liblvgl.git
         GIT_TAG        4b6f16e8baf592511ad7618547ade755858fc79b # update/9.2.0, no release tag
+        PATCH_COMMAND  "${CMAKE_COMMAND}"
+                       -DLIBLVGL_SOURCE_DIR=<SOURCE_DIR>
+                       -DLIBLVGL_PATCH_HASH=${LIBLVGL_PATCH_HASH}
+                       -P "${LIBLVGL_PATCH_SCRIPT}"
     )
     FetchContent_MakeAvailable(liblvgl)
 
