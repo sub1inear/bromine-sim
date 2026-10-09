@@ -52,9 +52,11 @@ void Sim::update()
         input.update(*screen.window);
         if (state.started)
         {
-            robot.update();
-            field.update();
+            robot.preUpdate();
+            field.preUpdate();
             b2World_Step(worldId, fixedDt, 4);
+            robot.postUpdate();
+            field.postUpdate();
         }
         accum -= fixedDt;
         steps++;

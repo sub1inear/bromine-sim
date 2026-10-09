@@ -80,11 +80,19 @@ Field::Field(b2WorldId worldId)
     };
 }
 
-void Field::update()
+void Field::preUpdate()
 {
     for (const std::unique_ptr<Object> &object : objects)
     {
-        object->update();
+        object->preUpdate();
+    }
+}
+
+void Field::postUpdate()
+{
+    for (const std::unique_ptr<Object> &object : objects)
+    {
+        object->postUpdate();
     }
 }
 } // namespace bromine

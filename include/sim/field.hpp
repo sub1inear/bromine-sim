@@ -13,7 +13,8 @@ class Field
 public:
     std::vector<std::unique_ptr<Object>> objects;
     Field(b2WorldId worldId);
-    void update();
+    void preUpdate();
+    void postUpdate();
 
 private:
     std::array<PhysicsIdRect, 4> walls;

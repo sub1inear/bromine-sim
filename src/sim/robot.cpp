@@ -92,11 +92,19 @@ Robot::Robot(b2WorldId worldId) : wheelCount(0)
     }
 }
 
-void Robot::update()
+void Robot::preUpdate()
 {
     for (auto &device : devices)
     {
-        device->update();
+        device->preUpdate();
+    }
+}
+
+void Robot::postUpdate()
+{
+    for (auto &device : devices)
+    {
+        device->postUpdate();
     }
 }
 

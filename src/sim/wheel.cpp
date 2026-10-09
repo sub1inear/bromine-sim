@@ -44,7 +44,7 @@ Wheel::Wheel(const json &j, Robot &robot)
     }
 }
 
-void Wheel::update()
+void Wheel::preUpdate()
 {
     // Apply friction.
     PhysicsRect worldRect = getWorldRect();
@@ -81,6 +81,8 @@ void Wheel::update()
         b2Add(b2MulSV(linearForce, forward), b2MulSV(lateralForce, right));
     b2Body_ApplyForce(robot.rect.bodyId, total, worldRect.pose.p, true);
 }
+
+void Wheel::postUpdate() {}
 
 void Wheel::draw(Renderer &renderer) const { renderer.drawWheel(*this); }
 

@@ -15,7 +15,8 @@ public:
     size_t wheelCount;
 
     Robot(b2WorldId worldId);
-    void update();
+    void preUpdate();
+    void postUpdate();
 };
 
 } // namespace bromine

@@ -17,7 +17,8 @@ public:
     };
     Type type;
     Pin(Type type) : type(type) {};
-    void update() override = 0;
+    void preUpdate() override = 0;
+    void postUpdate() override = 0;
     void draw(Renderer &renderer) const override = 0;
 };
 
@@ -27,7 +28,8 @@ public:
     PhysicsIdRect rect;
     HorizontalPin(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle,
                   Type type);
-    void update() override final;
+    void preUpdate() override final;
+    void postUpdate() override final;
     void draw(Renderer &renderer) const override final;
 };
 
@@ -38,7 +40,8 @@ public:
     bool isUp;
     VerticalPin(b2WorldId worldId, InputDist x, InputDist y, InputAngle angle,
                 bool isUp, Type type);
-    void update() override final;
+    void preUpdate() override final;
+    void postUpdate() override final;
     void draw(Renderer &renderer) const override final;
 };
 

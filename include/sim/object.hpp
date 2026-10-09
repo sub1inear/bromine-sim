@@ -13,7 +13,8 @@ public:
     std::unique_ptr<Object> next;
     Object(std::unique_ptr<Object> next = nullptr) : next(std::move(next)) {};
     virtual ~Object() = default;
-    virtual void update() = 0;
+    virtual void preUpdate() = 0;
+    virtual void postUpdate() = 0;
     virtual void draw(Renderer &renderer) const = 0; // Double-dispatch.
 };
 } // namespace bromine

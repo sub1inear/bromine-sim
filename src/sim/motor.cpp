@@ -102,7 +102,7 @@ Motor::Motor(const json &j, Robot &robot)
     }
 }
 
-void Motor::update()
+void Motor::preUpdate()
 {
     // Load voltage once to prevent it changing while it's applied.
     float loadedVoltage = sdk.voltage;
@@ -191,6 +191,8 @@ void Motor::update()
         b2Body_ApplyForce(robot.rect.bodyId, forceVec, rect.pose.p, true);
     }
 }
+
+void Motor::postUpdate() {}
 
 void Motor::draw(Renderer &renderer) const { renderer.drawMotor(*this); }
 

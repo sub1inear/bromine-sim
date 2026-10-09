@@ -20,7 +20,9 @@ Distance::Distance(const json &j, Robot &robot)
     rect.height = inputDistToPhysicsDist(0.69637047244f);
 }
 
-void Distance::update()
+void Distance::preUpdate() {}
+
+void Distance::postUpdate()
 {
     b2WorldId worldId = b2Body_GetWorld(robot.rect.bodyId);
 

@@ -22,7 +22,8 @@ public:
     Sdk sdk;
 
     Distance(const json &j, Robot &robot);
-    void update() override;
+    void preUpdate() override;
+    void postUpdate() override;
     void draw(Renderer &renderer) const override;
     bool isOutOfRange() const;
 };

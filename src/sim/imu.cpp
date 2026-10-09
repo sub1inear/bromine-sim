@@ -14,7 +14,9 @@ Imu::Imu(const json &j, Robot &robot)
     rect.height = inputDistToPhysicsDist(1.551181);
 }
 
-void Imu::update()
+void Imu::preUpdate() {}
+
+void Imu::postUpdate()
 {
     PhysicsRect worldRect = getWorldRect();
 
