@@ -226,7 +226,7 @@ void Renderer::drawRobot(const Robot &robot)
 
     Vector2 origin = {rect.width / 2.0f, rect.height / 2.0f};
     DrawRectanglePro({rect.x, rect.y, rect.width, rect.height}, origin,
-                     rect.angle, WHITE);
+                     rect.angle, RAYWHITE);
 }
 
 void Renderer::drawObject(const Object &object)
