@@ -94,6 +94,33 @@ PhysicsIdRect inputRectToPhysicsIdRect(InputRect rect, b2WorldId worldId,
     return out;
 }
 
+PhysicsIdPolygon inputPolygonToPhysicsIdPolygon(InputPolygon polygon,
+                                                b2WorldId worldId,
+                                                b2BodyDef &bodyDef,
+                                                b2ShapeDef &shapeDef)
+{
+    PhysicsIdPolygon out;
+
+    bodyDef.position = inputPointToPhysicsPoint({polygon.x, polygon.y});
+    bodyDef.rotation = inputAngleToPhysicsAngle(polygon.angle);
+
+    out = b2CreateBody(worldId, &bodyDef);
+
+    std::vector<PhysicsPoint> outVerticies(polygon.verticies.size());
+    for (size_t i = 0; i < polygon.verticies.size(); i++)
+    {
+        outVerticies.at(i) = inputPointToPhysicsPoint(polygon.verticies.at(i));
+    }
+
+    b2Hull hull = b2ComputeHull(outVerticies.data(), outVerticies.size());
+    b2Polygon outPolygon = b2MakePolygon(&hull, polygon.radius);
+
+    b2ShapeId shapeId = b2CreatePolygonShape(out, &shapeDef, &outPolygon);
+    setBodyMass(out, polygon.mass);
+
+    return out;
+}
+
 ScreenDist physicsDistToScreenDist(PhysicsDist dist)
 {
     assert(GetScreenWidth() == GetScreenHeight());
@@ -150,4 +177,5 @@ ScreenRect physicsIdRectToScreenRect(PhysicsIdRect rect)
     PhysicsPose pose = b2Body_GetTransform(rect.bodyId);
     return physicsRectToScreenRect({pose, rect.width, rect.height});
 }
+
 } // namespace bromine

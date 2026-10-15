@@ -24,9 +24,11 @@ When drawing, physics units are converted to screen units.
 
 #pragma once
 #include <algorithm>
+#include <array>
 #include <box2d/box2d.h>
 #include <raylib.h>
 #include <utility>
+#include <vector>
 
 namespace bromine
 {
@@ -61,9 +63,19 @@ struct InputRect
 {
     InputDist x;
     InputDist y;
-    InputDist angle;
+    InputAngle angle;
     InputDist width;
     InputDist height;
+    InputMass mass;
+};
+
+struct InputPolygon
+{
+    InputDist x;
+    InputDist y;
+    InputAngle angle;
+    InputDist radius; // Normally 0.0f.
+    std::vector<InputPoint> verticies;
     InputMass mass;
 };
 
@@ -101,6 +113,8 @@ struct PhysicsIdRect
     PhysicsDist height;
 };
 
+using PhysicsIdPolygon = b2BodyId;
+
 using ScreenDist = float;  // pixels
 using ScreenAngle = float; // degrees
 using ScreenPoint = Vector2;
@@ -124,7 +138,7 @@ struct ScreenRect
 {
     ScreenDist x;
     ScreenDist y;
-    ScreenDist angle;
+    ScreenAngle angle;
     ScreenDist width;
     ScreenDist height;
 };
@@ -150,7 +164,7 @@ constexpr inline PhysicsDist inputDistToPhysicsDist(InputDist dist)
     return dist * 0.0254f;
 }
 
-constexpr PhysicsMass inputMassToPhysicsMass(InputMass mass)
+constexpr inline PhysicsMass inputMassToPhysicsMass(InputMass mass)
 {
     return mass * 0.453592f;
 }
@@ -167,6 +181,10 @@ PhysicsRect inputRectToPhysicsRect(InputRect rect);
 PhysicsIdRect inputRectToPhysicsIdRect(InputRect rect, b2WorldId worldId,
                                        b2BodyDef &bodyDef,
                                        b2ShapeDef &shapeDef);
+PhysicsIdPolygon inputPolygonToPhysicsIdPolygon(InputPolygon polygon,
+                                                b2WorldId worldId,
+                                                b2BodyDef &bodyDef,
+                                                b2ShapeDef &shapeDef);
 
 ScreenDist physicsDistToScreenDist(PhysicsDist dist);
 ScreenAngle physicsAngleToScreenAngle(PhysicsAngle angle);

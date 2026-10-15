@@ -18,6 +18,7 @@ public:
 
 private:
     std::array<PhysicsIdRect, 4> walls;
+    std::array<PhysicsIdPolygon, 9> goals;
 };
 
 }; // namespace bromine

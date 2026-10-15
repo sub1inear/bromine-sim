@@ -33,7 +33,7 @@ void Distance::postUpdate()
 
     // Filter to only hit the walls.
     b2QueryFilter filter = b2DefaultQueryFilter();
-    filter.maskBits = std::to_underlying(Categories::Wall);
+    filter.maskBits = std::to_underlying(Categories::Wall | Categories::Goal);
 
     // Box2D combines the angle and the max distance into one vector.
     PhysicsPoint translation =

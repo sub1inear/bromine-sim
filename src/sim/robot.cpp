@@ -33,12 +33,14 @@ Robot::Robot(b2WorldId worldId) : wheelCount(0)
         error("JSON version mismatch: `{}` vs. `{}`", version, 1);
     }
 
+    InputDist height = expectJsonKey<float>(j, "height");
+
     InputRect inputRect = {
+        -70.0f + height / 2.0f, // Turned 90 degrees so relative to height.
         0.0f,
-        0.0f,
-        0.0f,
+        90.0f,
         expectJsonKey<float>(j, "width"),
-        expectJsonKey<float>(j, "height"),
+        height,
         expectJsonKey<float>(j, "mass"),
     };
 

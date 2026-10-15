@@ -29,6 +29,31 @@ static PhysicsIdRect makeWall(b2WorldId worldId, InputDist x, InputDist y,
     return inputRectToPhysicsIdRect(rect, worldId, bodyDef, shapeDef);
 }
 
+static PhysicsIdPolygon makeGoal(b2WorldId worldId, InputDist x, InputDist y)
+{
+    InputPolygon polygon = {
+        x,
+        y,
+        0.0f,
+        0.0f,
+        {{1.75f, 2.75f},
+         {2.75f, 1.75f},
+         {2.75f, -1.75f},
+         {1.75f, -2.75f},
+         {-1.75f, -2.75f},
+         {-2.75f, -1.75f},
+         {-2.75f, 1.75f},
+         {-1.75f, 2.75f}},
+    };
+
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = b2_staticBody;
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.filter.categoryBits = std::to_underlying(Categories::Goal);
+
+    return inputPolygonToPhysicsIdPolygon(polygon, worldId, bodyDef, shapeDef);
+}
+
 Field::Field(b2WorldId worldId)
 {
     objects = makeVector<Object>(
@@ -78,6 +103,12 @@ Field::Field(b2WorldId worldId)
         makeWall(worldId, 0.0f, -71.0f, 90.0f),
         makeWall(worldId, 0.0f, 71.0f, 90.0f),
     };
+    goals = {
+        makeGoal(worldId, 0.00f, 0.00f),     makeGoal(worldId, 23.25f, 46.50f),
+        makeGoal(worldId, -23.25f, 46.50f),  makeGoal(worldId, 23.25f, -46.50f),
+        makeGoal(worldId, -23.25f, -46.50f), makeGoal(worldId, 46.50f, 23.25f),
+        makeGoal(worldId, -46.50f, 23.25f),  makeGoal(worldId, 46.50f, -23.25f),
+        makeGoal(worldId, -46.50f, -23.25f)};
 }
 
 void Field::preUpdate()
