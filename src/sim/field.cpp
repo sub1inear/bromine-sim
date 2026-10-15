@@ -108,7 +108,8 @@ Field::Field(b2WorldId worldId)
         makeGoal(worldId, -23.25f, 46.50f),  makeGoal(worldId, 23.25f, -46.50f),
         makeGoal(worldId, -23.25f, -46.50f), makeGoal(worldId, 46.50f, 23.25f),
         makeGoal(worldId, -46.50f, 23.25f),  makeGoal(worldId, 46.50f, -23.25f),
-        makeGoal(worldId, -46.50f, -23.25f)};
+        makeGoal(worldId, -46.50f, -23.25f),
+    };
 }
 
 void Field::preUpdate()
