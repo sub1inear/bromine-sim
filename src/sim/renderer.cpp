@@ -5,6 +5,7 @@
 #include "imu.hpp"
 #include "motor.hpp"
 #include "pin.hpp"
+#include "rotation.hpp"
 #include "sim.hpp"
 #include "state.hpp"
 #include "units.hpp"
@@ -346,6 +347,18 @@ void Renderer::drawDistance(const Distance &distance)
 
         DrawLineV(lineStart, lineEnd, BLUE);
     }
+}
+
+void Renderer::drawRotation(const Rotation &rotation)
+{
+    PhysicsRect physicsRect = rotation.getWorldRect();
+    ScreenRect screenRect = physicsRectToScreenRect(physicsRect);
+
+    Vector2 origin = {screenRect.width / 2.0f, screenRect.height / 2.0f};
+
+    DrawRectangleLinesPro(
+        {screenRect.x, screenRect.y, screenRect.width, screenRect.height},
+        origin, screenRect.angle, 1.5f, BLUE);
 }
 
 void Renderer::drawDevice(const Device &device) { device.draw(*this); }

@@ -30,8 +30,8 @@ static float gearsetToRatio(V5MotorGearset gearset)
 
 Motor::Motor(const json &j, Robot &robot)
     : Device(j, robot), id(expectJsonKey<uint32_t>(j, "id")),
-      reversed(expectJsonKey<bool>(j, "reversed")), port(expectJsonPort(j)),
-      sdk{}
+      reversed(expectJsonKey<bool>(j, "reversed")),
+      ratio(expectJsonKey<float>(j, "ratio")), port(expectJsonPort(j)), sdk{}
 {
     std::string_view roleStr = expectJsonKey<std::string_view>(j, "role");
     if (roleStr == "input")
@@ -101,10 +101,9 @@ Motor::Motor(const json &j, Robot &robot)
               powerStr);
     }
 
-    ratio = expectJsonKey<float>(j, "ratio");
-    if (ratio == 0)
+    if (ratio <= 0)
     {
-        error("motor ratio must be non-zero");
+        error("motor ratio must be greater than zero");
     }
 }
 

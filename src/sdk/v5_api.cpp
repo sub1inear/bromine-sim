@@ -13,6 +13,7 @@
 #include "input.hpp"
 #include "motor.hpp"
 #include "robot.hpp"
+#include "rotation.hpp"
 #include "sim.hpp"
 #include "state.hpp"
 #include "utils.hpp"
@@ -752,19 +753,55 @@ int32_t vexDeviceRangeValueGet(V5_DeviceT device) { return 0; }
 
 void vexDeviceAbsEncReset(V5_DeviceT device) {}
 
-void vexDeviceAbsEncPositionSet(V5_DeviceT device, int32_t position) {}
+void vexDeviceAbsEncPositionSet(V5_DeviceT device, int32_t position)
+{
+    if (auto rotation = dynamic_cast<bromine::Rotation *>(device->ptr))
+    {
+        rotation->sdk.position =
+            static_cast<float>(position) * bromine::centidegreesToRadians;
+    }
+}
 
-int32_t vexDeviceAbsEncPositionGet(V5_DeviceT device) { return 0; }
+int32_t vexDeviceAbsEncPositionGet(V5_DeviceT device)
+{
+    if (auto rotation = dynamic_cast<bromine::Rotation *>(device->ptr))
+    {
+        return static_cast<int32_t>(rotation->sdk.position *
+                                    bromine::radiansToCentidegrees);
+    }
+    return 0;
+}
 
 int32_t vexDeviceAbsEncVelocityGet(V5_DeviceT device) { return 0; }
 
-int32_t vexDeviceAbsEncAngleGet(V5_DeviceT device) { return 0; }
+int32_t vexDeviceAbsEncAngleGet(V5_DeviceT device)
+{
+    if (auto rotation = dynamic_cast<bromine::Rotation *>(device->ptr))
+    {
+        float centidegrees =
+            rotation->sdk.position * bromine::radiansToCentidegrees;
+        centidegrees = std::fmod(centidegrees, 36000.0f);
+        if (centidegrees < 0.0f)
+        {
+            centidegrees += 36000.0f;
+        }
+        return static_cast<int32_t>(centidegrees);
+    }
+    return 0;
+}
 
 void vexDeviceAbsEncReverseFlagSet(V5_DeviceT device, bool value) {}
 
 bool vexDeviceAbsEncReverseFlagGet(V5_DeviceT device) { return false; }
 
-uint32_t vexDeviceAbsEncStatusGet(V5_DeviceT device) { return 0; }
+uint32_t vexDeviceAbsEncStatusGet(V5_DeviceT device)
+{
+    if (auto rotation = dynamic_cast<bromine::Rotation *>(device->ptr))
+    {
+        return 1;
+    }
+    return 0;
+}
 
 void vexDeviceAbsEncDataRateSet(V5_DeviceT device, uint32_t rate) {}
 
@@ -1285,6 +1322,11 @@ void vexSystemBoot(void)
             {
                 port = distance->port;
                 type = kDeviceTypeDistanceSensor;
+            }
+            else if (auto rotation = dynamic_cast<bromine::Rotation *>(ptr))
+            {
+                port = rotation->port;
+                type = kDeviceTypeAbsEncSensor;
             }
             else
             {

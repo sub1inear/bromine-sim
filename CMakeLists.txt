@@ -50,6 +50,7 @@ add_executable(${PROJECT_NAME}
     src/sim/pin.cpp
     src/sim/renderer.cpp
     src/sim/robot.cpp
+    src/sim/rotation.cpp
     src/sim/screen.cpp
     src/sim/sim.cpp
     src/sim/state.cpp

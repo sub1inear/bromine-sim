@@ -15,6 +15,8 @@ constexpr float radiansToRotations = 1.0f / (2.0f * std::numbers::pi_v<float>);
 constexpr float rotationsToRadians = (2.0f * std::numbers::pi_v<float>) / 1.0f;
 constexpr float degreesToRotations = 1.0f / 360.0f;
 constexpr float rotationsToDegrees = 360.0f / 1.0f;
+constexpr float radiansToCentidegrees = 18000.0f / std::numbers::pi_v<float>;
+constexpr float centidegreesToRadians = std::numbers::pi_v<float> / 18000.0f;
 
 constexpr InputDist inputFieldSize = 140.0f;
 constexpr InputDist inputHalfFieldSize = inputFieldSize / 2.0f;

@@ -33,7 +33,8 @@
                     { "$ref": "#/definitions/motor" },
                     { "$ref": "#/definitions/wheel" },
                     { "$ref": "#/definitions/imu" },
-                    { "$ref": "#/definitions/distance" }
+                    { "$ref": "#/definitions/distance" },
+                    { "$ref": "#/definitions/rotation" }
                 ]
             }
         }
@@ -157,6 +158,29 @@
             "properties": {
                 "type": { "const": "distance" },
                 "port": { "$ref": "#/definitions/port" },
+                "x": { "$ref": "#/definitions/x" },
+                "y": { "$ref": "#/definitions/y" },
+                "angle": { "$ref": "#/definitions/angle" }
+            }
+        },
+        "rotation": {
+            "type": "object",
+            "required": ["type", "port", "id", "ratio", "reversed", "x", "y", "angle"],
+            "additionalProperties": false,
+            "properties": {
+                "type": { "const": "rotation" },
+                "port": { "$ref": "#/definitions/port" },
+                "id": {
+                    "description": "Links the rotation sensor to the wheel with the same id.",
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "ratio": {
+                    "description": "External gear ratio. Greater than zero.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                },
+                "reversed": { "type": "boolean" },
                 "x": { "$ref": "#/definitions/x" },
                 "y": { "$ref": "#/definitions/y" },
                 "angle": { "$ref": "#/definitions/angle" }

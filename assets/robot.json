@@ -13,21 +13,9 @@
             "ratio": 1.3333333333333333,
             "role": "drive",
             "power": "full",
-            "reversed": false,
+            "reversed": true,
             "x": -3.0911424372104084,
             "y": 0.2500001349999961,
-            "angle": 0.0
-        },
-        {
-            "type": "motor",
-            "port": 5,
-            "id": 0,
-            "role": "drive",
-            "power": "half",
-            "ratio": 0.4444444444444444,
-            "reversed": false,
-            "x": -3.759083866058613,
-            "y": -2.12500115313194,
             "angle": 0.0
         },
         {
@@ -38,7 +26,7 @@
             "ratio": 1.3333333333333333,
             "role": "drive",
             "power": "full",
-            "reversed": true,
+            "reversed": false,
             "x": -3.0911424372104084,
             "y": -5.2500028350000045,
             "angle": 0.0
@@ -51,21 +39,9 @@
             "ratio": 1.3333333333333333,
             "role": "drive",
             "power": "full",
-            "reversed": true,
+            "reversed": false,
             "x": 3.0911424372104075,
             "y": 0.2500001349999977,
-            "angle": 0.0
-        },
-        {
-            "type": "motor",
-            "port": 2,
-            "id": 1,
-            "role": "drive",
-            "power": "half",
-            "ratio": 0.4444444444444444,
-            "reversed": false,
-            "x": 3.7590838660586137,
-            "y": -2.1250011531319384,
             "angle": 0.0
         },
         {
@@ -76,7 +52,7 @@
             "ratio": 1.3333333333333333,
             "role": "drive",
             "power": "full",
-            "reversed": false,
+            "reversed": true,
             "x": 3.0911424372104106,
             "y": -5.250002835000004,
             "angle": 0.0
@@ -125,15 +101,76 @@
             "type": "imu",
             "port": 11,
             "x": 0.0,
-            "y": 0.0,
+            "y": -2.8,
             "angle": 0.0
         },
         {
             "type": "distance",
-            "port": 10,
-            "x": 5.0,
-            "y": 0.0,
+            "port": 14,
+            "x": 0.0,
+            "y": 7.85,
             "angle": 0.0
+        },
+        {
+            "type": "distance",
+            "port": 16,
+            "x": 0.0,
+            "y": -7.85,
+            "angle": 180.0
+        },
+        {
+            "type": "distance",
+            "port": 19,
+            "x": -7.35,
+            "y": 0.0,
+            "angle": 270.0
+        },
+        {
+            "type": "distance",
+            "port": 17,
+            "x": 7.35,
+            "y": 0.0,
+            "angle": 90.0
+        },
+        {
+            "type": "rotation",
+            "port": 15,
+            "x": 0.0,
+            "y": 3.25,
+            "angle": 90.0,
+            "ratio": 1.0,
+            "reversed": false,
+            "id": 2
+        },
+        {
+            "type": "rotation",
+            "port": 21,
+            "x": -0.75,
+            "y": 0.0,
+            "angle": 0.0,
+            "ratio": 1.0,
+            "reversed": false,
+            "id": 3
+        },
+        {
+            "type": "wheel",
+            "subtype": "omni",
+            "id": 2,
+            "x": 0.8,
+            "y": 2.1025,
+            "angle": 90.0,
+            "width": 1.5,
+            "diameter": 2.0
+        },
+        {
+            "type": "wheel",
+            "subtype": "omni",
+            "id": 3,
+            "x": 0.3976,
+            "y": -0.8,
+            "angle": 0.0,
+            "width": 1.5,
+            "diameter": 2.0
         }
     ]
 }

@@ -4,6 +4,7 @@
 #include "distance.hpp"
 #include "imu.hpp"
 #include "motor.hpp"
+#include "rotation.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
 #include <algorithm>
@@ -71,23 +72,33 @@ Robot::Robot(b2WorldId worldId) : wheelCount(0)
         {
             devices.push_back(std::make_unique<Distance>(elem, *this));
         }
+        else if (type == "rotation")
+        {
+            devices.push_back(std::make_unique<Rotation>(elem, *this));
+        }
         else
         {
             error("unknown device type `{}`", type);
         }
     }
 
-    // Link motors to their corresponding wheels.
+    // Link motors/rotations to their corresponding wheels.
     // This action must be done following the creation of all devices,
     // so the wheels have been created.
     // Count the wheels as well.
     for (auto &device : devices)
     {
-        if (auto motor = dynamic_cast<Motor *>(device.get()))
+        // TODO: Merge the linking into an init() function.
+        Device *ptr = device.get();
+        if (auto motor = dynamic_cast<Motor *>(ptr))
         {
             motor->link();
         }
-        else if (dynamic_cast<Wheel *>(device.get()))
+        else if (auto rotation = dynamic_cast<Rotation *>(ptr))
+        {
+            rotation->link();
+        }
+        else if (dynamic_cast<Wheel *>(ptr))
         {
             ++wheelCount;
         }

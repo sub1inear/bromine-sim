@@ -17,6 +17,7 @@ class Motor;
 class Wheel;
 class Imu;
 class Distance;
+class Rotation;
 class Device;
 class State;
 
@@ -30,6 +31,7 @@ public:
     friend class Wheel;
     friend class Imu;
     friend class Distance;
+    friend class Rotation;
 
     Renderer(b2WorldId worldId);
     ~Renderer();
@@ -55,6 +57,7 @@ private:
     void drawWheel(const Wheel &wheel);
     void drawImu(const Imu &imu);
     void drawDistance(const Distance &distance);
+    void drawRotation(const Rotation &rotation);
     void drawDevice(const Device &device);
 
     Texture2D fieldTexture;
