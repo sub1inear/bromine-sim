@@ -130,5 +130,5 @@ Many of these limitations are rare in practice.
 [`include/sim`]: ./include/sim
 [`include/user`]: ./include/user
 
-### License
+## License
 See [LICENSE](./LICENSE) for details.
