@@ -2,7 +2,7 @@
 `bromine-sim` is a Vex V5 Robot Simulator.
 
 ## Features
-Planned features:
+Features:
 - PROS C++ emulation
 - LVGL/LCD screen emulation
 - 2D graphics/physics simulation
@@ -114,11 +114,7 @@ Many of these limitations are rare in practice.
 - [`src/sdk`]: VEX SDK wrappers to connect PROS and the simulator
 - [`src/sim`]: Simulator code (graphics, physics, etc.)
 - [`src/user`]: User source code
-- [`include/pros`]: PROS headers
-- [`include/sdk`]: Documented VEX SDK headers
-- [`include/sim`]: Simulator headers
-- [`include/user`]: User headers
-
+- [`include/pros
 [`src/pros`]: ./src/pros
 [`src/sdk`]: ./src/sdk
 [`src/sim`]: ./src/sim
@@ -127,3 +123,7 @@ Many of these limitations are rare in practice.
 [`include/sdk`]: ./include/sdk
 [`include/sim`]: ./include/sim
 [`include/user`]: ./include/user
+`]: PROS headers
+- [`include/sdk`]: Documented VEX SDK headers
+- [`include/sim`]: Simulator headers
+- [`include/user`]: User headers
