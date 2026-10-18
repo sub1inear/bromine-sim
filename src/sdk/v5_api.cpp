@@ -1420,8 +1420,10 @@ uint32_t vexCompetitionStatus(void)
     bromine::State::Data data = state.data;
 
     constexpr uint32_t opcontrolStatus = V5_COMP_BIT_GAME | V5_COMP_BIT_COMP;
-    constexpr uint32_t disabledStatus = V5_COMP_BIT_GAME | V5_COMP_BIT_EBL;
-    constexpr uint32_t autonomousStatus = V5_COMP_BIT_GAME | V5_COMP_BIT_MODE;
+    constexpr uint32_t disabledStatus =
+        V5_COMP_BIT_GAME | V5_COMP_BIT_EBL | V5_COMP_BIT_COMP;
+    constexpr uint32_t autonomousStatus =
+        V5_COMP_BIT_GAME | V5_COMP_BIT_MODE | V5_COMP_BIT_COMP;
 
     switch (data.phase)
     {
