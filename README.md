@@ -2,7 +2,7 @@
 `bromine-sim` is a Vex V5 Robot Simulator.
 
 ## Features
-Features:
+### Implemented
 - PROS C++ emulation
 - LVGL/LCD screen emulation
 - 2D graphics/physics simulation
@@ -10,7 +10,7 @@ Features:
 - Customizable robot configuration (can auto-generate from Fusion)
 - Warning system to catch issues early
 
-Not planned:
+#### Not Planned
 - 3D physics simulation
 - Full QEMU-based emulation
 - Vexide Simulator Protocol support
@@ -21,7 +21,7 @@ Not planned:
 
 ## Usage
 
-Requirements:
+### Requirements
 
 - [Git](https://git-scm.com/)
 - [CMake](https://cmake.org/)
@@ -30,26 +30,26 @@ Requirements:
 - [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) (MSVC is not supported)
 - [PROS](https://pros.cs.purdue.edu/)
 
-Instructions:
+### Instructions
 1. Create a PROS project if you don't already have one.
 
     VSCode: Install the PROS extension and go `Conductor > Create Project`.
 
     CLI: Run `pros c new-project path/to/pros/project`.
-1. Clone the repository and enter it.
+2. Clone the repository and enter it.
     ```bash
     git clone git@github.com:sub1inear/bromine-sim.git
     cd bromine-sim
     ```
-2. Link your PROS project and its libraries (redo if any added).
+3. Link your PROS project and its libraries (redo if any added).
     ```bash
     sudo uv run scripts/setup.py path/to/pros/project
     ```
-3. Edit `assets/robot.json` to match your robot, or export it from Fusion (TODO).
+4. Edit `assets/robot.json` to match your robot, or export it from Fusion (TODO).
     ```bash
     code assets/robot.json
     ```
-4. Build the project with CMake and run the simulator.
+5. Build the project with CMake and run the simulator.
     ```bash
     cmake -S . -B build
     cmake --build build
@@ -59,6 +59,8 @@ Instructions:
     Linux/macOS: `build/bromine-sim`
 ## Controls
 `bromine-sim` supports any gamepad or keyboard for input, including VEX V5 controllers.
+
+### Robot Controls
 | V5 | Nintendo | Xbox | PlayStation | Keyboard |
 |----|----------|------|-------------|----------|
 | Left Stick | Left Stick | Left Stick | Left Stick | WASD |
@@ -74,7 +76,7 @@ Instructions:
 | Y (left) | Y | X | Square | V |
 | Power  | + / − | Menu / View | Options / Create | P |
 
-Keyboard controls:
+### Simulator Controls
 | Key | Action |
 |-----|--------|
 | Esc | Exit |
