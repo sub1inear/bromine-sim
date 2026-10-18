@@ -129,3 +129,6 @@ Many of these limitations are rare in practice.
 [`include/sdk`]: ./include/sdk
 [`include/sim`]: ./include/sim
 [`include/user`]: ./include/user
+
+### License
+See [LICENSE](./LICENSE) for details.
