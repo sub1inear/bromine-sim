@@ -10,7 +10,7 @@
 - Customizable robot configuration (can auto-generate from Fusion)
 - Warning system to catch issues early
 
-#### Not Planned
+### Not Planned
 - 3D physics simulation
 - Full QEMU-based emulation
 - Vexide Simulator Protocol support
