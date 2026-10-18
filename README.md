@@ -27,7 +27,7 @@
 - [CMake](https://cmake.org/)
 - [Python](https://www.python.org/)
 - [uv](https://docs.astral.sh/uv/)
-- [GCC](https://gcc.gnu.org/) or [Clang](https://clang.llvm.org/) (MSVC is not supported)
+- [GCC 14](https://gcc.gnu.org/) or [Clang 18](https://clang.llvm.org/) (MSVC is not supported)
 - [PROS](https://pros.cs.purdue.edu/)
 
 ### Instructions
