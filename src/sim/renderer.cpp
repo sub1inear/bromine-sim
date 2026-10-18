@@ -58,6 +58,19 @@ static void DrawCenteredText(const char *text, float fontSizeCoeff,
     DrawText(text, textX, textY, fontSize, color);
 }
 
+static void DrawBottomRightText(const char *text, float fontSizeCoeff,
+                                Color color)
+{
+    int fontSize = SnapFontSize(GetScreenHeight() * fontSizeCoeff);
+    int fontSpacing = static_cast<float>(fontSize) / 10.0f;
+    ScreenPoint textSize =
+        MeasureTextEx(GetFontDefault(), text, fontSize, fontSpacing);
+
+    int textX = GetScreenWidth() - textSize.x;
+    int textY = GetScreenHeight() - textSize.y;
+    DrawText(text, textX, textY, fontSize, color);
+}
+
 Renderer::Renderer(b2WorldId worldId) : worldId(worldId), debug(false)
 {
     fieldTexture = LoadTexture("assets/field.png");
@@ -87,8 +100,18 @@ void Renderer::draw(const Sim &sim)
         {
             drawDebug(sim);
         }
+        drawCoordinates();
     }
     EndDrawing();
+}
+
+void Renderer::drawCoordinates()
+{
+
+    ScreenPoint mousePoint = GetMousePosition();
+    InputPoint inputPoint = screenPointToInputPoint(mousePoint);
+    DrawBottomRightText(TextFormat("(%.2f, %.2f)", inputPoint.x, inputPoint.y),
+                        0.02f, RAYWHITE);
 }
 
 void Renderer::drawDebug(const Sim &sim)

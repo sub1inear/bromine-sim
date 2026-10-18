@@ -41,15 +41,15 @@ public:
     void draw(const Sim &sim);
 
 private:
-    void drawHorizontalPin(const HorizontalPin &pin);
-    void drawVerticalPin(const VerticalPin &pin);
-
+    void drawCoordinates();
     void drawDebug(const Sim &sim);
     void drawState(const State &state);
     void drawStateTimer(const State &state);
     void drawStateType(const State &state);
     void drawStatePhase(const State &state);
     void drawCup(const Cup &cup);
+    void drawHorizontalPin(const HorizontalPin &pin);
+    void drawVerticalPin(const VerticalPin &pin);
     void drawField(const Field &field);
     void drawRobot(const Robot &robot);
     void drawObject(const Object &object);

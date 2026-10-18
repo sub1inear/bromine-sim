@@ -178,4 +178,20 @@ ScreenRect physicsIdRectToScreenRect(PhysicsIdRect rect)
     return physicsRectToScreenRect({pose, rect.width, rect.height});
 }
 
+InputDist screenDistToInputDist(ScreenDist dist)
+{
+    assert(GetScreenWidth() == GetScreenHeight());
+    float screenWidth = static_cast<float>(GetScreenWidth());
+    return remapDist(dist, 0.0f, screenWidth, inputFieldWallMin,
+                     inputFieldWallMax);
+}
+
+InputPoint screenPointToInputPoint(ScreenPoint point)
+{
+    return {
+        screenDistToInputDist(point.x),
+        -screenDistToInputDist(point.y),
+    };
+}
+
 } // namespace bromine

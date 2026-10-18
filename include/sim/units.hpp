@@ -195,4 +195,7 @@ ScreenCircle physicsIdCircleToScreenCircle(PhysicsIdCircle circle);
 ScreenRect physicsRectToScreenRect(PhysicsRect rect);
 ScreenRect physicsIdRectToScreenRect(PhysicsIdRect rect);
 
+InputDist screenDistToInputDist(ScreenDist dist);
+InputPoint screenPointToInputPoint(ScreenPoint point);
+
 } // namespace bromine
