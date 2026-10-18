@@ -1,176 +1,215 @@
 {
     "$schema": "./robot.schema.json",
     "version": 1,
-    "width": 14.746681270825269,
-    "height": 15.71342099319122,
+    "width": 14.1501,
+    "height": 18.284,
     "mass": 18.0,
     "devices": [
         {
-            "type": "motor",
-            "port": 6,
+            "type": "wheel",
+            "subtype": "omni",
             "id": 0,
-            "gearset": "blue",
-            "ratio": 1.3333333333333333,
-            "role": "drive",
-            "power": "full",
-            "reversed": true,
-            "x": -3.0911424372104084,
-            "y": 0.2500001349999961,
-            "angle": 0.0
+            "x": -5.5749,
+            "y": -7.142,
+            "angle": 0.0,
+            "width": 0.9764,
+            "diameter": 2.7521
+        },
+        {
+            "type": "wheel",
+            "subtype": "omni",
+            "id": 0,
+            "x": -5.5749,
+            "y": 3.358,
+            "angle": 0.0,
+            "width": 0.9764,
+            "diameter": 2.7521
         },
         {
             "type": "motor",
             "port": 4,
             "id": 0,
-            "gearset": "blue",
-            "ratio": 1.3333333333333333,
             "role": "drive",
             "power": "full",
+            "gearset": "blue",
+            "ratio": 1.3333333333333333,
             "reversed": false,
-            "x": -3.0911424372104084,
-            "y": -5.2500028350000045,
-            "angle": 0.0
+            "x": -3.0663,
+            "y": -5.892,
+            "angle": 90.0
         },
         {
-            "type": "motor",
-            "port": 3,
+            "type": "wheel",
+            "subtype": "omni",
             "id": 1,
-            "gearset": "blue",
-            "ratio": 1.3333333333333333,
-            "role": "drive",
-            "power": "full",
-            "reversed": false,
-            "x": 3.0911424372104075,
-            "y": 0.2500001349999977,
-            "angle": 0.0
+            "x": 5.6251,
+            "y": -7.142,
+            "angle": 0.0,
+            "width": 0.9764,
+            "diameter": 2.7521
+        },
+        {
+            "type": "wheel",
+            "subtype": "omni",
+            "id": 1,
+            "x": 5.6251,
+            "y": 3.358,
+            "angle": 0.0,
+            "width": 0.9764,
+            "diameter": 2.7521
         },
         {
             "type": "motor",
             "port": 1,
             "id": 1,
-            "gearset": "blue",
-            "ratio": 1.3333333333333333,
             "role": "drive",
             "power": "full",
+            "gearset": "blue",
+            "ratio": 1.3333333333333333,
             "reversed": true,
-            "x": 3.0911424372104106,
-            "y": -5.250002835000004,
-            "angle": 0.0
-        },
-        {
-            "type": "wheel",
-            "subtype": "omni",
-            "id": 0,
-            "x": -5.625,
-            "y": 5.0,
-            "angle": 0.0,
-            "width": 1.225,
-            "diameter": 2.75
-        },
-        {
-            "type": "wheel",
-            "subtype": "omni",
-            "id": 0,
-            "x": -5.625,
-            "y": -5.0,
-            "angle": 0.0,
-            "width": 1.225,
-            "diameter": 2.75
-        },
-        {
-            "type": "wheel",
-            "subtype": "omni",
-            "id": 1,
-            "x": 5.625,
-            "y": 5.0,
-            "angle": 0.0,
-            "width": 1.225,
-            "diameter": 2.75
-        },
-        {
-            "type": "wheel",
-            "subtype": "omni",
-            "id": 1,
-            "x": 5.625,
-            "y": -5.0,
-            "angle": 0.0,
-            "width": 1.225,
-            "diameter": 2.75
-        },
-        {
-            "type": "imu",
-            "port": 11,
-            "x": 0.0,
-            "y": -2.8,
-            "angle": 0.0
-        },
-        {
-            "type": "distance",
-            "port": 14,
-            "x": 0.0,
-            "y": 7.85,
-            "angle": 0.0
-        },
-        {
-            "type": "distance",
-            "port": 16,
-            "x": 0.0,
-            "y": -7.85,
-            "angle": 180.0
-        },
-        {
-            "type": "distance",
-            "port": 19,
-            "x": -7.35,
-            "y": 0.0,
-            "angle": 270.0
-        },
-        {
-            "type": "distance",
-            "port": 17,
-            "x": 7.35,
-            "y": 0.0,
+            "x": 3.1164,
+            "y": -5.892,
             "angle": 90.0
         },
         {
             "type": "rotation",
             "port": 15,
-            "x": 0.0,
-            "y": 3.25,
-            "angle": 90.0,
+            "id": 2,
             "ratio": 1.0,
             "reversed": false,
-            "id": 2
-        },
-        {
-            "type": "rotation",
-            "port": 21,
-            "x": -0.75,
-            "y": 0.0,
-            "angle": 0.0,
-            "ratio": 1.0,
-            "reversed": false,
-            "id": 3
+            "x": 0.1523,
+            "y": -1.9075,
+            "angle": 90.0
         },
         {
             "type": "wheel",
             "subtype": "omni",
             "id": 2,
-            "x": 0.8,
-            "y": 2.1025,
+            "x": -0.7119,
+            "y": -2.9326,
             "angle": 90.0,
-            "width": 1.5,
+            "width": 1.251,
             "diameter": 2.0
+        },
+        {
+            "type": "rotation",
+            "port": 21,
+            "id": 3,
+            "ratio": 1.0,
+            "reversed": false,
+            "x": 0.8684,
+            "y": -3.9842,
+            "angle": 0.0
         },
         {
             "type": "wheel",
             "subtype": "omni",
             "id": 3,
-            "x": 0.3976,
-            "y": -0.8,
+            "x": -0.1567,
+            "y": -4.7795,
             "angle": 0.0,
-            "width": 1.5,
+            "width": 1.251,
             "diameter": 2.0
+        },
+        {
+            "type": "motor",
+            "port": 6,
+            "id": 0,
+            "role": "drive",
+            "power": "full",
+            "gearset": "blue",
+            "ratio": 1.3333333333333333,
+            "reversed": true,
+            "x": -3.5663,
+            "y": -0.392,
+            "angle": 90.0
+        },
+        {
+            "type": "motor",
+            "port": 3,
+            "id": 1,
+            "role": "drive",
+            "power": "full",
+            "gearset": "blue",
+            "ratio": 1.3333333333333333,
+            "reversed": false,
+            "x": 3.4499,
+            "y": -0.3974,
+            "angle": 90.0
+        },
+        {
+            "type": "wheel",
+            "subtype": "flex",
+            "id": 4,
+            "x": -3.5579,
+            "y": 7.3765,
+            "angle": 0.0,
+            "width": 0.5,
+            "diameter": 2.0
+        },
+        {
+            "type": "wheel",
+            "subtype": "flex",
+            "id": 5,
+            "x": 0.0921,
+            "y": 7.3765,
+            "angle": 90.0,
+            "width": 2.0,
+            "diameter": 7.8
+        },
+        {
+            "type": "motor",
+            "port": 2,
+            "id": 4,
+            "role": "input",
+            "power": "full",
+            "gearset": "blue",
+            "ratio": 1.0,
+            "reversed": false,
+            "x": -3.5173,
+            "y": 1.804,
+            "angle": 90.0
+        },
+        {
+            "type": "imu",
+            "port": 11,
+            "x": 1.0,
+            "y": -7.0,
+            "angle": 0.0
+        },
+        {
+            "type": "distance",
+            "port": 19,
+            "x": -5.3697,
+            "y": -0.4716,
+            "angle": 270.0
+        },
+        {
+            "type": "distance",
+            "port": 12,
+            "x": -3.972,
+            "y": -4.1853,
+            "angle": 0.0
+        },
+        {
+            "type": "distance",
+            "port": 16,
+            "x": 1.525,
+            "y": -5.0988,
+            "angle": 180.0
+        },
+        {
+            "type": "motor",
+            "port": 5,
+            "id": 5,
+            "role": "input",
+            "power": "full",
+            "gearset": "blue",
+            "ratio": 1.0,
+            "reversed": false,
+            "x": -3.9206,
+            "y": -2.5921,
+            "angle": 90.0
         }
     ]
 }
