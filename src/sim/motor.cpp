@@ -88,7 +88,7 @@ Motor::Motor(const json &j, Robot &robot)
         power = Power::Half;
         rect.width = inputDistToPhysicsDist(2.25f);
         rect.height = inputDistToPhysicsDist(2.5f);
-        if (j.find("gear") != j.end())
+        if (j.find("gearset") != j.end())
         {
             error("5.5W motors (half-watts) do not support gearing");
         }
