@@ -40,40 +40,49 @@ Wheel::Wheel(const json &j, Robot &robot)
 
 void Wheel::preUpdate()
 {
-    // Apply friction.
-    PhysicsRect worldRect = getWorldRect();
+    // HACK: Flex wheels are most likely never touching the ground, so don't
+    // apply friction for them.
+    // TODO: Properly have roles for wheels just like motors or find their role
+    // dynamically.
+    if (subtype != Subtype::Flex)
+    {
+        // Apply friction.
+        PhysicsRect worldRect = getWorldRect();
 
-    // Get the forward/right vectors.
-    PhysicsPoint forward = b2RotateVector(worldRect.pose.q, {0.0f, 1.0f});
-    PhysicsPoint right = b2RightPerp(forward);
+        // Get the forward/right vectors.
+        PhysicsPoint forward = b2RotateVector(worldRect.pose.q, {0.0f, 1.0f});
+        PhysicsPoint right = b2RightPerp(forward);
 
-    // Get the velocity of the wheel.
-    PhysicsPoint velocity =
-        b2Body_GetWorldPointVelocity(robot.rect.bodyId, worldRect.pose.p);
+        // Get the velocity of the wheel.
+        PhysicsPoint velocity =
+            b2Body_GetWorldPointVelocity(robot.rect.bodyId, worldRect.pose.p);
 
-    // Each wheel has only a proportion of the total mass of the robot.
-    float massShare = b2Body_GetMass(robot.rect.bodyId) / robot.wheelCount;
-    // The normal force is the weight supported by this wheel.
-    float normalForce = massShare * gravity;
+        // Each wheel has only a proportion of the total mass of the robot.
+        float massShare = b2Body_GetMass(robot.rect.bodyId) / robot.wheelCount;
+        // The normal force is the weight supported by this wheel.
+        float normalForce = massShare * gravity;
 
-    float maxLateral = lateralFriction * normalForce;
+        float maxLateral = lateralFriction * normalForce;
 
-    // Calculate the lateral force needed to resist lateral movement
-    // with the amount that the velocity overlaps with the right vector.
-    // The final force is calculated with F = m * dv / dt
-    // (from Newton's second law F = ma, with a = dv / dt).
-    float lateralForce = std::clamp(
-        -b2Dot(velocity, right) * massShare / fixedDt, -maxLateral, maxLateral);
+        // Calculate the lateral force needed to resist lateral movement
+        // with the amount that the velocity overlaps with the right vector.
+        // The final force is calculated with F = m * dv / dt
+        // (from Newton's second law F = ma, with a = dv / dt).
+        float lateralForce =
+            std::clamp(-b2Dot(velocity, right) * massShare / fixedDt,
+                       -maxLateral, maxLateral);
 
-    // Same except for linear force.
-    float maxLinear = linearFriction * normalForce;
-    float linearForce = std::clamp(
-        -b2Dot(velocity, forward) * massShare / fixedDt, -maxLinear, maxLinear);
+        // Same except for linear force.
+        float maxLinear = linearFriction * normalForce;
+        float linearForce =
+            std::clamp(-b2Dot(velocity, forward) * massShare / fixedDt,
+                       -maxLinear, maxLinear);
 
-    // Multiply the scalars by the unit vectors to find the final force.
-    PhysicsPoint total =
-        b2Add(b2MulSV(linearForce, forward), b2MulSV(lateralForce, right));
-    b2Body_ApplyForce(robot.rect.bodyId, total, worldRect.pose.p, true);
+        // Multiply the scalars by the unit vectors to find the final force.
+        PhysicsPoint total =
+            b2Add(b2MulSV(linearForce, forward), b2MulSV(lateralForce, right));
+        b2Body_ApplyForce(robot.rect.bodyId, total, worldRect.pose.p, true);
+    }
 }
 
 void Wheel::postUpdate() {}
