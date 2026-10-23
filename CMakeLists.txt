@@ -183,12 +183,24 @@ if(WIN32 AND NOT MINGW AND CMAKE_CXX_COMPILER_LINKER_ID STREQUAL "LLD")
     endforeach()
 endif()
 
+if(NOT BROMINE_SIM_PROJECT)
+    message(FATAL_ERROR "${PROJECT_NAME}: set BROMINE_SIM_PROJECT to the PROS project to simulate")
+endif()
+
+get_filename_component(USER_PROJECT_DIR "${BROMINE_SIM_PROJECT}" REALPATH)
+
+if(NOT EXISTS "${USER_PROJECT_DIR}/project.pros")
+    message(FATAL_ERROR "${PROJECT_NAME}: no PROS project found at ${USER_PROJECT_DIR}")
+endif()
+
+message(STATUS "${PROJECT_NAME}: simulating ${USER_PROJECT_DIR}")
+
 set(PROS_BUILD_INFO_C "${CMAKE_CURRENT_BINARY_DIR}/pros_build_info.c")
 
 set(PROS_BUILD_INFO_ARGS
     -DTEMPLATE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/pros_build_info.c.in
     -DOUTPUT=${PROS_BUILD_INFO_C}
-    -DPROS_COMPILE_DIRECTORY=${CMAKE_CURRENT_SOURCE_DIR}
+    -DPROS_COMPILE_DIRECTORY=${USER_PROJECT_DIR}
     -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateBuildInfo.cmake
 )
 
@@ -216,18 +228,6 @@ foreach(header ${PROS_PUBLIC_HEADERS})
     set(FORWARD_HEADER_TARGET "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/${header}")
     configure_file(cmake/forward_header.h.in "${PROS_PUBLIC_INCLUDE_DIR}/${header}" @ONLY)
 endforeach()
-
-if(NOT BROMINE_SIM_PROJECT)
-    message(FATAL_ERROR "${PROJECT_NAME}: set BROMINE_SIM_PROJECT to the PROS project to simulate")
-endif()
-
-set(USER_PROJECT_DIR "${BROMINE_SIM_PROJECT}")
-
-if(NOT EXISTS "${USER_PROJECT_DIR}/project.pros")
-    message(FATAL_ERROR "${PROJECT_NAME}: no PROS project found at ${USER_PROJECT_DIR}")
-endif()
-
-message(STATUS "${PROJECT_NAME}: simulating ${USER_PROJECT_DIR}")
 
 set(USER_PROJECT_SOURCE_DIR "${USER_PROJECT_DIR}/src")
 set(USER_INCLUDE_DIR "${USER_PROJECT_DIR}/include")
