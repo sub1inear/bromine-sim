@@ -143,6 +143,10 @@ endif()
 
 message(STATUS "${PROJECT_NAME}: using the ${PROS_PORT_NAME} FreeRTOS port")
 
+set_source_files_properties(src/sim/renderer.cpp PROPERTIES
+    COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:Clang,AppleClang>:-Wno-c23-extensions>"
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_include_directories(${PROJECT_NAME} PRIVATE include/sim)
 target_include_directories(${PROJECT_NAME} PRIVATE include/pros)

@@ -25,6 +25,14 @@ constexpr Color fieldRed = {209, 46, 81, 255};
 constexpr Color fieldBlue = {87, 156, 189, 255};
 constexpr Color fieldYellow = {199, 191, 120, 255};
 
+constexpr unsigned char fieldPng[] = {
+#embed "../../assets/field.png"
+};
+
+constexpr unsigned char pinsPng[] = {
+#embed "../../assets/pins.png"
+};
+
 static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
                                   float rotation, float thick, Color color)
 {
@@ -73,8 +81,15 @@ static void DrawBottomRightText(const char *text, float fontSizeCoeff,
 
 Renderer::Renderer(b2WorldId worldId) : worldId(worldId), debug(false)
 {
-    fieldTexture = LoadTexture("assets/field.png");
-    pinsTexture = LoadTexture("assets/pins.png");
+    Image fieldImage = LoadImageFromMemory(".png", fieldPng, sizeof(fieldPng));
+    Image pinsImage = LoadImageFromMemory(".png", pinsPng, sizeof(pinsPng));
+
+    fieldTexture = LoadTextureFromImage(fieldImage);
+    pinsTexture = LoadTextureFromImage(pinsImage);
+
+    UnloadImage(fieldImage);
+    UnloadImage(pinsImage);
+
     GenTextureMipmaps(&pinsTexture);
     SetTextureFilter(pinsTexture, TEXTURE_FILTER_TRILINEAR);
 }
