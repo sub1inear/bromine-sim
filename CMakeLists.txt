@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.24)
 project(bromine-sim LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
@@ -37,7 +37,7 @@ unset(CMAKE_POLICY_VERSION_MINIMUM)
 
 FetchContent_MakeAvailable(json box2d)
 
-add_executable(${PROJECT_NAME}
+add_library(${PROJECT_NAME}-core STATIC
     src/sim/cup.cpp
     src/sim/device.cpp
     src/sim/distance.cpp
@@ -129,10 +129,10 @@ add_executable(${PROJECT_NAME}
 
 if(WIN32)
     set(PROS_PORT_NAME "MSVC-MinGW")
-    target_sources(${PROJECT_NAME} PRIVATE src/pros/rtos/MSVC-MinGW/port.c)
+    target_sources(${PROJECT_NAME}-core PRIVATE src/pros/rtos/MSVC-MinGW/port.c)
 elseif(UNIX)
     set(PROS_PORT_NAME "Posix")
-    target_sources(${PROJECT_NAME} PRIVATE
+    target_sources(${PROJECT_NAME}-core PRIVATE
         src/pros/rtos/Posix/port.c
         src/pros/rtos/Posix/utils/wait_for_event.c
     )
@@ -146,7 +146,7 @@ set_source_files_properties(src/sim/renderer.cpp PROPERTIES
     COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:Clang,AppleClang>:-Wno-c23-extensions>"
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${PROJECT_NAME}-core PRIVATE
     include
     include/sim
     include/pros
@@ -156,35 +156,52 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${raylib_SOURCE_DIR}/src/external/glfw/include
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
+target_compile_definitions(${PROJECT_NAME}-core PRIVATE
     BROMINE_SIM=1
     BROMINE_SIM_PROJECT_NAME="${PROJECT_NAME}"
     GLFW_INCLUDE_NONE
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(${PROJECT_NAME}-core PRIVATE
     raylib
     nlohmann_json::nlohmann_json
     box2d::box2d
 )
 
 if(APPLE)
-    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
+    target_link_libraries(${PROJECT_NAME}-core PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
 elseif(UNIX)
-    target_link_libraries(${PROJECT_NAME} PRIVATE m pthread dl X11)
+    target_link_libraries(${PROJECT_NAME}-core PRIVATE m pthread dl X11)
 elseif(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE winmm)
+    target_link_libraries(${PROJECT_NAME}-core PRIVATE winmm)
 endif()
 
 if(WIN32 AND NOT MINGW AND CMAKE_CXX_COMPILER_LINKER_ID STREQUAL "LLD")
-    target_link_options(${PROJECT_NAME} PRIVATE "LINKER:-lldmingw")
+    target_link_options(${PROJECT_NAME}-core INTERFACE "LINKER:-lldmingw")
     foreach(dir $ENV{LIB})
-        target_link_options(${PROJECT_NAME} PRIVATE "LINKER:/libpath:${dir}")
+        target_link_options(${PROJECT_NAME}-core INTERFACE "LINKER:/libpath:${dir}")
     endforeach()
 endif()
 
+install(FILES
+    "$<TARGET_FILE:${PROJECT_NAME}-core>"
+    "$<TARGET_FILE:raylib>"
+    "$<TARGET_FILE:box2d>"
+    DESTINATION lib
+    COMPONENT core
+)
+install(FILES include/pros/api.h include/compat/newlib_compat.h
+    DESTINATION include
+    COMPONENT core
+)
+install(DIRECTORY include/pros/pros
+    DESTINATION include
+    COMPONENT core
+)
+
 if(NOT BROMINE_SIM_PROJECT)
-    message(FATAL_ERROR "${PROJECT_NAME}: set BROMINE_SIM_PROJECT to the PROS project to simulate")
+    message(STATUS "${PROJECT_NAME}: BROMINE_SIM_PROJECT not set, building ${PROJECT_NAME}-core only")
+    return()
 endif()
 
 get_filename_component(USER_PROJECT_DIR "${BROMINE_SIM_PROJECT}" REALPATH)
@@ -194,6 +211,14 @@ if(NOT EXISTS "${USER_PROJECT_DIR}/project.pros")
 endif()
 
 message(STATUS "${PROJECT_NAME}: simulating ${USER_PROJECT_DIR}")
+
+add_executable(${PROJECT_NAME})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    "$<LINK_LIBRARY:WHOLE_ARCHIVE,${PROJECT_NAME}-core>"
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE include/pros)
 
 set(PROS_BUILD_INFO_C "${CMAKE_CURRENT_BINARY_DIR}/pros_build_info.c")
 
