@@ -71,6 +71,3 @@ Testing/
 # editors
 .vs
 .vscode
-
-src/user
-include/user

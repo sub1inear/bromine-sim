@@ -7,36 +7,35 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+set(BROMINE_SIM_PROJECT "" CACHE PATH "PROS project to simulate")
+
 include(FetchContent)
+
 FetchContent_Declare(
     raylib
     GIT_REPOSITORY https://github.com/raysan5/raylib.git
-    GIT_TAG 5.5
+    GIT_TAG        5.5
 )
-
-set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
-FetchContent_MakeAvailable(raylib)
-unset(CMAKE_POLICY_VERSION_MINIMUM)
-
 FetchContent_Declare(
     json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG v3.12.0
+    GIT_TAG        v3.12.0
 )
-FetchContent_MakeAvailable(json)
-
 FetchContent_Declare(
     box2d
     GIT_REPOSITORY https://github.com/erincatto/box2d
     GIT_TAG        v3.1.1
 )
 
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BOX2D_BUILD_TESTS OFF CACHE INTERNAL "")
 set(BOX2D_BUILD_SAMPLES OFF CACHE INTERNAL "")
 
-FetchContent_MakeAvailable(box2d)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.10)
+FetchContent_MakeAvailable(raylib)
+unset(CMAKE_POLICY_VERSION_MINIMUM)
+
+FetchContent_MakeAvailable(json box2d)
 
 add_executable(${PROJECT_NAME}
     src/sim/cup.cpp
@@ -147,27 +146,33 @@ set_source_files_properties(src/sim/renderer.cpp PROPERTIES
     COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:Clang,AppleClang>:-Wno-c23-extensions>"
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE include)
-target_include_directories(${PROJECT_NAME} PRIVATE include/sim)
-target_include_directories(${PROJECT_NAME} PRIVATE include/pros)
-target_include_directories(${PROJECT_NAME} PRIVATE include/sdk)
-target_include_directories(${PROJECT_NAME} PRIVATE include/pros/rtos)
-target_include_directories(${PROJECT_NAME} PRIVATE include/pros/rtos/${PROS_PORT_NAME})
+target_include_directories(${PROJECT_NAME} PRIVATE
+    include
+    include/sim
+    include/pros
+    include/sdk
+    include/pros/rtos
+    include/pros/rtos/${PROS_PORT_NAME}
+    ${raylib_SOURCE_DIR}/src/external/glfw/include
+)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${raylib_SOURCE_DIR}/src/external/glfw/include)
-target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    BROMINE_SIM=1
+    BROMINE_SIM_PROJECT_NAME="${PROJECT_NAME}"
+    GLFW_INCLUDE_NONE
+)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
-target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(${PROJECT_NAME} PRIVATE box2d::box2d)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    raylib
+    nlohmann_json::nlohmann_json
+    box2d::box2d
+)
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework IOKit" "-framework Cocoa" "-framework OpenGL")
-elseif(UNIX AND NOT APPLE)
+elseif(UNIX)
     target_link_libraries(${PROJECT_NAME} PRIVATE m pthread dl X11)
-endif()
-
-if(WIN32)
+elseif(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE winmm)
 endif()
 
@@ -199,11 +204,6 @@ add_dependencies(${PROJECT_NAME} pros_build_info)
 set_source_files_properties("${PROS_BUILD_INFO_C}" PROPERTIES GENERATED TRUE)
 target_sources(${PROJECT_NAME} PRIVATE "${PROS_BUILD_INFO_C}")
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    BROMINE_SIM=1
-    BROMINE_SIM_PROJECT_NAME="${PROJECT_NAME}"
-)
-
 set(PROS_PUBLIC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/pros_public_include")
 
 file(GLOB PROS_PUBLIC_HEADERS CONFIGURE_DEPENDS
@@ -217,24 +217,34 @@ foreach(header ${PROS_PUBLIC_HEADERS})
     configure_file(cmake/forward_header.h.in "${PROS_PUBLIC_INCLUDE_DIR}/${header}" @ONLY)
 endforeach()
 
-set(USER_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/user")
-set(USER_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/user/include")
+if(NOT BROMINE_SIM_PROJECT)
+    message(FATAL_ERROR "${PROJECT_NAME}: set BROMINE_SIM_PROJECT to the PROS project to simulate")
+endif()
 
-file(GLOB_RECURSE USER_SOURCE_PATHS CONFIGURE_DEPENDS FOLLOW_SYMLINKS
-    RELATIVE "${USER_SOURCE_DIR}"
-    "${USER_SOURCE_DIR}/*.cpp"
-    "${USER_SOURCE_DIR}/*.c"
+set(USER_PROJECT_DIR "${BROMINE_SIM_PROJECT}")
+
+if(NOT EXISTS "${USER_PROJECT_DIR}/project.pros")
+    message(FATAL_ERROR "${PROJECT_NAME}: no PROS project found at ${USER_PROJECT_DIR}")
+endif()
+
+message(STATUS "${PROJECT_NAME}: simulating ${USER_PROJECT_DIR}")
+
+set(USER_PROJECT_SOURCE_DIR "${USER_PROJECT_DIR}/src")
+set(USER_INCLUDE_DIR "${USER_PROJECT_DIR}/include")
+
+set(USER_PROJECT_CPP "${CMAKE_CURRENT_BINARY_DIR}/project.cpp")
+configure_file(cmake/project.cpp.in "${USER_PROJECT_CPP}" @ONLY)
+
+set(USER_SOURCES "${USER_PROJECT_CPP}")
+
+file(GLOB_RECURSE USER_PROJECT_SOURCE_PATHS CONFIGURE_DEPENDS FOLLOW_SYMLINKS
+    RELATIVE "${USER_PROJECT_SOURCE_DIR}"
+    "${USER_PROJECT_SOURCE_DIR}/*.cpp"
+    "${USER_PROJECT_SOURCE_DIR}/*.c"
 )
-
-set(USER_SOURCES "")
-foreach(path ${USER_SOURCE_PATHS})
-    if(path MATCHES "^src/(.*)$" OR path MATCHES "^[^/]+/src/(.*)$")
-        get_filename_component(dir "${CMAKE_MATCH_1}" DIRECTORY)
-    else()
-        continue()
-    endif()
-
-    set(source "${USER_SOURCE_DIR}/${path}")
+foreach(path ${USER_PROJECT_SOURCE_PATHS})
+    get_filename_component(dir "${path}" DIRECTORY)
+    set(source "${USER_PROJECT_SOURCE_DIR}/${path}")
     set_source_files_properties("${source}" PROPERTIES
         COMPILE_OPTIONS "-iquote;${USER_INCLUDE_DIR}/${dir}"
     )
@@ -245,12 +255,12 @@ add_library(${PROJECT_NAME}-user OBJECT ${USER_SOURCES})
 
 target_include_directories(${PROJECT_NAME}-user PRIVATE
     "${PROS_PUBLIC_INCLUDE_DIR}"
-    include/user/include
+    "${USER_INCLUDE_DIR}"
 )
 
 target_compile_definitions(${PROJECT_NAME}-user PRIVATE
     BROMINE_SIM=1
-    FMT_CONSTEVAL= # fmt library portability hack
+    FMT_CONSTEVAL=
 )
 
 set(NEWLIB_COMPAT_H "${CMAKE_CURRENT_SOURCE_DIR}/include/compat/newlib_compat.h")
@@ -265,7 +275,7 @@ if(EXISTS "${USER_INCLUDE_DIR}/liblvgl/llemu.hpp")
     FetchContent_Declare(
         liblvgl
         GIT_REPOSITORY https://github.com/purduesigbots/liblvgl.git
-        GIT_TAG        4b6f16e8baf592511ad7618547ade755858fc79b # update/9.2.0, no release tag
+        GIT_TAG        4b6f16e8baf592511ad7618547ade755858fc79b
         PATCH_COMMAND  "${CMAKE_COMMAND}"
                        -DLIBLVGL_SOURCE_DIR=<SOURCE_DIR>
                        -DLIBLVGL_PATCH_HASH=${LIBLVGL_PATCH_HASH}
@@ -307,5 +317,3 @@ if(EXISTS "${USER_INCLUDE_DIR}/liblvgl/llemu.hpp")
         _PROS_INCLUDE_LIBLVGL_LLEMU_HPP
     )
 endif()
-
-# TODO: Have scripts/setup.py generate a config.cmake for library-specific shims.

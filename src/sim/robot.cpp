@@ -4,19 +4,24 @@
 #include "distance.hpp"
 #include "imu.hpp"
 #include "motor.hpp"
+#include "project.hpp"
 #include "rotation.hpp"
 #include "utils.hpp"
 #include "wheel.hpp"
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <print>
+#include <raylib.h>
 
 namespace bromine
 {
 
 Robot::Robot(b2WorldId worldId) : wheelCount(0)
 {
-    std::ifstream file("assets/robot.json");
+    std::filesystem::path path = bromine::projectPath() / "robot.json";
+
+    std::ifstream file(path.string());
     json j;
     try
     {
