@@ -1,0 +1,40 @@
+name: Release Workflow
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+      - name: Build Project
+        uses: threeal/cmake-action@v2
+        with:
+          generator: Ninja
+          c-compiler: clang
+          cxx-compiler: clang++
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bromine-sim-${{ matrix.os }}
+          path: build/bromine-sim
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files:
+          tag_name: ${{ github.ref_name }}
+          body: "bromine-sim automated core release of ${{ github.ref_name }} for the bromine-sim extension."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
