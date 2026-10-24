@@ -40,13 +40,11 @@ jobs:
         uses: mlugg/setup-zig@v2
         with:
           version: "0.14.0"
-      - name: Add Zig Environment Variables
-        shell: bash
-        run: |
-          CC="zig cc"
-          CXX="zig c++"
       - name: Build Project
         uses: threeal/cmake-action@v2
+        env:
+          CC: zig cc
+          CXX: zig c++
         with:
           generator: Ninja
       - name: Install Distributables
