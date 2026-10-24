@@ -36,16 +36,16 @@ jobs:
             libglu1-mesa-dev \
             libwayland-dev \
             libxkbcommon-dev
-      - name: Install LLVM and Clang
-        uses: KyleMayes/install-llvm-action@v2
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
         with:
-          version: "21.1.8"
+          version: "0.14.0"
       - name: Build Project
         uses: threeal/cmake-action@v2
         with:
           generator: Ninja
-          c-compiler: clang
-          cxx-compiler: clang++
+          c-compiler: "zig;cc"
+          cxx-compiler: "zig;c++"
       - name: Install Distributables
         run: cmake --install build --prefix dist --component core
       - name: Upload Artifact
