@@ -10,13 +10,13 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            platform-name: linux
+            platform-name: windows
             arch: x64
           - os: macos-latest
             platform-name: macos
             arch: arm64
           - os: ubuntu-latest
-            platform-name: ubuntu
+            platform-name: linux
             arch: x64
     steps:
       - name: Checkout project
