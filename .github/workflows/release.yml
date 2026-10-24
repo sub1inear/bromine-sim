@@ -40,14 +40,18 @@ jobs:
         uses: mlugg/setup-zig@v2
         with:
           version: "0.14.0"
+      - name: Add Zig Shell Commands
+        shell: bash
+        run: |
+          printf '#!/bin/sh\nexec zig cc "$@"\n' > zig-cc
+          printf '#!/bin/sh\nexec zig c++ "$@"\n' > zig-c++
+          chmod +x zig-cc zig-c++
       - name: Build Project
         uses: threeal/cmake-action@v2
         with:
           generator: Ninja
-          c-compiler: zig
-          cxx-compiler: zig
-          c-flags: cc
-          cxx-flags: c++
+          c-compiler: zig-cc
+          cxx-compiler: zig-c++
       - name: Install Distributables
         run: cmake --install build --prefix dist --component core
       - name: Upload Artifact
