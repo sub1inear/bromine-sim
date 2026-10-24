@@ -62,12 +62,15 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
-      - name: List files for debugging
-        run: ls -la
+      - name: Archive Artifacts
+        run: |
+          zip -r bromine-sim-windows-x64.zip bromine-sim-windows-x64
+          tar -czf bromine-sim-macos-arm64.tar.gz bromine-sim-macos-arm64
+          tar -czf bromine-sim-linux-x64.tar.gz bromine-sim-linux-x64
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: bromine-sim-*/**
+          files: bromine-sim-windows-x64.zip bromine-sim-macos-arm64.tar.gz bromine-sim-linux-x64.tar.gz
           tag_name: ${{ github.ref_name }}
           body: "Automated core release of ${{ github.ref_name }} for the bromine-sim extension."
         env:
