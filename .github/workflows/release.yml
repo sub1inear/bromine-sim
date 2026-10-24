@@ -31,7 +31,7 @@ jobs:
         if: matrix.os != 'macos-latest'
         uses: KyleMayes/install-llvm-action@v2
         with:
-          version: "19.0"
+          version: "19.0.0"
       - name: Install LLVM and Clang
         if: matrix.os == 'macos-latest'
         uses: KyleMayes/install-llvm-action@v2
