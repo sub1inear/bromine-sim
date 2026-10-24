@@ -12,15 +12,12 @@ jobs:
           - os: windows-latest
             platform-name: windows
             arch: x64
-            args:
           - os: macos-latest
             platform-name: macos
             arch: arm64
-            args:
           - os: ubuntu-latest
             platform-name: linux
             arch: x64
-            args: -target x86_64-linux-gnu.2.31
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
@@ -50,8 +47,6 @@ jobs:
           CXX: zig c++
         with:
           generator: Ninja
-          c-flags: '"${{ matrix.args }}"'
-          cxx-flags: '"${{ matrix.args }}"'
           args: -DCMAKE_BUILD_TYPE=Release
       - name: Install Distributables
         run: cmake --install build --prefix dist --component core
