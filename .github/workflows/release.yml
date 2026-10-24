@@ -8,7 +8,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            platform-name: linux
+            arch: x64
+          - os: macos-latest
+            platform-name: macos
+            arch: arm64
+          - os: ubuntu-latest
+            platform-name: ubuntu
+            arch: x64
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
@@ -42,7 +51,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bromine-sim-${{ matrix.os }}
+          name: bromine-sim-${{ matrix.os }}-${{ matrix.arch }}
           path: dist
 
   release:
@@ -56,7 +65,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          files: bromine-sim-*
           tag_name: ${{ github.ref_name }}
-          body: "bromine-sim automated core release of ${{ github.ref_name }} for the bromine-sim extension."
+          body: "Automated core release of ${{ github.ref_name }} for the bromine-sim extension."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
