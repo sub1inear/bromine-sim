@@ -15,8 +15,8 @@ jobs:
       - name: Install X11 (Ubuntu-only)
         if: matrix.os == 'ubuntu-latest'
         run: |
-            sudo apt-get update
-            sudo apt-get install -y libx11-dev
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxrandr-dev
       - name: Build Project
         uses: threeal/cmake-action@v2
         with:
@@ -42,4 +42,3 @@ jobs:
           body: "bromine-sim automated core release of ${{ github.ref_name }} for the bromine-sim extension."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
