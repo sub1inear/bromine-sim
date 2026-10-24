@@ -56,7 +56,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files:
           tag_name: ${{ github.ref_name }}
           body: "bromine-sim automated core release of ${{ github.ref_name }} for the bromine-sim extension."
         env:
