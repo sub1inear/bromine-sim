@@ -28,7 +28,6 @@ jobs:
             libwayland-dev \
             libxkbcommon-dev
       - name: Install LLVM and Clang
-        if: matrix.os == 'macos-latest'
         uses: KyleMayes/install-llvm-action@v2
         with:
           version: "21.1.8"
