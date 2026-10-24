@@ -50,8 +50,8 @@ jobs:
           CXX: zig c++
         with:
           generator: Ninja
-          c-flags: "${{ matrix.args }}"
-          cxx-flags: "${{ matrix.args }}"
+          c-flags: '"${{ matrix.args }}"'
+          cxx-flags: '"${{ matrix.args }}"'
           args: -DCMAKE_BUILD_TYPE=Release
       - name: Install Distributables
         run: cmake --install build --prefix dist --component core
