@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
+      - name: Install X11 (Ubuntu-only)
+        if: matrix.os == 'ubuntu-latest'
+        uses: sudo apt install libx11-dev
       - name: Build Project
         uses: threeal/cmake-action@v2
         with:
