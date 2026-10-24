@@ -12,11 +12,21 @@ jobs:
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
-      - name: Install X11 (Ubuntu-only)
+      - name: Install dependencies
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxrandr-dev
+          sudo apt-get install -y \
+            libasound2-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxi-dev \
+            libxcursor-dev \
+            libxinerama-dev \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            libwayland-dev \
+            libxkbcommon-dev
       - name: Build Project
         uses: threeal/cmake-action@v2
         with:
