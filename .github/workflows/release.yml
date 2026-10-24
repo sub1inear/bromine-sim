@@ -70,7 +70,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: bromine-sim-windows-x64.zip bromine-sim-macos-arm64.tar.gz bromine-sim-linux-x64.tar.gz
+          files: |
+            bromine-sim-*.zip
+            bromine-sim-*.tar.gz
           tag_name: ${{ github.ref_name }}
           body: "Automated core release of ${{ github.ref_name }} for the bromine-sim extension."
         env:
