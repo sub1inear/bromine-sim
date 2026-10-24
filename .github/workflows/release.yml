@@ -27,6 +27,10 @@ jobs:
             libglu1-mesa-dev \
             libwayland-dev \
             libxkbcommon-dev
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "19.0"
       - name: Build Project
         uses: threeal/cmake-action@v2
         with:
