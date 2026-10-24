@@ -44,8 +44,10 @@ jobs:
         uses: threeal/cmake-action@v2
         with:
           generator: Ninja
-          c-compiler: "zig;cc"
-          cxx-compiler: "zig;c++"
+          c-compiler: zig
+          cxx-compiler: zig
+          c-flags: cc
+          cxx-flags: c++
       - name: Install Distributables
         run: cmake --install build --prefix dist --component core
       - name: Upload Artifact
