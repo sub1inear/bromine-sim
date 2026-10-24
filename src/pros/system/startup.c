@@ -19,7 +19,6 @@
 #include "v5_api.h"
 
 extern void rtos_initialize();
-extern void vfs_initialize();
 extern void system_daemon_initialize();
 extern void graphical_context_daemon_initialize(void);
 extern __attribute__((weak)) void display_initialize(void) {}
@@ -39,8 +38,6 @@ __attribute__((constructor(102))) static void pros_init(void) {
 	_boot();
 
 	rtos_initialize();
-
-	vfs_initialize();
 
 	vdml_initialize();
 

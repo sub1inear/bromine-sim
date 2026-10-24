@@ -757,7 +757,7 @@ int32_t serctl(const uint32_t action, void* const extra_arg);
  * }
  * \endcode
  */
-int32_t fdctl(int file, const uint32_t action, void* const extra_arg);
+inline int32_t fdctl(int file, const uint32_t action, void* const extra_arg) { return 0; }
 
 /**
  * Sets the reverse flag for the motor.

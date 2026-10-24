@@ -43,12 +43,9 @@ char task_names[4][32] = {"User Operator Control (PROS)", "User Autonomous (PROS
                           "User Comp. Init. (PROS)"};
 task_fn_t task_fns[4] = {_opcontrol_task, _autonomous_task, _disabled_task, _competition_initialize_task};
 
-extern void ser_output_flush(void);
-
 // does the basic background operations that need to occur every 2ms
 static inline void do_background_operations() {
 	port_mutex_take_all();
-	ser_output_flush();
 	rtos_suspend_all();
 	vexBackgroundProcessing();
 	rtos_resume_all();

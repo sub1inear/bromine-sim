@@ -117,12 +117,6 @@ add_library(${PROJECT_NAME}-core STATIC
     src/pros/system/unwind.c
     src/pros/system/user_functions.c
     src/pros/system/cpp_support.cpp
-    src/pros/system/dev/dev_driver.c
-    src/pros/system/dev/file_system_stubs.c
-    src/pros/system/dev/ser_daemon.c
-    src/pros/system/dev/ser_driver.c
-    src/pros/system/dev/usd_driver.c
-    src/pros/system/dev/vfs.c
     src/sdk/v5_api.cpp
     src/sdk/v5_apiuser.cpp
 )
