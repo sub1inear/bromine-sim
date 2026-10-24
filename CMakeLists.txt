@@ -177,8 +177,68 @@ if(WIN32 AND NOT MINGW AND CMAKE_CXX_COMPILER_LINKER_ID STREQUAL "LLD")
     endforeach()
 endif()
 
+set(PROS_PUBLIC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/pros_public_include")
+
+file(GLOB PROS_PUBLIC_HEADERS CONFIGURE_DEPENDS
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include/pros"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/api.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/pros/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/pros/*.hpp"
+)
+foreach(header ${PROS_PUBLIC_HEADERS})
+    set(FORWARD_HEADER_TARGET "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/${header}")
+    configure_file(cmake/forward_header.h.in "${PROS_PUBLIC_INCLUDE_DIR}/${header}" @ONLY)
+endforeach()
+
+set(LIBLVGL_PATCH_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_liblvgl.cmake")
+file(SHA256 "${LIBLVGL_PATCH_SCRIPT}" LIBLVGL_PATCH_HASH)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${LIBLVGL_PATCH_SCRIPT}")
+
+FetchContent_Declare(
+    liblvgl
+    GIT_REPOSITORY https://github.com/purduesigbots/liblvgl.git
+    GIT_TAG        4b6f16e8baf592511ad7618547ade755858fc79b
+    PATCH_COMMAND  "${CMAKE_COMMAND}"
+                   -DLIBLVGL_SOURCE_DIR=<SOURCE_DIR>
+                   -DLIBLVGL_PATCH_HASH=${LIBLVGL_PATCH_HASH}
+                   -P "${LIBLVGL_PATCH_SCRIPT}"
+)
+FetchContent_MakeAvailable(liblvgl)
+
+file(GLOB_RECURSE LIBLVGL_SOURCES CONFIGURE_DEPENDS
+    "${liblvgl_SOURCE_DIR}/src/liblvgl/*.c"
+    "${liblvgl_SOURCE_DIR}/src/liblvgl/*.cpp"
+)
+
+foreach(source ${LIBLVGL_SOURCES})
+    file(RELATIVE_PATH path "${liblvgl_SOURCE_DIR}/src" "${source}")
+    get_filename_component(dir "${path}" DIRECTORY)
+    set_source_files_properties("${source}" PROPERTIES
+        COMPILE_OPTIONS "-iquote;${liblvgl_SOURCE_DIR}/include/${dir}"
+    )
+endforeach()
+
+if(WIN32)
+    set_property(SOURCE "${liblvgl_SOURCE_DIR}/src/liblvgl/libs/fsdrv/lv_fs_stdio.c"
+        APPEND PROPERTY COMPILE_DEFINITIONS WIN32)
+endif()
+
+# Must be linked as a whole archive: display.c overrides the weak
+# display_initialize() in core, which a normal archive link would not pull in.
+add_library(${PROJECT_NAME}-lvgl STATIC ${LIBLVGL_SOURCES})
+set_target_properties(${PROJECT_NAME}-lvgl PROPERTIES OUTPUT_NAME lvgl)
+
+target_include_directories(${PROJECT_NAME}-lvgl PRIVATE
+    "${PROS_PUBLIC_INCLUDE_DIR}"
+    "${liblvgl_SOURCE_DIR}/include"
+    "${liblvgl_SOURCE_DIR}/include/liblvgl"
+)
+
+target_compile_definitions(${PROJECT_NAME}-lvgl PRIVATE BROMINE_SIM=1)
+
 install(FILES
     "$<TARGET_FILE:${PROJECT_NAME}-core>"
+    "$<TARGET_FILE:${PROJECT_NAME}-lvgl>"
     "$<TARGET_FILE:raylib>"
     "$<TARGET_FILE:box2d>"
     DESTINATION lib
@@ -235,19 +295,6 @@ add_dependencies(${PROJECT_NAME} pros_build_info)
 set_source_files_properties("${PROS_BUILD_INFO_C}" PROPERTIES GENERATED TRUE)
 target_sources(${PROJECT_NAME} PRIVATE "${PROS_BUILD_INFO_C}")
 
-set(PROS_PUBLIC_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/pros_public_include")
-
-file(GLOB PROS_PUBLIC_HEADERS CONFIGURE_DEPENDS
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/include/pros"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/api.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/pros/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/pros/*.hpp"
-)
-foreach(header ${PROS_PUBLIC_HEADERS})
-    set(FORWARD_HEADER_TARGET "${CMAKE_CURRENT_SOURCE_DIR}/include/pros/${header}")
-    configure_file(cmake/forward_header.h.in "${PROS_PUBLIC_INCLUDE_DIR}/${header}" @ONLY)
-endforeach()
-
 set(USER_PROJECT_SOURCE_DIR "${USER_PROJECT_DIR}/src")
 set(USER_INCLUDE_DIR "${USER_PROJECT_DIR}/include")
 
@@ -287,49 +334,9 @@ target_compile_options(${PROJECT_NAME}-user PRIVATE -include "${NEWLIB_COMPAT_H}
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-user)
 
 if(EXISTS "${USER_INCLUDE_DIR}/liblvgl/llemu.hpp")
-    set(LIBLVGL_PATCH_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_liblvgl.cmake")
-    file(SHA256 "${LIBLVGL_PATCH_SCRIPT}" LIBLVGL_PATCH_HASH)
-    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${LIBLVGL_PATCH_SCRIPT}")
-
-    FetchContent_Declare(
-        liblvgl
-        GIT_REPOSITORY https://github.com/purduesigbots/liblvgl.git
-        GIT_TAG        4b6f16e8baf592511ad7618547ade755858fc79b
-        PATCH_COMMAND  "${CMAKE_COMMAND}"
-                       -DLIBLVGL_SOURCE_DIR=<SOURCE_DIR>
-                       -DLIBLVGL_PATCH_HASH=${LIBLVGL_PATCH_HASH}
-                       -P "${LIBLVGL_PATCH_SCRIPT}"
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        "$<LINK_LIBRARY:WHOLE_ARCHIVE,${PROJECT_NAME}-lvgl>"
     )
-    FetchContent_MakeAvailable(liblvgl)
-
-    file(GLOB_RECURSE LIBLVGL_SOURCES CONFIGURE_DEPENDS
-        "${liblvgl_SOURCE_DIR}/src/liblvgl/*.c"
-        "${liblvgl_SOURCE_DIR}/src/liblvgl/*.cpp"
-    )
-
-    foreach(source ${LIBLVGL_SOURCES})
-        file(RELATIVE_PATH path "${liblvgl_SOURCE_DIR}/src" "${source}")
-        get_filename_component(dir "${path}" DIRECTORY)
-        set_source_files_properties("${source}" PROPERTIES
-            COMPILE_OPTIONS "-iquote;${liblvgl_SOURCE_DIR}/include/${dir}"
-        )
-    endforeach()
-
-    if(WIN32)
-        set_property(SOURCE "${liblvgl_SOURCE_DIR}/src/liblvgl/libs/fsdrv/lv_fs_stdio.c"
-            APPEND PROPERTY COMPILE_DEFINITIONS WIN32)
-    endif()
-
-    add_library(${PROJECT_NAME}-lvgl OBJECT ${LIBLVGL_SOURCES})
-
-    target_include_directories(${PROJECT_NAME}-lvgl PRIVATE
-        "${PROS_PUBLIC_INCLUDE_DIR}"
-        "${liblvgl_SOURCE_DIR}/include"
-        "${liblvgl_SOURCE_DIR}/include/liblvgl"
-    )
-
-    target_compile_definitions(${PROJECT_NAME}-lvgl PRIVATE BROMINE_SIM=1)
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}-lvgl)
 
     target_compile_definitions(${PROJECT_NAME}-user PRIVATE
         _PROS_INCLUDE_LIBLVGL_LLEMU_H
