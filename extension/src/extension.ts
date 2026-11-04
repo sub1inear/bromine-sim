@@ -159,7 +159,7 @@ async function installTool(name: string, url: string, installDir: string): Promi
 async function installDependencies(context: vscode.ExtensionContext): Promise<boolean> {
 	const globalStoragePath = context.globalStorageUri.fsPath;
 	const installed = await Promise.all([
-		installTool('Zig', getZigUrl('0.17.1'), path.join(globalStoragePath, 'zig')),
+		installTool('Zig', getZigUrl('0.17.0'), path.join(globalStoragePath, 'zig')),
 		installTool('Ninja', getNinjaUrl('1.13.2'), path.join(globalStoragePath, 'ninja')),
 	]);
 	return installed.every(Boolean);
