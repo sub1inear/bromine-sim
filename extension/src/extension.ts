@@ -5,10 +5,8 @@ import axios from 'axios';
 import * as path from 'path';
 import * as fflate from 'fflate';
 import { pipeline } from 'stream/promises';
-import { execFile } from 'child_process';
-import { promisify } from 'util';
-
-const execFileAsync = promisify(execFile);
+import { spawn } from 'child_process';
+import { once } from 'events';
 
 type ProgressReporter = (percent: number, message: string) => void;
 
@@ -91,12 +89,26 @@ async function extractZip(filePath: string, outputPath: string, onProgress: Prog
 	await flush();
 }
 
+async function extractTar(filePath: string, outputPath: string, onProgress: ProgressReporter): Promise<void> {
+	const total = (await fs.promises.stat(filePath)).size;
+	let read = 0;
+	const tar = spawn('tar', [filePath.endsWith('.xz') ? '-xJf' : '-xzf', '-', '-C', outputPath], { stdio: ['pipe', 'ignore', 'inherit'] });
+	const input = fs.createReadStream(filePath);
+	input.on('data', chunk => {
+		read += chunk.length;
+		onProgress(read / total * 100, `Extracting ${path.basename(filePath)}`);
+	});
+	const [[code]] = await Promise.all([once(tar, 'close'), pipeline(input, tar.stdin)]);
+	if (code !== 0) {
+		throw new Error(`Extracting ${path.basename(filePath)} failed with exit code ${code}`);
+	}
+}
+
 async function extractArchive(filePath: string, outputPath: string, onProgress: ProgressReporter): Promise<void> {
 	if (filePath.endsWith('.zip')) {
 		await extractZip(filePath, outputPath, onProgress);
-	} else if (filePath.endsWith('.tar.xz')) {
-		onProgress(0, `Extracting ${path.basename(filePath)}`);
-		await execFileAsync('tar', ['-xJf', filePath, '-C', outputPath]);
+	} else if (/\.tar\.(gz|xz)$/.test(filePath)) {
+		await extractTar(filePath, outputPath, onProgress);
 	} else {
 		throw new Error(`Unsupported archive format: ${filePath}`);
 	}
