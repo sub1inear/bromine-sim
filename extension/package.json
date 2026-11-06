@@ -51,7 +51,13 @@
           "when": "bromine-sim.hasProject"
         }
       ]
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "**/robot.json",
+        "url": "./schemas/robot.schema.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
