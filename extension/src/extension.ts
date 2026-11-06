@@ -235,8 +235,41 @@ async function getBromineSimCoreUrl(installDir: string): Promise<string> {
 	}
 }
 
+async function findProjects(): Promise<string[]> {
+	const files = await vscode.workspace.findFiles('**/project.pros', '**/{node_modules,.bromine-sim}/**');
+	return files.map(file => path.dirname(file.fsPath)).sort();
+}
+
+async function pickProject(): Promise<string | undefined> {
+	const projects = await findProjects();
+	if (projects.length <= 1) {
+		if (!projects.length) {
+			vscode.window.showErrorMessage('No PROS project (project.pros) found in this workspace.');
+		}
+		return projects[0];
+	}
+	const picked = await vscode.window.showQuickPick(
+		projects.map(project => ({ label: vscode.workspace.asRelativePath(project), project })),
+		{ placeHolder: 'Select a PROS project to simulate' }
+	);
+	return picked?.project;
+}
+
 export function activate(context: vscode.ExtensionContext) {
-	const disposable = vscode.commands.registerCommand('bromine-sim.run', async () => {
+	const updateProjects = async () => {
+		const hasProject = (await findProjects()).length > 0;
+		await vscode.commands.executeCommand('setContext', 'bromine-sim.hasProject', hasProject);
+	};
+
+	const watcher = vscode.workspace.createFileSystemWatcher('**/project.pros', false, true, false);
+	watcher.onDidCreate(updateProjects);
+	watcher.onDidDelete(updateProjects);
+
+	const run = vscode.commands.registerCommand('bromine-sim.run', async () => {
+		const project = await pickProject();
+		if (!project) {
+			return;
+		}
 		try {
 			if (!await ensureDependencies(context)) {
 				return;
@@ -247,7 +280,12 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(
+		watcher,
+		run,
+		vscode.workspace.onDidChangeWorkspaceFolders(updateProjects),
+	);
+	updateProjects();
 }
 
 export function deactivate() { }

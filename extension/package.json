@@ -9,15 +9,34 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "workspaceContains:**/project.pros"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "bromine-sim.run",
-        "title": "Bromine Sim: Run"
+        "title": "Run Sim",
+        "category": "Bromine Sim",
+        "enablement": "bromine-sim.hasProject"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "bromine-sim.run",
+          "when": "bromine-sim.hasProject",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "bromine-sim.run",
+          "when": "bromine-sim.hasProject"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
