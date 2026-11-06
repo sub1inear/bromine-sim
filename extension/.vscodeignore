@@ -1,5 +1,4 @@
 .vscode/**
-.vscode-test/**
 out/**
 node_modules/**
 src/**
@@ -11,4 +10,3 @@ vsc-extension-quickstart.md
 **/eslint.config.mjs
 **/*.map
 **/*.ts
-**/.vscode-test.*
