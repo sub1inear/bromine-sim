@@ -7,6 +7,8 @@ import * as fflate from 'fflate';
 import { pipeline } from 'stream/promises';
 import { spawn } from 'child_process';
 import { once } from 'events';
+import { writeBuildFiles } from './build';
+import { getTemplateSourceUrl, readTemplates } from './templates';
 
 type ProgressReporter = (percent: number, message: string) => void;
 
@@ -168,16 +170,68 @@ async function installTool(name: string, url: string, installDir: string): Promi
 	);
 }
 
-async function installDependencies(context: vscode.ExtensionContext): Promise<boolean> {
+function getToolPaths(context: vscode.ExtensionContext) {
 	const globalStoragePath = context.globalStorageUri.fsPath;
-	const coreDir = path.join(globalStoragePath, 'bromine-sim-core');
+	const exe = process.platform === 'win32' ? '.exe' : '';
+	const zigDir = path.join(globalStoragePath, 'zig');
+	const ninjaDir = path.join(globalStoragePath, 'ninja');
+	return {
+		zigDir,
+		ninjaDir,
+		coreDir: path.join(globalStoragePath, 'bromine-sim-core'),
+		templatesDir: path.join(globalStoragePath, 'templates'),
+		zig: path.join(zigDir, `zig${exe}`),
+		ninja: path.join(ninjaDir, `ninja${exe}`),
+	};
+}
+
+async function installDependencies(context: vscode.ExtensionContext): Promise<boolean> {
+	const { zigDir, ninjaDir, coreDir } = getToolPaths(context);
 	const installed = await Promise.all([
-		installTool('Zig', getZigUrl('0.17.0'), path.join(globalStoragePath, 'zig')),
-		installTool('Ninja', getNinjaUrl('1.13.2'), path.join(globalStoragePath, 'ninja')),
+		installTool('Zig', getZigUrl('0.17.0'), zigDir),
+		installTool('Ninja', getNinjaUrl('1.13.2'), ninjaDir),
 		installTool('Bromine Sim Core', await getBromineSimCoreUrl(coreDir), coreDir),
 	]);
 	return installed.every(Boolean);
 }
+
+async function installTemplates(context: vscode.ExtensionContext, project: string): Promise<{ name: string; dir: string }[] | undefined> {
+	const dirs = [];
+	for (const template of await readTemplates(project)) {
+		const id = `${template.name}@${template.version}`;
+		const dir = path.join(getToolPaths(context).templatesDir, id);
+		if (!fs.existsSync(path.join(dir, '.installed')) && !await installTool(id, await getTemplateSourceUrl(template), dir)) {
+			return undefined;
+		}
+		dirs.push({ name: template.name, dir });
+	}
+	return dirs;
+}
+
+async function runBuild(project: string, ninja: string, buildDir: string): Promise<number | undefined> {
+	const folder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(project)) ?? vscode.TaskScope.Workspace;
+	const task = new vscode.Task(
+		{ type: 'bromine-sim' }, folder, 'Build Sim', 'bromine-sim',
+		new vscode.ProcessExecution(ninja, ['-C', buildDir]),
+		[]
+	);
+	task.presentationOptions = { clear: true };
+	let execution: vscode.TaskExecution | undefined;
+	return new Promise((resolve, reject) => {
+		const listener = vscode.tasks.onDidEndTaskProcess(event => {
+			if (event.execution === execution) {
+				listener.dispose();
+				resolve(event.exitCode);
+			}
+		});
+		vscode.tasks.executeTask(task).then(result => execution = result, error => {
+			listener.dispose();
+			reject(error);
+		});
+	});
+}
+
+let simTerminal: vscode.Terminal | undefined;
 
 let installing: Promise<boolean> | undefined;
 
@@ -266,6 +320,10 @@ export function activate(context: vscode.ExtensionContext) {
 	watcher.onDidDelete(updateProjects);
 
 	const run = vscode.commands.registerCommand('bromine-sim.run', async () => {
+		if (!context.storageUri) {
+			vscode.window.showErrorMessage('Open a folder to run the simulator.');
+			return;
+		}
 		const project = await pickProject();
 		if (!project) {
 			return;
@@ -278,12 +336,35 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage(`Failed to install dependencies: ${(error as Error).message}`);
 			return;
 		}
+
+		try {
+			const templateDirs = await installTemplates(context, project);
+			if (!templateDirs) {
+				return;
+			}
+			const { zig, ninja, coreDir } = getToolPaths(context);
+			const buildDir = path.join(context.storageUri.fsPath, 'build');
+			const exe = await writeBuildFiles(project, buildDir, zig, coreDir, templateDirs);
+			if (await runBuild(project, ninja, buildDir) !== 0) {
+				return;
+			}
+			simTerminal?.dispose();
+			simTerminal = vscode.window.createTerminal({ name: 'Bromine Sim', shellPath: exe, cwd: project });
+			simTerminal.show();
+		} catch (error) {
+			vscode.window.showErrorMessage(`Failed to run the simulator: ${(error as Error).message}`);
+		}
 	});
 
 	context.subscriptions.push(
 		watcher,
 		run,
 		vscode.workspace.onDidChangeWorkspaceFolders(updateProjects),
+		vscode.window.onDidCloseTerminal(terminal => {
+			if (terminal === simTerminal) {
+				simTerminal = undefined;
+			}
+		}),
 	);
 	updateProjects();
 }
