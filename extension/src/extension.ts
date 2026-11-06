@@ -173,6 +173,7 @@ async function installDependencies(context: vscode.ExtensionContext): Promise<bo
 	const installed = await Promise.all([
 		installTool('Zig', getZigUrl('0.17.0'), path.join(globalStoragePath, 'zig')),
 		installTool('Ninja', getNinjaUrl('1.13.2'), path.join(globalStoragePath, 'ninja')),
+		installTool('Bromine Sim Core', getBromineSimCoreUrl(), path.join(globalStoragePath, 'bromine-sim-core')),
 	]);
 	return installed.every(Boolean);
 }
@@ -206,6 +207,17 @@ function getNinjaUrl(version: string): string {
 	} else {
 		throw new Error(`Unsupported platform: ${process.platform}-${process.arch}`);
 	}
+}
+function getBromineSimCoreUrl() {
+       if (process.platform === 'win32' && process.arch === 'x64') {
+               return `https://github.com/sub1inear/bromine-sim/releases/latest/download/bromine-sim-windows-x64.zip`;
+       } else if (process.platform === 'linux' && process.arch === 'x64') {
+               return `https://github.com/sub1inear/bromine-sim/releases/latest/download/bromine-sim-linux-x64.tar.gz`;
+       } else if (process.platform === 'darwin' && process.arch === 'arm64') {
+               return `https://github.com/sub1inear/bromine-sim/releases/latest/download/bromine-sim-macos-arm64.tar.gz`;
+       } else {
+               throw new Error(`Unsupported platform: ${process.platform}-${process.arch}`);
+       }
 }
 
 export function activate(context: vscode.ExtensionContext) {
