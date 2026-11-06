@@ -1,30 +1,7 @@
-# Patches liblvgl after FetchContent downloads it. Run in script mode:
-#   cmake -DLIBLVGL_SOURCE_DIR=<dir> -P patch_liblvgl.cmake
-#
-# LVGL 9.2 stores enums in bitfields that are only wide enough for the enum's
-# values as unsigned numbers (e.g. `lv_draw_sw_mask_line_side_t side : 2` for
-# values 0-3). The MSVC ABI (used by Clang on Windows) gives enums a signed
-# underlying type, so the upper values read back negative and comparisons such
-# as `side == LV_DRAW_SW_MASK_LINE_SIDE_TOP` fail. This breaks, among other
-# things, every diagonal line. GCC and the V5 toolchain treat these bitfields
-# as unsigned, so the bug only shows up in the simulator on Windows.
-#
-# Upstream fixed this after 9.2.0 by widening the bitfields
-# (https://github.com/lvgl/lvgl/pull/7171), but that changes struct layouts,
-# and user code compiles against the PROS project's own unpatched copy of the
-# LVGL headers. Instead, each field's type becomes `unsigned int` with the same
-# width: the enums are int-sized, so storage units and bit positions are
-# unchanged and only the library's reads stop sign-extending.
-#
-# Edits are plain text replacements rather than a .patch file so they work
-# regardless of the checkout's line endings, and they are idempotent so the
-# step can safely re-run.
-
 if(NOT LIBLVGL_SOURCE_DIR)
     message(FATAL_ERROR "LIBLVGL_SOURCE_DIR must be set")
 endif()
 
-# file|enum type|field|bit width
 set(BITFIELDS
     "include/liblvgl/draw/sw/lv_draw_sw_mask_private.h|lv_draw_sw_mask_line_side_t|side|2"
     "include/liblvgl/draw/lv_draw_line.h|lv_blend_mode_t|blend_mode|2"

@@ -3,7 +3,7 @@
  *
  * Build stamp recorded by CMake at build time.
  *
- * Defined in the generated pros_build_info.c. On a real brain these symbols are
+ * Defined in the generated stubs.cpp. On a real brain these symbols are
  * injected by the PROS CLI at link time and declared weak so a build without the
  * CLI still links; here CMake always provides them, so they are ordinary strong
  * definitions.

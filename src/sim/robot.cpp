@@ -19,7 +19,7 @@ namespace bromine
 
 Robot::Robot(b2WorldId worldId) : wheelCount(0)
 {
-    std::filesystem::path path = bromine::projectPath() / "robot.json";
+    std::filesystem::path path = bromine::getProjectPath() / "robot.json";
 
     std::ifstream file(path.string());
     json j;

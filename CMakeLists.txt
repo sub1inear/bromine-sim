@@ -275,34 +275,32 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/pros)
 
-set(PROS_BUILD_INFO_C "${CMAKE_CURRENT_BINARY_DIR}/pros_build_info.c")
+set(STUBS_CPP "${CMAKE_CURRENT_BINARY_DIR}/stubs.cpp")
 
-set(PROS_BUILD_INFO_ARGS
-    -DTEMPLATE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/pros_build_info.c.in
-    -DOUTPUT=${PROS_BUILD_INFO_C}
+set(STUBS_ARGS
+    -DTEMPLATE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/stubs.cpp.in
+    -DOUTPUT=${STUBS_CPP}
+    -DUSER_PROJECT_DIR=${USER_PROJECT_DIR}
     -DPROS_COMPILE_DIRECTORY=${USER_PROJECT_DIR}
-    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateBuildInfo.cmake
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_stubs.cmake
 )
 
-execute_process(COMMAND ${CMAKE_COMMAND} ${PROS_BUILD_INFO_ARGS})
+execute_process(COMMAND ${CMAKE_COMMAND} ${STUBS_ARGS})
 
-add_custom_target(pros_build_info
-    COMMAND ${CMAKE_COMMAND} ${PROS_BUILD_INFO_ARGS}
-    BYPRODUCTS "${PROS_BUILD_INFO_C}"
-    COMMENT "Stamping PROS build info"
+add_custom_target(${PROJECT_NAME}-stubs
+    COMMAND ${CMAKE_COMMAND} ${STUBS_ARGS}
+    BYPRODUCTS "${STUBS_CPP}"
+    COMMENT "Generating stubs"
     VERBATIM
 )
-add_dependencies(${PROJECT_NAME} pros_build_info)
-set_source_files_properties("${PROS_BUILD_INFO_C}" PROPERTIES GENERATED TRUE)
-target_sources(${PROJECT_NAME} PRIVATE "${PROS_BUILD_INFO_C}")
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}-stubs)
+set_source_files_properties("${STUBS_CPP}" PROPERTIES GENERATED TRUE)
+target_sources(${PROJECT_NAME} PRIVATE "${STUBS_CPP}")
 
 set(USER_PROJECT_SOURCE_DIR "${USER_PROJECT_DIR}/src")
 set(USER_INCLUDE_DIR "${USER_PROJECT_DIR}/include")
 
-set(USER_PROJECT_CPP "${CMAKE_CURRENT_BINARY_DIR}/project.cpp")
-configure_file(cmake/project.cpp.in "${USER_PROJECT_CPP}" @ONLY)
-
-set(USER_SOURCES "${USER_PROJECT_CPP}")
+set(USER_SOURCES "")
 
 file(GLOB_RECURSE USER_PROJECT_SOURCE_PATHS CONFIGURE_DEPENDS FOLLOW_SYMLINKS
     RELATIVE "${USER_PROJECT_SOURCE_DIR}"

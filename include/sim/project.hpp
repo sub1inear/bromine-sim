@@ -4,6 +4,6 @@
 namespace bromine
 {
 
-const std::filesystem::path &projectPath();
+const std::filesystem::path &getProjectPath();
 
 }

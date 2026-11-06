@@ -1,5 +1,3 @@
-# Regenerates pros_build_info.c.
-
 string(TIMESTAMP PROS_COMPILE_TIMESTAMP "%Y-%m-%d %H:%M:%S")
 string(TIMESTAMP PROS_COMPILE_TIMESTAMP_INT "%s" UTC)
 
