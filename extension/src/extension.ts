@@ -9,6 +9,7 @@ import { spawn } from 'child_process';
 import { once } from 'events';
 import { writeBuildFiles } from './build';
 import { getTemplateSourceUrl, readTemplates } from './templates';
+import { ensureRobotConfig } from './robot';
 
 type ProgressReporter = (percent: number, message: string) => void;
 
@@ -369,6 +370,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		const project = await pickProject();
 		if (!project) {
+			return undefined;
+		}
+		try {
+			if (!await ensureRobotConfig(project)) {
+				return undefined;
+			}
+		} catch (error) {
+			vscode.window.showErrorMessage(`Failed to create robot.json: ${(error as Error).message}`);
 			return undefined;
 		}
 		try {
