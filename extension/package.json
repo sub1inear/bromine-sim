@@ -20,6 +20,12 @@
         "title": "Run Sim",
         "category": "Bromine Sim",
         "enablement": "bromine-sim.hasProject"
+      },
+      {
+        "command": "bromine-sim.debug",
+        "title": "Debug Sim",
+        "category": "Bromine Sim",
+        "enablement": "bromine-sim.hasProject"
       }
     ],
     "menus": {
@@ -27,12 +33,21 @@
         {
           "command": "bromine-sim.run",
           "when": "bromine-sim.hasProject",
-          "group": "navigation"
+          "group": "navigation@1"
+        },
+        {
+          "command": "bromine-sim.debug",
+          "when": "bromine-sim.hasProject",
+          "group": "navigation@2"
         }
       ],
       "commandPalette": [
         {
           "command": "bromine-sim.run",
+          "when": "bromine-sim.hasProject"
+        },
+        {
+          "command": "bromine-sim.debug",
           "when": "bromine-sim.hasProject"
         }
       ]

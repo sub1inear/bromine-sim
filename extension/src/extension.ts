@@ -309,6 +309,49 @@ async function pickProject(): Promise<string | undefined> {
 	return picked?.project;
 }
 
+const codeLldbId = 'vadimcn.vscode-lldb';
+const cppToolsId = 'ms-vscode.cpptools';
+
+type DebuggerType = 'lldb' | 'cppdbg';
+
+async function pickDebugger(): Promise<DebuggerType | undefined> {
+	if (vscode.extensions.getExtension(codeLldbId)) {
+		return 'lldb';
+	}
+	if (vscode.extensions.getExtension(cppToolsId)) {
+		return 'cppdbg';
+	}
+	const install = 'Install CodeLLDB';
+	const choice = await vscode.window.showErrorMessage(
+		'Debugging the simulator requires the CodeLLDB or C/C++ extension.',
+		install
+	);
+	if (choice !== install) {
+		return undefined;
+	}
+	try {
+		await vscode.commands.executeCommand('workbench.extensions.installExtension', codeLldbId);
+	} catch (error) {
+		vscode.window.showErrorMessage(`Failed to install CodeLLDB: ${(error as Error).message}`);
+		return undefined;
+	}
+	return 'lldb';
+}
+
+function getDebugConfiguration(type: DebuggerType, exe: string, project: string): vscode.DebugConfiguration {
+	const base = { name: 'Debug Sim', request: 'launch', program: exe, cwd: project, args: [] };
+	if (type === 'lldb') {
+		return { ...base, type, terminal: 'integrated' };
+	}
+	return {
+		...base,
+		type,
+		MIMode: process.platform === 'darwin' ? 'lldb' : 'gdb',
+		externalConsole: false,
+		setupCommands: [{ text: '-enable-pretty-printing', ignoreFailures: true }],
+	};
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	const updateProjects = async () => {
 		const hasProject = (await findProjects()).length > 0;
@@ -319,46 +362,75 @@ export function activate(context: vscode.ExtensionContext) {
 	watcher.onDidCreate(updateProjects);
 	watcher.onDidDelete(updateProjects);
 
-	const run = vscode.commands.registerCommand('bromine-sim.run', async () => {
+	const buildSim = async (): Promise<{ project: string; exe: string } | undefined> => {
 		if (!context.storageUri) {
 			vscode.window.showErrorMessage('Open a folder to run the simulator.');
-			return;
+			return undefined;
 		}
 		const project = await pickProject();
 		if (!project) {
-			return;
+			return undefined;
 		}
 		try {
 			if (!await ensureDependencies(context)) {
-				return;
+				return undefined;
 			}
 		} catch (error) {
 			vscode.window.showErrorMessage(`Failed to install dependencies: ${(error as Error).message}`);
-			return;
+			return undefined;
 		}
 
 		try {
 			const templateDirs = await installTemplates(context, project);
 			if (!templateDirs) {
-				return;
+				return undefined;
 			}
 			const { zig, ninja, coreDir } = getToolPaths(context);
 			const buildDir = path.join(context.storageUri.fsPath, 'build');
 			const exe = await writeBuildFiles(project, buildDir, zig, coreDir, templateDirs);
 			if (await runBuild(project, ninja, buildDir) !== 0) {
-				return;
+				return undefined;
 			}
-			simTerminal?.dispose();
-			simTerminal = vscode.window.createTerminal({ name: 'Bromine Sim', shellPath: exe, cwd: project });
-			simTerminal.show();
+			return { project, exe };
 		} catch (error) {
-			vscode.window.showErrorMessage(`Failed to run the simulator: ${(error as Error).message}`);
+			vscode.window.showErrorMessage(`Failed to build the simulator: ${(error as Error).message}`);
+			return undefined;
+		}
+	};
+
+	const run = vscode.commands.registerCommand('bromine-sim.run', async () => {
+		const sim = await buildSim();
+		if (!sim) {
+			return;
+		}
+		simTerminal?.dispose();
+		simTerminal = vscode.window.createTerminal({ name: 'Bromine Sim', shellPath: sim.exe, cwd: sim.project });
+		simTerminal.show();
+	});
+
+	const debug = vscode.commands.registerCommand('bromine-sim.debug', async () => {
+		const debuggerType = await pickDebugger();
+		if (!debuggerType) {
+			return;
+		}
+		const sim = await buildSim();
+		if (!sim) {
+			return;
+		}
+		const folder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(sim.project));
+		try {
+			if (!await vscode.debug.startDebugging(folder, getDebugConfiguration(debuggerType, sim.exe, sim.project))) {
+				vscode.window.showErrorMessage('Failed to start the debugger.');
+			}
+		} catch (error) {
+			vscode.window.showErrorMessage(`Failed to start the debugger: ${(error as Error).message}`);
 		}
 	});
 
 	context.subscriptions.push(
 		watcher,
 		run,
+		debug,
 		vscode.workspace.onDidChangeWorkspaceFolders(updateProjects),
 		vscode.window.onDidCloseTerminal(terminal => {
 			if (terminal === simTerminal) {
