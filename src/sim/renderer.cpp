@@ -25,6 +25,8 @@ constexpr Color fieldRed = {209, 46, 81, 255};
 constexpr Color fieldBlue = {87, 156, 189, 255};
 constexpr Color fieldYellow = {199, 191, 120, 255};
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++11-narrowing"
 constexpr unsigned char fieldPng[] = {
 #embed "../../assets/field.png"
 };
@@ -32,6 +34,7 @@ constexpr unsigned char fieldPng[] = {
 constexpr unsigned char pinsPng[] = {
 #embed "../../assets/pins.png"
 };
+#pragma clang diagnostic pop
 
 static void DrawRectangleLinesPro(Rectangle rect, Vector2 origin,
                                   float rotation, float thick, Color color)
