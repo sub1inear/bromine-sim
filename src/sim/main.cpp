@@ -47,6 +47,7 @@ int main()
     {
         sim.update();
         renderer.draw(sim);
+        window.waitForNextFrame();
     }
 
     // HACK: Exit the program without destructing to avoid PROS accessing the
