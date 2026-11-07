@@ -76,6 +76,6 @@ jobs:
             bromine-sim-*.zip
             bromine-sim-*.tar.gz
           tag_name: ${{ github.ref_name }}
-          body: "Automated core release of ${{ github.ref_name }} for the bromine-sim extension."
+          body: "Automated core release of ${{ github.ref_name }} for the Bromine Sim extension."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
