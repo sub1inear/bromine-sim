@@ -132,7 +132,7 @@ export async function writeBuildFiles(project: string, buildDir: string, zig: st
 
 	const sourceDirs: SourceDir[] = [
 		{ srcDir: path.join(project, 'src'), objDir: 'obj' },
-		...templateDirs.map(({ name, dir }) => ({ srcDir: path.join(dir, 'src'), objDir: `obj/templates/${name}`, exclude: ['main.cpp'] })),
+		...templateDirs.map(({ name, dir }) => ({ srcDir: path.join(dir, 'src'), objDir: path.join('obj', 'templates', name), exclude: ['main.cpp'] })),
 	];
 	const objects: string[] = [];
 	for (const { srcDir, objDir, exclude } of sourceDirs) {
@@ -140,7 +140,7 @@ export async function writeBuildFiles(project: string, buildDir: string, zig: st
 			if (exclude?.includes(path.basename(source))) {
 				continue;
 			}
-			const object = `${objDir}/${source.split(path.sep).join('/')}.o`;
+			const object = path.join(buildDir, objDir, `${source}.o`);
 			const rule = source.endsWith('.c') ? 'cc' : 'cxx';
 			lines.push(
 				`build ${ninjaPath(object)}: ${rule} ${ninjaPath(path.join(srcDir, source))}`,
@@ -150,8 +150,9 @@ export async function writeBuildFiles(project: string, buildDir: string, zig: st
 		}
 	}
 
-	lines.push(`build obj/stubs.cpp.o: cxx ${ninjaPath(stubs)}`);
-	objects.push('obj/stubs.cpp.o');
+	const stubsObject = path.join(buildDir, 'obj', 'stubs.cpp.o');
+	lines.push(`build ${ninjaPath(stubsObject)}: cxx ${ninjaPath(stubs)}`);
+	objects.push(stubsObject);
 
 	const coreLibs = ['bromine-sim-core', 'lvgl', 'raylib', 'box2d'].map(name => path.join(coreDir, 'lib', `lib${name}.a`));
 	lines.push(
