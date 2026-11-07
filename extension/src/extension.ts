@@ -313,14 +313,14 @@ async function pickProject(): Promise<string | undefined> {
 const codeLldbId = 'vadimcn.vscode-lldb';
 const cppToolsId = 'ms-vscode.cpptools';
 
-type DebuggerType = 'lldb' | 'cppdbg';
+type DebuggerType = 'lldb' | 'cppdbg' | 'cppvsdbg';
 
 async function pickDebugger(): Promise<DebuggerType | undefined> {
 	if (vscode.extensions.getExtension(codeLldbId)) {
 		return 'lldb';
 	}
 	if (vscode.extensions.getExtension(cppToolsId)) {
-		return 'cppdbg';
+		return process.platform === 'win32' ? 'cppvsdbg' : 'cppdbg';
 	}
 	const install = 'Install CodeLLDB';
 	const choice = await vscode.window.showErrorMessage(
@@ -343,6 +343,9 @@ function getDebugConfiguration(type: DebuggerType, exe: string, project: string)
 	const base = { name: 'Debug Sim', request: 'launch', program: exe, cwd: project, args: [] };
 	if (type === 'lldb') {
 		return { ...base, type, terminal: 'integrated' };
+	}
+	if (type === 'cppvsdbg') {
+		return { ...base, type, console: 'integratedTerminal' };
 	}
 	return {
 		...base,
