@@ -4,6 +4,7 @@ Bromine Sim is a Vex V5 Robot Simulator.
 ## Features
 ### Implemented
 - PROS C++ emulation
+- VSCode extension
 - LVGL/LCD screen emulation
 - 2D graphics/physics simulation
 - Basic sensor emulation (motors, distance sensors, inertial sensors, etc.)
@@ -21,42 +22,12 @@ Bromine Sim is a Vex V5 Robot Simulator.
 
 ## Usage
 
-### Requirements
+1. Install the [Bromine Sim](https://marketplace.visualstudio.com/items?itemName=sublinear.bromine-sim) extension.
+2. Open up a PROS project.
+3. Create a `robot.json` with the Fusion exporter or by hand.
+4. Click `Run Sim` on the top right to run your code with the simulator.
+5. Click `Debug Sim` on the top right to debug your with the simulator.
 
-- [Git](https://git-scm.com/)
-- [CMake](https://cmake.org/)
-- [Python](https://www.python.org/)
-- [uv](https://docs.astral.sh/uv/)
-- [GCC 14](https://gcc.gnu.org/) or [Clang 18](https://clang.llvm.org/) (MSVC is not supported)
-- [PROS](https://pros.cs.purdue.edu/)
-
-### Instructions
-1. Create a PROS project if you don't already have one.
-
-    VSCode: Install the PROS extension and go `Conductor > Create Project`.
-
-    CLI: Run `pros c new-project path/to/pros/project`.
-2. Clone the repository and enter it.
-    ```bash
-    git clone git@github.com:sub1inear/bromine-sim.git
-    cd bromine-sim
-    ```
-3. Link your PROS project and its libraries (redo if any added).
-    ```bash
-    sudo uv run scripts/setup.py path/to/pros/project
-    ```
-4. Edit `assets/robot.json` to match your robot, or export it from Fusion (TODO).
-    ```bash
-    code assets/robot.json
-    ```
-5. Build the project with CMake and run the simulator.
-    ```bash
-    cmake -S . -B build
-    cmake --build build
-    ```
-    Windows: `build\bromine-sim.exe`
-
-    Linux/macOS: `build/bromine-sim`
 ## Controls
 Bromine Sim supports any gamepad or keyboard for input, including VEX V5 controllers.
 
@@ -115,11 +86,10 @@ Many of these limitations are rare in practice.
 - [`src/pros`]: Modified PROS source code to run on Windows/POSIX
 - [`src/sdk`]: VEX SDK wrappers to connect PROS and the simulator
 - [`src/sim`]: Simulator code (graphics, physics, etc.)
-- [`src/user`]: User source code
 - [`include/pros`]: PROS headers
 - [`include/sdk`]: Documented VEX SDK headers
 - [`include/sim`]: Simulator headers
-- [`include/user`]: User headers
+- [`extension`]: Extension source code
 
 [`src/pros`]: ./src/pros
 [`src/sdk`]: ./src/sdk
@@ -129,6 +99,7 @@ Many of these limitations are rare in practice.
 [`include/sdk`]: ./include/sdk
 [`include/sim`]: ./include/sim
 [`include/user`]: ./include/user
+[`extension`]: ./extension
 
 ## License
 See [LICENSE](./LICENSE) for details.
