@@ -25,13 +25,13 @@ Bromine Sim is a Vex V5 Robot Simulator.
 1. Install the [Bromine Sim](https://marketplace.visualstudio.com/items?itemName=sublinear.bromine-sim) extension.
 2. Open up a PROS project.
 3. Create a `robot.json` with the Fusion exporter or by hand.
-    a. Open Fusion.
-    b. Go to Utilities → Add-Ins → Scripts and Add-Ins.
-    c. Click the + next to My Scripts.
-    d. Select [`scripts/fusion`] to add the script.
-    e. Select the script and click `Run`.
-    f. Input the configuration details.
-    g. Run. It may take some time to finish.
+   1. Open Fusion.
+   2. Go to `Utilities → Add-Ins → Scripts and Add-Ins`.
+   3. Click the `+` next to `My Scripts`.
+   4. Select the [`scripts/fusion`](scripts/fusion) folder to add the script.
+   5. Select the script and click `Run`.
+   6. Input the configuration details.
+   7. Run. It may take some time to finish.
 4. Click `Run Sim` on the top right to run your code with the simulator.
 5. Click `Debug Sim` on the top right to debug your with the simulator.
 
