@@ -41,13 +41,14 @@ Robot::Robot(b2WorldId worldId) : wheelCount(0)
 
     InputDist height = expectJsonKey<float>(j, "height");
 
+    InputDist x = expectJsonKey<float>(j, "x");
+    InputDist y = expectJsonKey<float>(j, "y");
+    InputAngle angle = expectJsonKey<float>(j, "angle");
+
     InputRect inputRect = {
-        -70.0f + height / 2.0f, // Turned 90 degrees so relative to height.
-        0.0f,
-        90.0f,
-        expectJsonKey<float>(j, "width"),
-        height,
-        expectJsonKey<float>(j, "mass"),
+        x,      y,
+        angle,  expectJsonKey<float>(j, "width"),
+        height, expectJsonKey<float>(j, "mass"),
     };
 
     b2BodyDef bodyDef = b2DefaultBodyDef();

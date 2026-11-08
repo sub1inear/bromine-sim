@@ -3,7 +3,7 @@
     "title": "Bromine Sim robot",
     "description": "Robot description loaded by Bromine Sim.",
     "type": "object",
-    "required": ["version", "width", "height", "mass", "devices"],
+    "required": ["version", "width", "height", "mass", "x", "y", "angle", "devices"],
     "additionalProperties": false,
     "properties": {
         "$schema": { "type": "string" },
@@ -25,6 +25,18 @@
             "description": "Robot mass in pounds.",
             "type": "number",
             "exclusiveMinimum": 0
+        },
+        "x": {
+            "description": "Starting x position of the robot center on the field, in inches.",
+            "type": "number"
+        },
+        "y": {
+            "description": "Starting y position of the robot center on the field, in inches.",
+            "type": "number"
+        },
+        "angle": {
+            "description": "Starting heading of the robot in degrees.",
+            "type": "number"
         },
         "devices": {
             "type": "array",
