@@ -1,12 +1,12 @@
 {
 	"autodeskProduct":	"Fusion",
 	"type":	"script",
-	"author":	"",
+	"author":	"sub1inear",
 	"description":	{
-		"":	""
+		"":	"Export CADs to bromine-sim."
 	},
 	"version":	"",
 	"supportedOS":	"windows|mac",
 	"editEnabled":	true,
-	"iconFilename":	"ScriptIcon.svg"
+	"iconFilename":	"ScriptIcon.png"
 }
