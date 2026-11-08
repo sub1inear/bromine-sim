@@ -152,7 +152,6 @@ target_include_directories(${PROJECT_NAME}-core PRIVATE
 
 target_compile_definitions(${PROJECT_NAME}-core PRIVATE
     BROMINE_SIM=1
-    BROMINE_SIM_PROJECT_NAME="${PROJECT_NAME}"
     GLFW_INCLUDE_NONE
 )
 
