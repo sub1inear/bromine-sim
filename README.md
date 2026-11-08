@@ -1,3 +1,4 @@
+
 # Bromine Sim
 Bromine Sim is a Vex V5 Robot Simulator.
 
@@ -9,10 +10,12 @@ Bromine Sim is a Vex V5 Robot Simulator.
 - Basic sensor emulation (motors, distance sensors, inertial sensors, etc.)
 - Customizable robot configuration (can auto-generate from Fusion)
 - Warning system to catch issues early
+- VSCode extension
 
 ### Not Planned
 - 3D physics simulation
 - Full QEMU-based emulation
+- Blocks, Python, or Rust support
 - Vexide Simulator Protocol support
 - Full sensor support
 - VEXCode support
@@ -21,42 +24,12 @@ Bromine Sim is a Vex V5 Robot Simulator.
 
 ## Usage
 
-### Requirements
+1. Install the `Bromine Sim` VSCode extension.
+2. Open a PROS project in VSCode.
+3. Create a `robot.json` file in your project with the Fusion exporter or by hand.
+4. Click `Run Sim` or use `Bromine Sim: Run Sim` from the command palette to start the simulation.
+5. Click `Debug Sim` or use `Bromine Sim: Debug Sim` to debug your code with the simulation.
 
-- [Git](https://git-scm.com/)
-- [CMake](https://cmake.org/)
-- [Python](https://www.python.org/)
-- [uv](https://docs.astral.sh/uv/)
-- [GCC 14](https://gcc.gnu.org/) or [Clang 18](https://clang.llvm.org/) (MSVC is not supported)
-- [PROS](https://pros.cs.purdue.edu/)
-
-### Instructions
-1. Create a PROS project if you don't already have one.
-
-    VSCode: Install the PROS extension and go `Conductor > Create Project`.
-
-    CLI: Run `pros c new-project path/to/pros/project`.
-2. Clone the repository and enter it.
-    ```bash
-    git clone git@github.com:sub1inear/bromine-sim.git
-    cd bromine-sim
-    ```
-3. Link your PROS project and its libraries (redo if any added).
-    ```bash
-    sudo uv run scripts/setup.py path/to/pros/project
-    ```
-4. Edit `assets/robot.json` to match your robot, or export it from Fusion (TODO).
-    ```bash
-    code assets/robot.json
-    ```
-5. Build the project with CMake and run the simulator.
-    ```bash
-    cmake -S . -B build
-    cmake --build build
-    ```
-    Windows: `build\bromine-sim.exe`
-
-    Linux/macOS: `build/bromine-sim`
 ## Controls
 Bromine Sim supports any gamepad or keyboard for input, including VEX V5 controllers.
 
@@ -120,6 +93,7 @@ Many of these limitations are rare in practice.
 - [`include/sdk`]: Documented VEX SDK headers
 - [`include/sim`]: Simulator headers
 - [`include/user`]: User headers
+- [`extension`]: VSCode extension source code
 
 [`src/pros`]: ./src/pros
 [`src/sdk`]: ./src/sdk
@@ -129,6 +103,6 @@ Many of these limitations are rare in practice.
 [`include/sdk`]: ./include/sdk
 [`include/sim`]: ./include/sim
 [`include/user`]: ./include/user
-
+[`extension`]: ./extension
 ## License
 See [LICENSE](./LICENSE) for details.
