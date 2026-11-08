@@ -252,6 +252,15 @@ install(DIRECTORY include/pros/pros
     DESTINATION include
     COMPONENT core
 )
+install(FILES LICENSE THIRD_PARTY_NOTICES.md
+    DESTINATION .
+    COMPONENT core
+)
+install(FILES src/pros/rtos/LICENSE
+    DESTINATION licenses
+    RENAME FreeRTOS-LICENSE
+    COMPONENT core
+)
 
 if(NOT BROMINE_SIM_PROJECT)
     message(STATUS "${PROJECT_NAME}: BROMINE_SIM_PROJECT not set, building ${PROJECT_NAME}-core only")
