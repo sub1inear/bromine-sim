@@ -10,3 +10,5 @@ vsc-extension-quickstart.md
 **/eslint.config.mjs
 **/*.map
 **/*.ts
+prepare-package.js
+README.template.md

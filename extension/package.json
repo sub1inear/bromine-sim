@@ -1,10 +1,18 @@
 {
   "name": "bromine-sim",
   "displayName": "Bromine Sim",
-  "description": "",
+  "description": "Run and debug PROS projects in a VEX V5 simulator",
   "version": "0.0.1",
+  "publisher": "sublinear",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sub1inear/bromine-sim.git",
+    "directory": "extension"
+  },
+  "license": "MIT",
+  "icon": "assets/icon.png",
   "engines": {
-    "vscode": "^1.140.0"
+    "vscode": "^1.48.0"
   },
   "categories": [
     "Other"
@@ -65,13 +73,14 @@
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "prepackage": "node prepare-package.js",
     "package": "npm run check-types && npm run lint && node esbuild.js --production",
     "check-types": "tsc --noEmit",
     "lint": "eslint src"
   },
   "devDependencies": {
     "@types/node": "24.x",
-    "@types/vscode": "^1.140.0",
+    "@types/vscode": "^1.48.0",
     "esbuild": "^0.28.1",
     "eslint": "^10.5.0",
     "npm-run-all": "^4.1.5",

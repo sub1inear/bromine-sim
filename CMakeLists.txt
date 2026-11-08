@@ -152,7 +152,6 @@ target_include_directories(${PROJECT_NAME}-core PRIVATE
 
 target_compile_definitions(${PROJECT_NAME}-core PRIVATE
     BROMINE_SIM=1
-    BROMINE_SIM_PROJECT_NAME="${PROJECT_NAME}"
     GLFW_INCLUDE_NONE
 )
 
@@ -251,6 +250,15 @@ install(FILES include/pros/api.h include/compat/newlib_compat.h
 )
 install(DIRECTORY include/pros/pros
     DESTINATION include
+    COMPONENT core
+)
+install(FILES LICENSE THIRD_PARTY_NOTICES.md
+    DESTINATION .
+    COMPONENT core
+)
+install(FILES src/pros/rtos/LICENSE
+    DESTINATION licenses
+    RENAME FreeRTOS-LICENSE
     COMPONENT core
 )
 

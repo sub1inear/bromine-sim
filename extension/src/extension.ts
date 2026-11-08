@@ -319,12 +319,15 @@ async function pickDebugger(): Promise<DebuggerType | undefined> {
 	if (vscode.extensions.getExtension(codeLldbId)) {
 		return 'lldb';
 	}
-	if (vscode.extensions.getExtension(cppToolsId)) {
+	const isMac = process.platform === 'darwin';
+	if (!isMac && vscode.extensions.getExtension(cppToolsId)) {
 		return process.platform === 'win32' ? 'cppvsdbg' : 'cppdbg';
 	}
 	const install = 'Install CodeLLDB';
 	const choice = await vscode.window.showErrorMessage(
-		'Debugging the simulator requires the CodeLLDB or C/C++ extension.',
+		isMac
+			? 'Debugging the simulator on macOS requires the CodeLLDB extension.'
+			: 'Debugging the simulator requires the CodeLLDB or C/C++ extension.',
 		install
 	);
 	if (choice !== install) {
@@ -350,7 +353,7 @@ function getDebugConfiguration(type: DebuggerType, exe: string, project: string)
 	return {
 		...base,
 		type,
-		MIMode: process.platform === 'darwin' ? 'lldb' : 'gdb',
+		MIMode: 'gdb',
 		externalConsole: false,
 		setupCommands: [{ text: '-enable-pretty-printing', ignoreFailures: true }],
 	};

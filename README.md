@@ -1,21 +1,19 @@
-
 # Bromine Sim
 Bromine Sim is a Vex V5 Robot Simulator.
 
 ## Features
 ### Implemented
 - PROS C++ emulation
+- VSCode extension
 - LVGL/LCD screen emulation
 - 2D graphics/physics simulation
 - Basic sensor emulation (motors, distance sensors, inertial sensors, etc.)
 - Customizable robot configuration (can auto-generate from Fusion)
 - Warning system to catch issues early
-- VSCode extension
 
 ### Not Planned
 - 3D physics simulation
 - Full QEMU-based emulation
-- Blocks, Python, or Rust support
 - Vexide Simulator Protocol support
 - Full sensor support
 - VEXCode support
@@ -24,11 +22,11 @@ Bromine Sim is a Vex V5 Robot Simulator.
 
 ## Usage
 
-1. Install the `Bromine Sim` VSCode extension.
-2. Open a PROS project in VSCode.
-3. Create a `robot.json` file in your project with the Fusion exporter or by hand.
-4. Click `Run Sim` or use `Bromine Sim: Run Sim` from the command palette to start the simulation.
-5. Click `Debug Sim` or use `Bromine Sim: Debug Sim` to debug your code with the simulation.
+1. Install the [Bromine Sim](https://marketplace.visualstudio.com/items?itemName=sublinear.bromine-sim) extension.
+2. Open up a PROS project.
+3. Create a `robot.json` with the Fusion exporter or by hand.
+4. Click `Run Sim` on the top right to run your code with the simulator.
+5. Click `Debug Sim` on the top right to debug your with the simulator.
 
 ## Controls
 Bromine Sim supports any gamepad or keyboard for input, including VEX V5 controllers.
@@ -88,12 +86,10 @@ Many of these limitations are rare in practice.
 - [`src/pros`]: Modified PROS source code to run on Windows/POSIX
 - [`src/sdk`]: VEX SDK wrappers to connect PROS and the simulator
 - [`src/sim`]: Simulator code (graphics, physics, etc.)
-- [`src/user`]: User source code
 - [`include/pros`]: PROS headers
 - [`include/sdk`]: Documented VEX SDK headers
 - [`include/sim`]: Simulator headers
-- [`include/user`]: User headers
-- [`extension`]: VSCode extension source code
+- [`extension`]: Extension source code
 
 [`src/pros`]: ./src/pros
 [`src/sdk`]: ./src/sdk
@@ -104,5 +100,6 @@ Many of these limitations are rare in practice.
 [`include/sim`]: ./include/sim
 [`include/user`]: ./include/user
 [`extension`]: ./extension
+
 ## License
 See [LICENSE](./LICENSE) for details.

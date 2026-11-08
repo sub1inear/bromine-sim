@@ -20,7 +20,7 @@ Window::Window()
     int windowSize = (int)((float)monitorSize * 0.8f);
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(windowSize, windowSize, BROMINE_SIM_PROJECT_NAME);
+    InitWindow(windowSize, windowSize, "Bromine Sim");
     ClearWindowState(FLAG_WINDOW_HIDDEN);
 
     int refreshRate = GetMonitorRefreshRate(GetCurrentMonitor());
@@ -28,8 +28,9 @@ Window::Window()
     {
         refreshRate = 60;
     }
-    framePeriod = std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-        std::chrono::duration<double>(1.0 / refreshRate));
+    framePeriod =
+        std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+            std::chrono::duration<double>(1.0 / refreshRate));
     frameDeadline = std::chrono::steady_clock::now();
 }
 
