@@ -19,7 +19,7 @@ public:
 
     struct Sdk
     {
-        // In radians, unwrapped.
+        // In rotations, unwrapped.
         std::atomic<float> position;
     };
 

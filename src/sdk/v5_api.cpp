@@ -758,7 +758,7 @@ void vexDeviceAbsEncPositionSet(V5_DeviceT device, int32_t position)
     if (auto rotation = dynamic_cast<bromine::Rotation *>(device->ptr))
     {
         rotation->sdk.position =
-            static_cast<float>(position) * bromine::centidegreesToRadians;
+            static_cast<float>(position) * bromine::centidegreesToRotations;
     }
 }
 
@@ -767,7 +767,7 @@ int32_t vexDeviceAbsEncPositionGet(V5_DeviceT device)
     if (auto rotation = dynamic_cast<bromine::Rotation *>(device->ptr))
     {
         return static_cast<int32_t>(rotation->sdk.position *
-                                    bromine::radiansToCentidegrees);
+                                    bromine::rotationsToCentidegrees);
     }
     return 0;
 }
@@ -779,7 +779,7 @@ int32_t vexDeviceAbsEncAngleGet(V5_DeviceT device)
     if (auto rotation = dynamic_cast<bromine::Rotation *>(device->ptr))
     {
         float centidegrees =
-            rotation->sdk.position * bromine::radiansToCentidegrees;
+            rotation->sdk.position * bromine::rotationsToCentidegrees;
         centidegrees = std::fmod(centidegrees, 36000.0f);
         if (centidegrees < 0.0f)
         {
